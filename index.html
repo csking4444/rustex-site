@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <title>Rustex — Tactical Companion for Rust</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23B3261E%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23D97745%22%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%227.5%22%20fill%3D%22url%28%23g%29%22%2F%3E%3Cg%20transform%3D%22translate%284%204%29%22%20fill%3D%22%23fff%22%3E%3Crect%20x%3D%224.9%22%20y%3D%223.4%22%20width%3D%223.7%22%20height%3D%2217.2%22%20rx%3D%221.2%22%2F%3E%3Cpath%20d%3D%22M8.0%203.4h3.7a5.3%205.3%200%200%201%200%2010.6H8.0v-3.4h3.7a1.9%201.9%200%200%200%200-3.8H8.0Z%22%2F%3E%3Cpath%20d%3D%22M10.9%2012.7h3.8l4.6%207.9h-3.8Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<meta name="theme-color" content="#0D0D0D">
 <style>
 /* ===================================================================
    RUSTEX — design tokens
@@ -262,6 +264,132 @@ img,svg{display:block;}
 .heat-key.off{opacity:.38; filter:grayscale(1);}
 @media (max-width:640px){ .heat-hint{display:none;} }
 
+/* ============================ account, pricing & billing ============================ */
+.page-head{padding:86px 0 34px;}
+.page-head h1{font-size:clamp(28px,3.6vw,42px); margin:14px 0 12px;}
+.page-head .sub{color:var(--text-2); font-size:15px; max-width:600px;}
+
+/* --- pricing --- */
+.plan-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:start;}
+.plan{position:relative; display:flex; flex-direction:column; gap:16px; padding:24px; border-radius:var(--r-lg);
+  background:var(--surface); border:1px solid var(--border); transition:border-color .18s ease, transform .18s ease, box-shadow .18s ease;}
+.plan:hover{border-color:var(--border-strong); transform:translateY(-2px); box-shadow:var(--shadow-md);}
+.plan.featured{border-color:var(--border-accent); background:linear-gradient(180deg, rgba(217,119,69,.07), var(--surface) 42%);
+  box-shadow:0 0 0 1px rgba(217,119,69,.14), 0 22px 50px -26px var(--orange-glow);}
+.plan .plan-tag{position:absolute; top:-10px; left:24px; font-size:10px; font-weight:700; letter-spacing:.09em;
+  text-transform:uppercase; color:#1a0f08; background:var(--orange); padding:4px 9px; border-radius:99px;}
+.plan h3{font-size:15px; font-weight:700;}
+.plan .price{display:flex; align-items:baseline; gap:6px;}
+.plan .price .amt{font-family:var(--font-mono); font-size:34px; font-weight:700; letter-spacing:-.02em;}
+.plan .price .per{font-size:12px; color:var(--text-3);}
+.plan ul{display:flex; flex-direction:column; gap:9px; margin-top:2px;}
+.plan li{display:flex; gap:9px; align-items:flex-start; font-size:12.5px; color:var(--text-2);}
+.plan li .icon{width:14px; height:14px; color:var(--success); flex-shrink:0; margin-top:2px;}
+.plan li.off{color:var(--text-3);}
+.plan li.off .icon{color:var(--text-3);}
+.plan .btn{margin-top:auto;}
+.billing-toggle{display:inline-flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-2);}
+.save-chip{font-size:10.5px; font-weight:700; color:var(--success); background:var(--success-soft);
+  border:1px solid rgba(74,222,128,.25); padding:2px 7px; border-radius:99px;}
+
+/* --- sign in with steam --- */
+.btn-steam{background:linear-gradient(180deg,#2a475e,#1b2838); color:#fff; border:1px solid #3d6a8a;
+  box-shadow:0 1px 0 rgba(255,255,255,.12) inset, 0 8px 22px -10px rgba(27,40,56,.9);}
+.btn-steam:hover{background:linear-gradient(180deg,#33556f,#22303f); border-color:#4d80a5;}
+.btn-steam .steam-glyph{width:19px; height:19px; fill:currentColor; flex-shrink:0;}
+.auth-overlay{position:fixed; inset:0; z-index:250; display:none; align-items:center; justify-content:center;
+  padding:20px; background:rgba(6,5,4,.74); backdrop-filter:blur(5px); -webkit-backdrop-filter:blur(5px);}
+.auth-overlay.open{display:flex; animation:authFade .18s ease;}
+@keyframes authFade{from{opacity:0} to{opacity:1}}
+.auth-card{width:100%; max-width:412px; background:var(--surface); border:1px solid var(--border-strong);
+  border-radius:var(--r-xl); box-shadow:var(--shadow-lg); padding:28px 26px 24px; text-align:center;
+  animation:authPop .26s cubic-bezier(.16,.8,.3,1);}
+@keyframes authPop{from{opacity:0; transform:translateY(12px) scale(.97)} to{opacity:1; transform:none}}
+.auth-card h3{font-size:17px; margin-bottom:7px;}
+.auth-card .auth-sub{font-size:12.5px; color:var(--text-3); margin-bottom:20px; line-height:1.55;}
+.auth-badge{width:56px; height:56px; margin:0 auto 16px; border-radius:15px; display:flex; align-items:center;
+  justify-content:center; background:linear-gradient(180deg,#2a475e,#1b2838); border:1px solid #3d6a8a;}
+.auth-badge .steam-glyph{width:30px; height:30px; fill:#fff;}
+.auth-step{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--text-2); text-align:left;
+  padding:8px 0; opacity:.4; transition:opacity .25s ease, color .25s ease;}
+.auth-step.on{opacity:1; color:var(--text);}
+.auth-step.done{opacity:1; color:var(--text-2);}
+.auth-step .mk{width:17px; height:17px; border-radius:50%; flex-shrink:0; border:1.5px solid var(--border-strong);
+  display:flex; align-items:center; justify-content:center;}
+.auth-step.on .mk{border-color:var(--orange);}
+.auth-step.done .mk{background:var(--success); border-color:var(--success);}
+.auth-step.done .mk svg{width:10px; height:10px; stroke:#04160a; stroke-width:3.4; fill:none;}
+.spin{width:13px; height:13px; border-radius:50%; border:2px solid rgba(255,255,255,.22);
+  border-top-color:var(--orange); animation:spin .7s linear infinite; flex-shrink:0;}
+.auth-step.on .mk .spin{width:9px; height:9px; border-width:1.6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.auth-error{display:flex; gap:10px; text-align:left; padding:12px 13px; border-radius:var(--r-md);
+  background:var(--crimson-soft); border:1px solid rgba(179,38,30,.32); margin-bottom:16px;}
+.auth-error .icon{width:16px; height:16px; color:#ef6a62; flex-shrink:0; margin-top:1px;}
+.auth-error b{display:block; font-size:12.5px; margin-bottom:2px;}
+.auth-error span{font-size:11.5px; color:var(--text-2);}
+
+/* --- account chrome --- */
+.user-chip{display:flex; align-items:center; gap:8px; padding:5px 10px 5px 6px; border-radius:99px;
+  border:1px solid var(--border-strong); background:var(--surface-2); font-size:12.5px; font-weight:600;
+  cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+.user-chip:hover{background:var(--hover); border-color:var(--border-accent);}
+.user-chip img{width:24px; height:24px; border-radius:50%; object-fit:cover;}
+.acct-grid{display:grid; grid-template-columns:230px 1fr; gap:26px; align-items:start; padding-bottom:100px;}
+.acct-nav{display:flex; flex-direction:column; gap:3px; position:sticky; top:88px;}
+.acct-nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px;
+  font-size:13px; font-weight:600; color:var(--text-2); transition:.15s;}
+.acct-nav a .icon{width:15px; height:15px;}
+.acct-nav a:hover{background:var(--surface-2); color:var(--text);}
+.acct-nav a.active{background:var(--orange-soft); color:var(--orange);}
+.acct-sep{height:1px; background:var(--border); margin:9px 4px;}
+.field-row{display:grid; grid-template-columns:190px 1fr; gap:16px; align-items:center;
+  padding:14px 0; border-bottom:1px solid var(--border);}
+.field-row:last-child{border-bottom:none;}
+.field-row .fl{font-size:12.5px; color:var(--text-3); font-weight:600;}
+.field-row .fv{font-size:13px; display:flex; align-items:center; gap:9px; flex-wrap:wrap; min-width:0;}
+.field-row .fv .mono{color:var(--text-2);}
+.inp{background:var(--surface-3); border:1px solid var(--border-strong); border-radius:var(--r-sm);
+  padding:9px 11px; font-size:13px; color:var(--text); font-family:inherit; width:100%; max-width:320px;
+  transition:border-color .15s ease, background .15s ease;}
+.inp:focus{outline:none; border-color:var(--border-accent); background:var(--hover);}
+.inp[disabled]{opacity:.55; cursor:not-allowed;}
+select.inp{cursor:pointer;}
+.pref-row{display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+  padding:13px 0; border-bottom:1px solid var(--border);}
+.pref-row:last-child{border-bottom:none;}
+.pref-row .pt{font-size:13px; font-weight:600; margin-bottom:2px;}
+.pref-row .pd{font-size:11.5px; color:var(--text-3); max-width:440px;}
+.steam-id-copy{cursor:pointer; border:none; background:var(--surface-3); color:var(--text-2);
+  border-radius:6px; padding:3px 7px; font-size:10.5px; font-weight:700; transition:.15s;}
+.steam-id-copy:hover{background:var(--hover); color:var(--text);}
+
+/* --- billing --- */
+.bill-stat{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+.bill-stat .card{padding:16px 18px;}
+.bill-stat .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; margin-bottom:7px;}
+.bill-stat .val{font-size:15px; font-weight:700;}
+.pay-card{display:flex; align-items:center; gap:14px; padding:15px 16px; border-radius:var(--r-md);
+  background:var(--surface-2); border:1px solid var(--border);}
+.pay-brand{width:44px; height:30px; border-radius:6px; background:linear-gradient(145deg,#2b3350,#141826);
+  border:1px solid var(--border-strong); display:flex; align-items:center; justify-content:center;
+  font-size:9.5px; font-weight:800; letter-spacing:.04em; color:#c9d3f0;}
+.danger-zone{border-color:rgba(179,38,30,.3); background:linear-gradient(180deg, rgba(179,38,30,.05), var(--surface) 50%);}
+.btn-danger{background:var(--crimson-soft); color:#ef6a62; border-color:rgba(179,38,30,.35);}
+.btn-danger:hover{background:rgba(179,38,30,.26); border-color:rgba(179,38,30,.55); color:#ff8177;}
+
+@media (max-width:900px){
+  .plan-grid{grid-template-columns:1fr;}
+  .acct-grid{grid-template-columns:1fr; gap:18px;}
+  .acct-nav{position:static; flex-direction:row; flex-wrap:wrap; gap:6px;}
+  .bill-stat{grid-template-columns:repeat(2,1fr);}
+}
+@media (max-width:560px){
+  .field-row{grid-template-columns:1fr; gap:7px; align-items:flex-start;}
+  .bill-stat{grid-template-columns:1fr;}
+  .pref-row{flex-direction:column; gap:10px;}
+}
+
 /* dropdowns */
 .dropdown{position:relative;}
 .dropdown-panel{position:absolute; top:calc(100% + 8px); right:0; min-width:240px; background:var(--surface-2); border:1px solid var(--border-strong); border-radius:var(--r-md); box-shadow:var(--shadow-md); padding:6px; z-index:150; display:none;}
@@ -322,7 +450,7 @@ img,svg{display:block;}
 }
 .brand:hover .brand-mark{transform:translateY(-1px) rotate(-3deg); box-shadow:0 8px 22px -5px var(--orange-glow), 0 1px 0 rgba(255,255,255,.3) inset;}
 .brand:active .brand-mark{transform:translateY(0) rotate(0);}
-.brand-mark svg{width:17px; height:17px; stroke:#fff; fill:none; stroke-width:2;}
+.brand-mark svg{width:16px; height:16px; fill:#fff; stroke:none;}
 .nav-links{display:flex; align-items:center; gap:2px;}
 .nav-links a{padding:9px 14px; font-size:13px; font-weight:600; color:var(--text-2); border-radius:8px; transition:.15s;}
 .nav-links a:hover{color:var(--text); background:var(--surface-2);}
@@ -383,11 +511,16 @@ img,svg{display:block;}
 .footer{border-top:1px solid var(--border); padding:40px 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;}
 
 /* view switching */
-#dashboard-view, #pairing-view{display:none;}
-body.dash #landing-view{display:none;}
+#dashboard-view, #pairing-view, #pricing-view, #settings-view, #billing-view{display:none;}
+body.dash #landing-view, body.pairing #landing-view, body.pricing #landing-view,
+body.settings #landing-view, body.billing #landing-view{display:none;}
 body.dash #dashboard-view{display:block;}
-body.pairing #landing-view{display:none;}
 body.pairing #pairing-view{display:block;}
+body.pricing #pricing-view{display:block;}
+body.settings #settings-view{display:block;}
+body.billing #billing-view{display:block;}
+/* auth-gated chrome is toggled with [hidden]; beat the display rules that outrank it */
+[hidden]{display:none !important;}
 
 /* ============== DASHBOARD ============== */
 .dash-shell{display:grid; grid-template-columns:250px 1fr; min-height:100vh;}
@@ -615,9 +748,10 @@ body.pairing #pairing-view{display:block;}
 <!-- ============================================================= ICON SPRITE ============================================================= -->
 <svg width="0" height="0" style="position:absolute">
 <defs>
-<!-- Rustex mark: the site's own HUD corner-brackets clamped around an angular R, with a
-     live blip on the shoulder. Four strokes, so it still reads at 13px in the footer. -->
-<symbol id="i-mark" viewBox="0 0 24 24"><path d="M3.2 8.6V4.9a1.7 1.7 0 0 1 1.7-1.7h3.7" stroke-linecap="round"/><path d="M20.8 15.4v3.7a1.7 1.7 0 0 1-1.7 1.7h-3.7" stroke-linecap="round"/><path d="M8.9 17.6V6.9h3.8a2.9 2.9 0 0 1 0 5.9H8.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.6 12.8l3.6 4.8" stroke-linecap="round"/><circle cx="17.6" cy="6.6" r="1.5" fill="currentColor" stroke="none"/></symbol>
+<!-- Rustex mark: a geometric R — stem, true semicircular bowl with an enclosed
+     counter, and a 45-degree leg. Filled, not stroked, so it stays solid at 16px. -->
+<symbol id="i-mark" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="4.9" y="3.4" width="3.7" height="17.2" rx="1.2"/><path d="M8.0 3.4h3.7a5.3 5.3 0 0 1 0 10.6H8.0v-3.4h3.7a1.9 1.9 0 0 0 0-3.8H8.0Z"/><path d="M10.9 12.7h3.8l4.6 7.9h-3.8Z"/></symbol>
+<symbol id="i-steam" viewBox="0 0 24 24"><path d="M11.98 2A10.02 10.02 0 0 0 2 11.2l5.37 2.22a2.83 2.83 0 0 1 1.6-.5h.14l2.39-3.46v-.05a3.78 3.78 0 1 1 3.78 3.78h-.09l-3.41 2.43v.12a2.84 2.84 0 0 1-5.63.5L2.2 14.6A10.02 10.02 0 1 0 11.98 2Z"/><path d="M6.1 17.17l-1.23-.51a2.13 2.13 0 0 0 3.9-.6 2.13 2.13 0 0 0-2.83-2.33l1.27.53a1.57 1.57 0 1 1-1.21 2.9Z"/><path d="M17.79 9.4a2.52 2.52 0 1 0-5.04 0 2.52 2.52 0 0 0 5.04 0Zm-4.4 0a1.89 1.89 0 1 1 3.77 0 1.89 1.89 0 0 1-3.78 0Z"/></symbol>
 <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
 <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
 <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
@@ -666,6 +800,39 @@ body.pairing #pairing-view{display:block;}
 </defs>
 </svg>
 
+
+<!-- sign in with steam -->
+<div class="auth-overlay" id="steamAuth" role="dialog" aria-modal="true" aria-labelledby="steamAuthTitle">
+  <div class="auth-card">
+    <div class="auth-badge"><svg class="steam-glyph"><use href="#i-steam"/></svg></div>
+    <h3 id="steamAuthTitle">Sign in through Steam</h3>
+    <p class="auth-sub">Rustex uses Steam's own OpenID sign-in. You enter your details on Steam — we never see your password.</p>
+
+    <div id="steamAuthIdle">
+      <button class="btn btn-steam btn-block" onclick="runSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="closeSteamAuth()">Cancel</button>
+      <p class="text-3" style="font-size:10.5px;margin-top:14px;line-height:1.5;">By continuing you agree to the terms. Steam and the Steam logo are trademarks of Valve Corporation.</p>
+    </div>
+
+    <div id="steamAuthBusy" hidden>
+      <div style="text-align:left;">
+        <div class="auth-step" data-step="0"><span class="mk"></span>Opening Steam sign-in</div>
+        <div class="auth-step" data-step="1"><span class="mk"></span>Verifying your OpenID response</div>
+        <div class="auth-step" data-step="2"><span class="mk"></span>Loading your Rust+ profile</div>
+      </div>
+    </div>
+
+    <div id="steamAuthError" hidden>
+      <div class="auth-error">
+        <svg class="icon"><use href="#i-siren"/></svg>
+        <div><b id="steamErrTitle">Sign-in failed</b><span id="steamErrBody">Steam did not confirm the sign-in. This usually clears on a retry.</span></div>
+      </div>
+      <button class="btn btn-steam btn-block" onclick="runSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Try again</button>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="closeSteamAuth()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- toast stack -->
 <div class="toast-stack" id="toastStack"></div>
 
@@ -698,12 +865,15 @@ body.pairing #pairing-view{display:block;}
     <div class="nav-links">
       <a href="#f01">Team Tracker</a>
       <a href="#f03">Raid Alarms</a>
+      <a href="#" onclick="goPricing();return false;">Pricing</a>
       <a href="#" onclick="goPairing();return false;">Pairing</a>
-      <a href="#f11">Heatmap</a>
     </div>
     <div class="nav-actions">
       <button class="btn btn-ghost" onclick="openCmdk()"><svg class="icon" style="width:15px;height:15px"><use href="#i-command"/></svg>Search</button>
-      <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+      <button class="btn btn-steam" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in with Steam</button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+      <button class="btn btn-primary" data-when="entitled" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+      <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
     </div>
   </div>
 </nav>
@@ -1331,7 +1501,8 @@ body.pairing #pairing-view{display:block;}
     <a class="side-link" href="#d-heatmap"><svg class="icon"><use href="#i-map"/></svg>Heatmap</a>
     <div class="side-foot">
       <a class="side-link" href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
-      <a class="side-link" href="#"><svg class="icon"><use href="#i-settings"/></svg>Settings</a>
+      <a class="side-link" href="#" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription</a>
+      <a class="side-link" href="#" onclick="goSettings();return false;"><svg class="icon"><use href="#i-settings"/></svg>Settings</a>
       <div class="conn-status" style="cursor:pointer;" onclick="goPairing()"><span class="dot"></span>Rust+ Connected</div>
     </div>
   </aside>
@@ -1370,13 +1541,14 @@ body.pairing #pairing-view{display:block;}
           </div>
         </div>
         <div class="dropdown">
-          <div class="user-chip" onclick="toggleDropdown('ddUser', event)"><span class="avatar" style="width:26px;height:26px;font-size:10px;background:var(--orange)">KL</span><span style="font-size:12.5px;font-weight:600">Kaelthorn</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="user-chip" onclick="toggleDropdown('ddUser', event)"><img data-acct="avatar" alt=""><span data-acct="name">Player</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddUser">
-            <div class="dropdown-item"><svg class="icon"><use href="#i-users"/></svg>Profile</div>
+            <div class="dropdown-item" onclick="closeDropdowns();goSettings();"><svg class="icon"><use href="#i-users"/></svg>Account</div>
             <div class="dropdown-item" onclick="closeDropdowns();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</div>
-            <div class="dropdown-item"><svg class="icon"><use href="#i-settings"/></svg>Settings</div>
+            <div class="dropdown-item" onclick="closeDropdowns();goBilling();"><svg class="icon"><use href="#i-tag"/></svg>Subscription &amp; billing</div>
+            <div class="dropdown-item" onclick="closeDropdowns();goSettings();"><svg class="icon"><use href="#i-settings"/></svg>Settings</div>
             <div class="dropdown-sep"></div>
-            <div class="dropdown-item danger"><svg class="icon"><use href="#i-x"/></svg>Log out</div>
+            <div class="dropdown-item danger" onclick="closeDropdowns();logOut();"><svg class="icon"><use href="#i-x"/></svg>Log out</div>
           </div>
         </div>
       </div>
@@ -1422,6 +1594,23 @@ body.pairing #pairing-view{display:block;}
       </div>
 
       <div class="widget-grid">
+
+        <div class="widget card w-12" id="d-profile">
+          <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+            <img data-acct="avatar" alt="" style="width:54px;height:54px;border-radius:14px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
+            <div style="min-width:0;">
+              <div style="font-weight:800;font-size:16px;" data-acct="name">Player</div>
+              <div class="text-3" style="font-size:11.5px;margin-top:3px;">Steam ID <span class="mono" data-acct="steamId">—</span></div>
+            </div>
+            <div style="display:flex;gap:22px;flex-wrap:wrap;margin-left:auto;">
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Plan</div><span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>—</span></div>
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Rust+</div><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span></div>
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Server</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="serverName">Rustex Main</span></span></div>
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Team</div><span class="pill pill-slate"><span class="dot"></span>Squad 5 · 4 online</span></div>
+              <div style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-outline btn-sm" onclick="goSettings()"><svg class="icon" style="width:14px;height:14px"><use href="#i-settings"/></svg>Account</button></div>
+            </div>
+          </div>
+        </div>
 
         <div class="widget card w-5" id="d-team">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
@@ -1570,6 +1759,310 @@ body.pairing #pairing-view{display:block;}
 </div>
 </div>
 
+
+<!-- ================================================================= PRICING VIEW ================================================================= -->
+<div id="pricing-view">
+<nav class="nav scrolled" id="pricingNav">
+  <div class="container nav-inner">
+    <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
+    <div class="nav-actions" style="margin-left:auto;">
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="container">
+    <span class="eyebrow">Pricing</span>
+    <h1>Pick a plan, then open<br/>your dashboard.</h1>
+    <p class="sub">The dashboard unlocks as soon as a plan is active. Every tier is a single flat price — no per-seat billing, no per-server surcharge.</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:24px;flex-wrap:wrap;">
+      <div class="tabs" id="cycleTabs">
+        <button class="tab active" data-cycle="monthly" onclick="setCycle(this)">Monthly</button>
+        <button class="tab" data-cycle="yearly" onclick="setCycle(this)">Yearly</button>
+      </div>
+      <span class="billing-toggle"><span class="save-chip">Save 20%</span>on yearly billing</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="container" style="padding-bottom:40px;">
+    <div class="plan-grid">
+        <div class="plan" data-plan="scout">
+          
+          <div>
+            <h3>Scout</h3>
+            <p class="text-3" style="font-size:12px;margin-top:5px;">For a solo player holding one base.</p>
+          </div>
+          <div class="price">
+            <span class="amt mono" data-price-m="6" data-price-y="58">$6</span>
+            <span class="per" data-per>/ month</span>
+          </div>
+          <ul><li><svg class="icon"><use href="#i-check"/></svg>1 paired server</li><li><svg class="icon"><use href="#i-check"/></svg>Team tracker &amp; map</li><li><svg class="icon"><use href="#i-check"/></svg>Raid alarms to web push</li><li><svg class="icon"><use href="#i-check"/></svg>Decay timers</li><li><svg class="icon"><use href="#i-check"/></svg>7-day event history</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Phone call escalation</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Vending &amp; shop alerts</li></ul>
+          <button class="btn btn-outline btn-block" onclick="choosePlan('scout')">Choose Scout</button>
+        </div>
+        <div class="plan featured" data-plan="raider">
+          <span class="plan-tag">Most popular</span>
+          <div>
+            <h3>Raider</h3>
+            <p class="text-3" style="font-size:12px;margin-top:5px;">For a squad running a wipe properly.</p>
+          </div>
+          <div class="price">
+            <span class="amt mono" data-price-m="14" data-price-y="134">$14</span>
+            <span class="per" data-per>/ month</span>
+          </div>
+          <ul><li><svg class="icon"><use href="#i-check"/></svg>Up to 5 paired servers</li><li><svg class="icon"><use href="#i-check"/></svg>Everything in Scout</li><li><svg class="icon"><use href="#i-check"/></svg>Phone call escalation</li><li><svg class="icon"><use href="#i-check"/></svg>Vending search &amp; shop alerts</li><li><svg class="icon"><use href="#i-check"/></svg>Smart device control</li><li><svg class="icon"><use href="#i-check"/></svg>Genetics lab &amp; recycler</li><li><svg class="icon"><use href="#i-check"/></svg>30-day event history</li></ul>
+          <button class="btn btn-primary btn-block" onclick="choosePlan('raider')">Choose Raider</button>
+        </div>
+        <div class="plan" data-plan="clan">
+          
+          <div>
+            <h3>Clan</h3>
+            <p class="text-3" style="font-size:12px;margin-top:5px;">For a full clan with several bases.</p>
+          </div>
+          <div class="price">
+            <span class="amt mono" data-price-m="32" data-price-y="306">$32</span>
+            <span class="per" data-per>/ month</span>
+          </div>
+          <ul><li><svg class="icon"><use href="#i-check"/></svg>Unlimited paired servers</li><li><svg class="icon"><use href="#i-check"/></svg>Everything in Raider</li><li><svg class="icon"><use href="#i-check"/></svg>Unlimited team members</li><li><svg class="icon"><use href="#i-check"/></svg>Priority alarm routing</li><li><svg class="icon"><use href="#i-check"/></svg>Chat assistant with custom commands</li><li><svg class="icon"><use href="#i-check"/></svg>Full event history &amp; export</li><li><svg class="icon"><use href="#i-check"/></svg>Priority support</li></ul>
+          <button class="btn btn-outline btn-block" onclick="choosePlan('clan')">Choose Clan</button>
+        </div>
+    </div>
+    <p class="text-3" style="font-size:11.5px;margin-top:20px;text-align:center;">
+      Prices in USD. Cancel any time — access runs to the end of the period you already paid for.
+    </p>
+  </div>
+</section>
+
+<section style="padding-bottom:100px;">
+  <div class="container">
+    <div class="card" style="display:flex;gap:16px;align-items:flex-start;">
+      <svg class="icon" style="width:18px;height:18px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-lock"/></svg>
+      <div>
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:4px;">You need a Steam account to subscribe</div>
+        <div class="text-3" style="font-size:12.5px;max-width:620px;">Rustex pairs through Rust's own in-game request, so billing is tied to the Steam account you actually play on. Signing in takes one click and we never see your Steam password.</div>
+        <button class="btn btn-steam btn-sm" style="margin-top:13px;" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ================================================================= SETTINGS VIEW ================================================================= -->
+<div id="settings-view">
+<nav class="nav scrolled" id="settingsNav">
+  <div class="container nav-inner">
+    <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
+    <div class="nav-actions" style="margin-left:auto;">
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head" style="padding-bottom:22px;">
+  <div class="container">
+    <span class="eyebrow">Account</span>
+    <h1 style="font-size:clamp(26px,3vw,34px);">Account &amp; settings</h1>
+  </div>
+</header>
+
+<section>
+  <div class="container acct-grid">
+    <nav class="acct-nav" aria-label="Account sections">
+      <a href="#" class="active" onclick="goSettings();return false;"><svg class="icon"><use href="#i-settings"/></svg>Account &amp; Settings</a>
+      <a href="#" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription &amp; Billing</a>
+      <a href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
+      <a href="#" data-when="entitled" onclick="goDashboard();return false;"><svg class="icon"><use href="#i-home"/></svg>Dashboard</a>
+      <div class="acct-sep"></div>
+      <a href="#" onclick="logOut();return false;"><svg class="icon"><use href="#i-x"/></svg>Log out</a>
+    </nav>
+
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+
+      <div class="card">
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+          <img data-acct="avatar" alt="" style="width:64px;height:64px;border-radius:16px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
+          <div style="min-width:0;flex:1;">
+            <div style="font-weight:800;font-size:17px;" data-acct="name">Player</div>
+            <div class="text-3" style="font-size:12px;margin-top:3px;">Signed in through Steam · member since <span data-acct="created">—</span></div>
+          </div>
+          <span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>No plan</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:6px;"><svg class="icon"><use href="#i-users"/></svg>Steam profile</div>
+        <div class="field-row"><span class="fl">Steam username</span><span class="fv" data-acct="steamName">—</span></div>
+        <div class="field-row"><span class="fl">Steam ID (64)</span><span class="fv"><span class="mono" data-acct="steamId">—</span><button class="steam-id-copy" onclick="copySteamId(this)">Copy</button></span></div>
+        <div class="field-row"><span class="fl">Account created</span><span class="fv" data-acct="created">—</span></div>
+        <div class="field-row"><span class="fl">Email</span><span class="fv" data-acct="email">—</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:6px;"><svg class="icon"><use href="#i-wifi"/></svg>Connections</div>
+        <div class="field-row">
+          <span class="fl">Rust+ account</span>
+          <span class="fv"><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span><span class="text-3" style="font-size:11.5px;" data-acct="rustplusWho">—</span></span>
+        </div>
+        <div class="field-row">
+          <span class="fl">Connected servers</span>
+          <span class="fv" style="flex-direction:column;align-items:flex-start;gap:8px;">
+            <div id="settingsServers" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
+            <button class="btn btn-outline btn-sm" onclick="goPairing()"><svg class="icon" style="width:14px;height:14px"><use href="#i-plus"/></svg>Pair another server</button>
+          </span>
+        </div>
+        <div class="field-row">
+          <span class="fl">Rust+ link</span>
+          <span class="fv"><button class="btn btn-outline btn-sm" onclick="goPairing()">Re-link Rust+ account</button><button class="btn btn-ghost btn-sm" onclick="disconnectRustPlus()">Disconnect</button></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-settings"/></svg>Profile</div></div>
+        <div class="field-row">
+          <span class="fl"><label for="setDisplayName">Display name</label></span>
+          <span class="fv"><input class="inp" id="setDisplayName" maxlength="32" placeholder="Shown to your team"></span>
+        </div>
+        <div class="field-row">
+          <span class="fl"><label for="setTimezone">Time zone</label></span>
+          <span class="fv"><select class="inp" id="setTimezone">
+            <option>UTC</option><option>US/Eastern</option><option>US/Central</option><option>US/Pacific</option><option>Europe/London</option><option>Europe/Berlin</option><option>Australia/Sydney</option>
+          </select></span>
+        </div>
+        <div class="field-row">
+          <span class="fl"><label for="setAppearance">Appearance</label></span>
+          <span class="fv" style="flex-direction:column;align-items:flex-start;gap:6px;">
+            <select class="inp" id="setAppearance"><option value="dark">Dark (tactical)</option><option value="system" disabled>Match system — coming soon</option></select>
+            <span class="text-3" style="font-size:11px;">Rustex is built dark on purpose: the HUD reads correctly against near-black.</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-bell"/></svg>Notifications</div></div>
+        <div class="pref-row"><div><div class="pt">Raid alarms</div><div class="pd">Web push the moment a Smart Alarm trips on a base you track.</div></div><label class="switch"><input type="checkbox" id="prefRaid" checked><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Phone call escalation</div><div class="pd">If nobody acknowledges a raid alarm within 60 seconds, call every member.</div></div><label class="switch"><input type="checkbox" id="prefCall" checked><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Shop &amp; vending alerts</div><div class="pd">Tell me when a watched item is listed near me, or a shop disappears.</div></div><label class="switch"><input type="checkbox" id="prefShop" checked><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Decay warnings</div><div class="pd">Warn me when any tracked base drops under 12 hours of upkeep.</div></div><label class="switch"><input type="checkbox" id="prefDecay" checked><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Team activity</div><div class="pd">Teammates coming online, going offline, or dying.</div></div><label class="switch"><input type="checkbox" id="prefTeam"><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Product email</div><div class="pd">Occasional release notes. Never more than once a month.</div></div><label class="switch"><input type="checkbox" id="prefEmail"><span class="track"></span></label></div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveSettings()">Save changes</button>
+        <button class="btn btn-ghost" onclick="loadSettingsForm()">Discard</button>
+        <span class="text-3" style="font-size:11.5px;margin-left:auto;" id="settingsSaved"></span>
+      </div>
+
+      <div class="card danger-zone" style="margin-top:6px;">
+        <div class="card-title" style="margin-bottom:8px;color:#ef6a62;"><svg class="icon" style="color:#ef6a62"><use href="#i-lock"/></svg>Session</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+          <div class="text-3" style="font-size:12.5px;max-width:460px;">Logging out clears this browser's Rustex session. Your servers stay paired and your subscription is unaffected.</div>
+          <button class="btn btn-danger" onclick="logOut()"><svg class="icon" style="width:15px;height:15px"><use href="#i-x"/></svg>Log out</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ================================================================= BILLING VIEW ================================================================= -->
+<div id="billing-view">
+<nav class="nav scrolled" id="billingNav">
+  <div class="container nav-inner">
+    <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
+    <div class="nav-actions" style="margin-left:auto;">
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head" style="padding-bottom:22px;">
+  <div class="container">
+    <span class="eyebrow">Billing</span>
+    <h1 style="font-size:clamp(26px,3vw,34px);">Subscription &amp; billing</h1>
+  </div>
+</header>
+
+<section>
+  <div class="container acct-grid">
+    <nav class="acct-nav" aria-label="Account sections">
+      <a href="#" onclick="goSettings();return false;"><svg class="icon"><use href="#i-settings"/></svg>Account &amp; Settings</a>
+      <a href="#" class="active" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription &amp; Billing</a>
+      <a href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
+      <a href="#" data-when="entitled" onclick="goDashboard();return false;"><svg class="icon"><use href="#i-home"/></svg>Dashboard</a>
+      <div class="acct-sep"></div>
+      <a href="#" onclick="logOut();return false;"><svg class="icon"><use href="#i-x"/></svg>Log out</a>
+    </nav>
+
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+
+      <div class="bill-stat">
+        <div class="card"><div class="lbl">Current plan</div><div class="val" data-acct="planName">—</div></div>
+        <div class="card"><div class="lbl">Status</div><div class="val"><span class="pill" data-acct="statusPill"><span class="dot"></span>—</span></div></div>
+        <div class="card"><div class="lbl">Billing cycle</div><div class="val" data-acct="cycle">—</div></div>
+        <div class="card"><div class="lbl">Next payment</div><div class="val mono" data-acct="nextPayment">—</div></div>
+      </div>
+
+      <div class="card" id="billingActive">
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-tag"/></svg>Plan</div><span class="pill pill-orange" data-acct="pricePill"><span class="dot"></span>—</span></div>
+        <div class="field-row"><span class="fl">Renews on</span><span class="fv mono" data-acct="renewsAt">—</span></div>
+        <div class="field-row"><span class="fl">Amount</span><span class="fv mono" data-acct="amount">—</span></div>
+        <div class="field-row"><span class="fl">Started</span><span class="fv mono" data-acct="startedAt">—</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+          <button class="btn btn-primary btn-sm" onclick="goPricing()" data-bill="upgrade"><svg class="icon" style="width:14px;height:14px"><use href="#i-trend-up"/></svg>Upgrade plan</button>
+          <button class="btn btn-outline btn-sm" onclick="goPricing()" data-bill="downgrade">Change plan</button>
+          <button class="btn btn-outline btn-sm" onclick="reactivateSub()" data-bill="reactivate">Reactivate subscription</button>
+          <button class="btn btn-ghost btn-sm" onclick="cancelSub()" data-bill="cancel" style="color:#ef6a62;">Cancel subscription</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-lock"/></svg>Payment method</div></div>
+        <div class="pay-card">
+          <span class="pay-brand" data-acct="cardBrand">VISA</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:13px;font-weight:600;">•••• •••• •••• <span class="mono" data-acct="cardLast4">4242</span></div>
+            <div class="text-3" style="font-size:11.5px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">04 / 2029</span> · <span data-acct="cardName">Steam account holder</span></div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="updatePaymentMethod()">Update</button>
+        </div>
+        <p class="text-3" style="font-size:11px;margin-top:11px;">Card details are held by the payment processor. Rustex only ever stores the last four digits and the expiry.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-layers"/></svg>Billing history</div><span class="text-3" style="font-size:11.5px;" id="invoiceCount"></span></div>
+        <div style="overflow-x:auto;">
+          <table class="table" id="invoiceTable">
+            <thead><tr><th>Invoice</th><th>Date</th><th>Plan</th><th>Amount</th><th>Status</th><th style="text-align:right">Receipt</th></tr></thead>
+            <tbody id="invoiceRows"></tbody>
+          </table>
+        </div>
+        <div id="invoiceEmpty" style="text-align:center;padding:26px 10px;">
+          <svg class="icon" style="width:22px;height:22px;color:var(--text-3);margin:0 auto 10px;"><use href="#i-layers"/></svg>
+          <div class="text-2" style="font-size:13px;font-weight:600;margin-bottom:3px;">No invoices yet</div>
+          <div class="text-3" style="font-size:12px;">Your first receipt appears here once a plan is active.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+</div>
 <!-- ================================================================= PAIRING VIEW ================================================================= -->
 <div id="pairing-view">
 
@@ -1683,21 +2176,433 @@ body.pairing #pairing-view{display:block;}
 </div>
 
 <script>
+// ---- session ----------------------------------------------------------------
+// NOTE: this is a client-side session for the product demo. Real authorisation has to
+// be enforced server-side — hiding a nav link never stops anyone from editing
+// localStorage. steamAuthenticate() and the plan calls below are the seams where the
+// real Rustex API (Steam OpenID + the billing provider) gets wired in.
+const RX_KEY = 'rustex.session.v2';
+const PLANS = {
+  scout:  { id:'scout',  name:'Scout',  monthly:6,  yearly:58  },
+  raider: { id:'raider', name:'Raider', monthly:14, yearly:134 },
+  clan:   { id:'clan',   name:'Clan',   monthly:32, yearly:306 }
+};
+const DEFAULT_PREFS = { raid:true, call:true, shop:true, decay:true, team:false, email:false, timezone:'UTC', appearance:'dark' };
+
+const Session = {
+  data: null,
+  load(){
+    try { this.data = JSON.parse(localStorage.getItem(RX_KEY)) || null; } catch { this.data = null; }
+    if(this.data && !this.data.prefs) this.data.prefs = { ...DEFAULT_PREFS };
+    return this.data;
+  },
+  save(){
+    try { localStorage.setItem(RX_KEY, JSON.stringify(this.data)); } catch {}
+    syncAuthUI();
+  },
+  get signedIn(){ return !!(this.data && this.data.user); },
+  // a cancelled plan still grants access until the period it was paid for runs out
+  get entitled(){
+    const p = this.data && this.data.plan;
+    return !!p && (p.status === 'active' || p.status === 'canceled');
+  },
+  get state(){ return this.entitled ? 'entitled' : this.signedIn ? 'in' : 'out'; },
+  signIn(user){
+    this.data = this.data || {};
+    this.data.user = user;
+    this.data.prefs = this.data.prefs || { ...DEFAULT_PREFS };
+    this.data.rustPlus = this.data.rustPlus || { connected:true, name:user.name };
+    this.data.servers = this.data.servers || [{ name:'Rustex Main', region:'US-East', addr:'203.0.113.42:28083' }];
+    this.save();
+  },
+  signOut(){ this.data = null; try{ localStorage.removeItem(RX_KEY); }catch{} syncAuthUI(); },
+  subscribe(planId, cycle){
+    const plan = PLANS[planId]; if(!plan) return;
+    const now = new Date();
+    const renews = new Date(now); cycle === 'yearly' ? renews.setFullYear(renews.getFullYear()+1) : renews.setMonth(renews.getMonth()+1);
+    const already = this.data.plan;
+    this.data.plan = {
+      id: plan.id, cycle, status:'active',
+      startedAt: (already && already.startedAt) || now.toISOString(),
+      renewsAt: renews.toISOString()
+    };
+    this.data.card = this.data.card || { brand:'VISA', last4:'4242', exp:'04 / 2029', name:this.data.user.name };
+    this.data.invoices = this.data.invoices || [];
+    this.data.invoices.unshift({
+      id:'RX-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + '-' + String(1000 + this.data.invoices.length + 1),
+      date: now.toISOString(), plan: plan.name, cycle,
+      amount: cycle === 'yearly' ? plan.yearly : plan.monthly, status:'Paid'
+    });
+    this.save();
+  },
+  cancel(){ if(this.data && this.data.plan){ this.data.plan.status = 'canceled'; this.save(); } },
+  reactivate(){ if(this.data && this.data.plan){ this.data.plan.status = 'active'; this.save(); } }
+};
+Session.load();
+
+const fmtDate = iso => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}) : '—';
+const money = n => '$' + Number(n).toFixed(2);
+
+// deterministic self-contained avatar — no external image request to make or leak
+function avatarFor(name, seed){
+  const s = String(seed || name || 'rx');
+  let h = 0; for(const c of s) h = (h * 31 + c.charCodeAt(0)) % 360;
+  const initials = (name || 'RX').replace(/[^A-Za-z0-9]/g,'').slice(0,2).toUpperCase() || 'RX';
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+    + '<defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1">'
+    + '<stop offset="0" stop-color="hsl(' + h + ' 48% 44%)"/>'
+    + '<stop offset="1" stop-color="hsl(' + ((h+40)%360) + ' 52% 24%)"/></linearGradient></defs>'
+    + '<rect width="64" height="64" fill="url(#a)"/>'
+    + '<text x="32" y="42" font-family="Inter,Segoe UI,sans-serif" font-size="25" font-weight="700" '
+    + 'fill="rgba(255,255,255,.94)" text-anchor="middle">' + initials + '</text></svg>';
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
 // ---- view switching ----
-function goDashboard(){ document.body.classList.remove('pairing'); document.body.classList.add('dash'); window.scrollTo(0,0); history.replaceState(null,'','#dashboard'); }
+function showView(name){
+  document.body.classList.remove('dash','pairing','pricing','settings','billing');
+  if(name) document.body.classList.add(name);
+  window.scrollTo({ top:0, left:0, behavior:'auto' });
+  history.replaceState(null,'', name ? '#' + name : '#');
+  closeDropdowns && closeDropdowns();
+  syncAuthUI();
+}
 function goLanding(){
-  const alreadyHome = !document.body.classList.contains('dash') && !document.body.classList.contains('pairing');
-  document.body.classList.remove('dash','pairing');
-  // Already on the landing page: glide back up. Arriving from the dashboard or pairing
-  // view, the page underneath has just been swapped, so animating a scroll through
-  // content the user never saw would only read as jank — jump instead.
+  const alreadyHome = !document.body.className.match(/\b(dash|pairing|pricing|settings|billing)\b/);
+  document.body.classList.remove('dash','pairing','pricing','settings','billing');
+  // Already home: glide up. Coming from another view the page under us just swapped, so
+  // animating a scroll through content the user never saw would only read as jank.
   const smooth = alreadyHome && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   window.scrollTo({ top:0, left:0, behavior: smooth ? 'smooth' : 'auto' });
   history.replaceState(null,'','#');
+  syncAuthUI();
 }
-function goPairing(){ document.body.classList.remove('dash'); document.body.classList.add('pairing'); window.scrollTo(0,0); history.replaceState(null,'','#pairing'); }
-if(location.hash === '#dashboard') document.body.classList.add('dash');
-if(location.hash === '#pairing') document.body.classList.add('pairing');
+function goPricing(){ showView('pricing'); renderPricing(); }
+function goPairing(){ showView('pairing'); }
+function goSettings(){
+  if(!requireSignIn('settings')) return;
+  showView('settings'); loadSettingsForm(); renderSettings();
+}
+function goBilling(){
+  if(!requireSignIn('billing')) return;
+  showView('billing'); renderBilling();
+}
+// The dashboard is the gated surface: signed out -> sign in, signed in but unpaid -> pricing.
+function goDashboard(){
+  if(!Session.signedIn){ openSteamAuth('dashboard'); return; }
+  if(!Session.entitled){
+    goPricing();
+    fireCustomToast('Choose a plan to continue', 'The dashboard unlocks the moment a subscription is active.', 'i-lock');
+    return;
+  }
+  showView('dash');
+}
+function requireSignIn(intent){
+  if(Session.signedIn) return true;
+  openSteamAuth(intent); return false;
+}
+
+// ---- auth-aware chrome ----
+function syncAuthUI(){
+  const state = Session.state;
+  document.body.dataset.auth = state;
+  document.querySelectorAll('[data-when]').forEach(el=>{
+    el.hidden = !el.dataset.when.split(/\s+/).includes(state);
+  });
+  const d = Session.data || {};
+  const u = d.user, p = d.plan, plan = p && PLANS[p.id];
+  const set = (k, fn) => document.querySelectorAll('[data-acct="' + k + '"]').forEach(fn);
+
+  // 'name' is what the user chose to be called; 'steamName' is what Steam actually returned
+  set('name', el => el.textContent = (u ? (d.displayName || u.name) : 'Player'));
+  set('steamName', el => el.textContent = u ? u.name : '—');
+  set('steamId', el => el.textContent = u ? u.steamId : '—');
+  set('created', el => el.textContent = u ? fmtDate(u.created) : '—');
+  set('email', el => el.textContent = u && u.email ? u.email : 'Not provided by Steam');
+  set('avatar', el => { if(u) el.src = u.avatar; else el.removeAttribute('src'); });
+  set('serverName', el => el.textContent = (d.servers && d.servers[0]) ? d.servers[0].name : 'None paired');
+  set('rustplusWho', el => el.textContent = d.rustPlus && d.rustPlus.connected ? d.rustPlus.name : 'Not linked');
+  set('rustplusPill', el => {
+    const on = !!(d.rustPlus && d.rustPlus.connected);
+    el.className = 'pill ' + (on ? 'pill-online' : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (on ? 'Connected' : 'Not linked');
+  });
+  set('planName', el => el.textContent = plan ? plan.name : 'No plan');
+  set('planPill', el => {
+    el.className = 'pill ' + (plan ? (p.status === 'canceled' ? 'pill-warn' : 'pill-orange') : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (plan ? plan.name + (p.status === 'canceled' ? ' · ending' : '') : 'No plan');
+  });
+  set('statusPill', el => {
+    const label = !p ? 'Inactive' : p.status === 'canceled' ? 'Cancels at period end' : 'Active';
+    el.className = 'pill ' + (!p ? 'pill-offline' : p.status === 'canceled' ? 'pill-warn' : 'pill-online');
+    el.innerHTML = '<span class="dot"></span>' + label;
+  });
+  set('cycle', el => el.textContent = p ? (p.cycle === 'yearly' ? 'Yearly' : 'Monthly') : '—');
+  set('renewsAt', el => el.textContent = p ? fmtDate(p.renewsAt) : '—');
+  set('startedAt', el => el.textContent = p ? fmtDate(p.startedAt) : '—');
+  set('nextPayment', el => el.textContent = (p && p.status === 'active') ? fmtDate(p.renewsAt) : '—');
+  set('amount', el => el.textContent = plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) + ' / ' + (p.cycle === 'yearly' ? 'year' : 'month') : '—');
+  set('pricePill', el => el.innerHTML = '<span class="dot"></span>' + (plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) + (p.cycle === 'yearly' ? '/yr' : '/mo') : '—'));
+  set('cardBrand', el => el.textContent = d.card ? d.card.brand : '—');
+  set('cardLast4', el => el.textContent = d.card ? d.card.last4 : '••••');
+  set('cardExp', el => el.textContent = d.card ? d.card.exp : '—');
+  set('cardName', el => el.textContent = d.card ? d.card.name : '—');
+}
+
+// ---- sign in with steam ----
+let authIntent = null;
+function openSteamAuth(intent){
+  authIntent = intent || null;
+  authPhase('idle');
+  document.getElementById('steamAuth').classList.add('open');
+}
+function closeSteamAuth(){ document.getElementById('steamAuth').classList.remove('open'); }
+function authPhase(phase){
+  document.getElementById('steamAuthIdle').hidden  = phase !== 'idle';
+  document.getElementById('steamAuthBusy').hidden  = phase !== 'busy';
+  document.getElementById('steamAuthError').hidden = phase !== 'error';
+  if(phase === 'busy') document.querySelectorAll('#steamAuthBusy .auth-step').forEach(s=>{ s.className = 'auth-step'; s.querySelector('.mk').innerHTML = ''; });
+}
+function authStep(i, done){
+  const steps = document.querySelectorAll('#steamAuthBusy .auth-step');
+  steps.forEach((s, n) => {
+    const mk = s.querySelector('.mk');
+    if(n < i || (n === i && done)){ s.className = 'auth-step done'; mk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
+    else if(n === i){ s.className = 'auth-step on'; mk.innerHTML = '<span class="spin"></span>'; }
+    else { s.className = 'auth-step'; mk.innerHTML = ''; }
+  });
+}
+// Seam for the real integration: redirect to Steam OpenID and verify the response
+// server-side. Resolves with the profile the backend returns.
+function steamAuthenticate(){
+  return new Promise((resolve, reject)=>{
+    const t = window.__steamAuthDelay ?? 620;
+    setTimeout(()=> authStep(0, true), t);
+    setTimeout(()=> authStep(1), t);
+    setTimeout(()=> authStep(1, true), t*2);
+    setTimeout(()=> authStep(2), t*2);
+    setTimeout(()=>{
+      if(window.__steamAuthFail){ reject(new Error(window.__steamAuthFail)); return; }
+      authStep(2, true);
+      const steamId = '7656119' + String(7000000000 + Math.floor(Math.random()*899999999));
+      const name = window.__steamAuthName || 'Kilnwatch';
+      resolve({
+        steamId, name,
+        created: new Date(Date.now() - 1000*60*60*24*(420 + Math.floor(Math.random()*900))).toISOString(),
+        email: null,
+        avatar: avatarFor(name, steamId)
+      });
+    }, t*3);
+  });
+}
+async function runSteamAuth(){
+  authPhase('busy'); authStep(0);
+  try {
+    const user = await steamAuthenticate();
+    Session.signIn(user);
+    await new Promise(r => setTimeout(r, 380));
+    closeSteamAuth();
+    fireCustomToast('Signed in', 'Welcome, ' + user.name + '. Your Steam account is linked.', 'i-check');
+    const intent = authIntent; authIntent = null;
+    if(intent === 'dashboard' || !intent) goDashboard();
+    else if(intent === 'settings') goSettings();
+    else if(intent === 'billing') goBilling();
+    else if(intent === 'pricing') goPricing();
+  } catch (err) {
+    authPhase('error');
+    document.getElementById('steamErrBody').textContent =
+      (err && err.message) ? err.message : 'Steam did not confirm the sign-in. This usually clears on a retry.';
+  }
+}
+
+// ---- pricing ----
+let billingCycle = 'monthly';
+function setCycle(btn){
+  document.querySelectorAll('#cycleTabs .tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  billingCycle = btn.dataset.cycle;
+  renderPricing();
+}
+function renderPricing(){
+  document.querySelectorAll('.plan').forEach(card=>{
+    const amt = card.querySelector('.amt');
+    const per = card.querySelector('[data-per]');
+    const m = +amt.dataset.priceM, y = +amt.dataset.priceY;
+    amt.textContent = '$' + (billingCycle === 'yearly' ? (y/12).toFixed(2).replace(/\.00$/,'') : m);
+    per.textContent = billingCycle === 'yearly' ? '/ month, billed yearly' : '/ month';
+    const cur = Session.data && Session.data.plan;
+    const btn = card.querySelector('.btn');
+    const isCurrent = cur && cur.id === card.dataset.plan && cur.cycle === billingCycle && cur.status === 'active';
+    btn.textContent = isCurrent ? 'Current plan' : 'Choose ' + PLANS[card.dataset.plan].name;
+    btn.disabled = !!isCurrent;
+    btn.style.opacity = isCurrent ? .55 : '';
+  });
+}
+function choosePlan(planId){
+  if(!Session.signedIn){ openSteamAuth('pricing'); return; }
+  Session.subscribe(planId, billingCycle);
+  fireCustomToast('Subscription active', PLANS[planId].name + ' is live — your dashboard is unlocked.', 'i-check');
+  setTimeout(()=> goDashboard(), 420);
+}
+
+// ---- settings ----
+function loadSettingsForm(){
+  const d = Session.data || {}, pr = d.prefs || DEFAULT_PREFS;
+  const v = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  const c = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
+  v('setDisplayName', d.displayName || (d.user ? d.user.name : ''));
+  v('setTimezone', pr.timezone || 'UTC');
+  v('setAppearance', pr.appearance || 'dark');
+  c('prefRaid', pr.raid); c('prefCall', pr.call); c('prefShop', pr.shop);
+  c('prefDecay', pr.decay); c('prefTeam', pr.team); c('prefEmail', pr.email);
+  const note = document.getElementById('settingsSaved'); if(note) note.textContent = '';
+}
+function renderSettings(){
+  const wrap = document.getElementById('settingsServers'); if(!wrap) return;
+  const servers = (Session.data && Session.data.servers) || [];
+  wrap.innerHTML = servers.length ? servers.map(s =>
+    '<div class="panel-2" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">'
+    + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
+    + '<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:600;">' + s.name + '</div>'
+    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.region + ' · ' + s.addr + '</div></div>'
+    + '<button class="btn btn-ghost btn-sm" onclick="unpairServer(\'' + s.name.replace(/'/g,"\\'") + '\')">Unpair</button></div>'
+  ).join('') : '<div class="text-3" style="font-size:12px;">No servers paired yet.</div>';
+}
+function saveSettings(){
+  if(!Session.data) return;
+  const val = id => (document.getElementById(id) || {}).value;
+  const chk = id => !!(document.getElementById(id) || {}).checked;
+  Session.data.displayName = (val('setDisplayName') || '').trim() || Session.data.user.name;
+  Session.data.prefs = {
+    raid:chk('prefRaid'), call:chk('prefCall'), shop:chk('prefShop'),
+    decay:chk('prefDecay'), team:chk('prefTeam'), email:chk('prefEmail'),
+    timezone: val('setTimezone'), appearance: val('setAppearance')
+  };
+  Session.save();
+  const note = document.getElementById('settingsSaved');
+  if(note){ note.textContent = 'Saved just now'; setTimeout(()=>{ if(note.textContent === 'Saved just now') note.textContent = ''; }, 3200); }
+  fireCustomToast('Settings saved', 'Your profile and notification preferences are up to date.', 'i-check');
+}
+function copySteamId(btn){
+  const id = (Session.data && Session.data.user) ? Session.data.user.steamId : '';
+  if(!id) return;
+  navigator.clipboard?.writeText(id).then(()=>{
+    const t = btn.textContent; btn.textContent = 'Copied';
+    setTimeout(()=> btn.textContent = t, 1400);
+  }).catch(()=>{});
+}
+function disconnectRustPlus(){
+  if(!Session.data) return;
+  Session.data.rustPlus = { connected:false, name:'—' };
+  Session.save();
+  fireCustomToast('Rust+ disconnected', 'Pair again from the pairing page to resume live data.', 'i-wifi');
+}
+function unpairServer(name){
+  if(!Session.data) return;
+  Session.data.servers = (Session.data.servers || []).filter(s => s.name !== name);
+  Session.save(); renderSettings();
+  fireCustomToast('Server unpaired', name + ' no longer streams to Rustex.', 'i-wifi');
+}
+
+// ---- billing ----
+function renderBilling(){
+  const d = Session.data || {}, inv = d.invoices || [];
+  const rows = document.getElementById('invoiceRows');
+  const empty = document.getElementById('invoiceEmpty');
+  const table = document.getElementById('invoiceTable');
+  const count = document.getElementById('invoiceCount');
+  if(rows){
+    rows.innerHTML = inv.map(v =>
+      '<tr><td class="mono">' + v.id + '</td><td>' + fmtDate(v.date) + '</td><td>' + v.plan
+      + '</td><td class="mono">' + money(v.amount) + '</td><td><span class="pill pill-online"><span class="dot"></span>'
+      + v.status + '</span></td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="downloadInvoice(\'' + v.id + '\')">Download</button></td></tr>'
+    ).join('');
+    table.style.display = inv.length ? '' : 'none';
+    empty.style.display = inv.length ? 'none' : '';
+    count.textContent = inv.length ? inv.length + (inv.length === 1 ? ' invoice' : ' invoices') : '';
+  }
+  const p = d.plan;
+  const show = (sel, on) => document.querySelectorAll(sel).forEach(b => b.hidden = !on);
+  show('[data-bill="cancel"]', !!p && p.status === 'active');
+  show('[data-bill="reactivate"]', !!p && p.status === 'canceled');
+  show('[data-bill="upgrade"]', !!p);
+  show('[data-bill="downgrade"]', !!p);
+  const card = document.getElementById('billingActive');
+  if(card && !p) card.hidden = false;
+}
+function cancelSub(){
+  if(!Session.data || !Session.data.plan) return;
+  Session.cancel(); renderBilling();
+  fireCustomToast('Subscription cancelled', 'You keep full access until ' + fmtDate(Session.data.plan.renewsAt) + '.', 'i-clock');
+}
+function reactivateSub(){
+  if(!Session.data || !Session.data.plan) return;
+  Session.reactivate(); renderBilling();
+  fireCustomToast('Subscription reactivated', 'Billing resumes on ' + fmtDate(Session.data.plan.renewsAt) + '.', 'i-check');
+}
+function updatePaymentMethod(){
+  if(!Session.data) return;
+  const brands = ['VISA','MASTERCARD','AMEX'];
+  Session.data.card = {
+    brand: brands[Math.floor(Math.random()*brands.length)],
+    last4: String(1000 + Math.floor(Math.random()*8999)),
+    exp: String(1 + Math.floor(Math.random()*12)).padStart(2,'0') + ' / 20' + (28 + Math.floor(Math.random()*4)),
+    name: Session.data.displayName || Session.data.user.name
+  };
+  Session.save();
+  fireCustomToast('Payment method updated', 'Future invoices will charge the new card.', 'i-check');
+}
+function downloadInvoice(id){
+  const d = Session.data || {};
+  const v = (d.invoices || []).find(x => x.id === id); if(!v) return;
+  const line = (k, val) => k.padEnd(20) + val;
+  const body = [
+    'RUSTEX — TACTICAL COMPANION FOR RUST', '='.repeat(52), '',
+    line('Invoice', v.id), line('Issued', fmtDate(v.date)), line('Status', v.status), '',
+    line('Billed to', d.displayName || d.user.name), line('Steam ID', d.user.steamId), '',
+    '-'.repeat(52),
+    line('Plan', v.plan + ' (' + v.cycle + ')'),
+    line('Amount', money(v.amount)),
+    line('Tax', money(0)),
+    '-'.repeat(52),
+    line('Total', money(v.amount)), '',
+    'Thank you. Questions: billing@rustex.app'
+  ].join('\n');
+  const url = URL.createObjectURL(new Blob([body], { type:'text/plain' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = id + '.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 1000);
+  fireCustomToast('Invoice downloaded', v.id + ' saved to your downloads.', 'i-check');
+}
+
+// ---- logout ----
+function logOut(){
+  Session.signOut();
+  document.body.classList.remove('dash','pairing','pricing','settings','billing');
+  window.scrollTo({ top:0, left:0, behavior:'auto' });
+  history.replaceState(null,'','#');
+  fireCustomToast('Logged out', 'Your session on this browser has been cleared.', 'i-check');
+}
+
+// ---- boot: honour the deep link, but never past the gate ----
+(function bootView(){
+  const h = location.hash;
+  if(h === '#dash' || h === '#dashboard'){
+    // entitled goes through; signed-in-but-unpaid lands on pricing; signed out just
+    // gets the landing page rather than a hint that a dashboard exists
+    if(Session.entitled) document.body.classList.add('dash');
+    else if(Session.signedIn) document.body.classList.add('pricing');
+  }
+  else if(h === '#pairing') document.body.classList.add('pairing');
+  else if(h === '#pricing') document.body.classList.add('pricing');
+  else if(h === '#settings' && Session.signedIn) document.body.classList.add('settings');
+  else if(h === '#billing' && Session.signedIn) document.body.classList.add('billing');
+  syncAuthUI();
+  if(document.body.classList.contains('pricing')) renderPricing();
+  if(document.body.classList.contains('settings')){ loadSettingsForm(); renderSettings(); }
+  if(document.body.classList.contains('billing')) renderBilling();
+})();
 
 // ---- sticky nav ----
 const nav = document.getElementById('siteNav');
