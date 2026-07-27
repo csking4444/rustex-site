@@ -69,15 +69,22 @@ const PLAN_NAMES = { scout: 'Scout', raider: 'Raider', clan: 'Clan' };
  *   COMPED_ACCOUNTS="76561198000000000:clan,76561198000000001:raider"
  * Checked server-side only; the client is never trusted to say what plan it has.
  */
-export function compedPlan(steamId) {
+function parseComped() {
   const raw = process.env.COMPED_ACCOUNTS || '';
-  for (const pair of raw.split(',')) {
-    const [id, planId] = pair.split(':').map(s => (s || '').trim());
-    if (id && id === String(steamId) && PLAN_NAMES[planId]) {
-      return { id: planId, name: PLAN_NAMES[planId], source: 'comp' };
-    }
-  }
-  return null;
+  return raw.split(',')
+    .map(pair => { const [id, planId] = pair.split(':').map(s => (s || '').trim()); return { id, planId }; })
+    .filter(e => e.id && PLAN_NAMES[e.planId]);
+}
+
+export function compedPlan(steamId) {
+  const hit = parseComped().find(e => e.id === String(steamId));
+  return hit ? { id: hit.planId, name: PLAN_NAMES[hit.planId], source: 'comp' } : null;
+}
+
+/** Count only — never the SteamIDs or plans themselves — so /api/auth/health can
+ * confirm the variable parsed without leaking who has been granted access. */
+export function compedAccountCount() {
+  return parseComped().length;
 }
 
 /** Absolute origin of this deployment, honouring Vercel's proxy headers. */
