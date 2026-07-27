@@ -390,6 +390,44 @@ select.inp{cursor:pointer;}
   .pref-row{flex-direction:column; gap:10px;}
 }
 
+/* --- dashboard sections: one screen, one job --- */
+.dash-tabs{display:flex; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border);
+  border-radius:var(--r-md); overflow-x:auto; scrollbar-width:none;}
+.dash-tabs::-webkit-scrollbar{display:none;}
+.dash-tab{display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:8px; border:none;
+  background:transparent; color:var(--text-2); font-size:12.5px; font-weight:600; white-space:nowrap;
+  transition:background .15s ease, color .15s ease;}
+.dash-tab .icon{width:14px; height:14px;}
+.dash-tab:hover{color:var(--text); background:var(--hover);}
+.dash-tab.active{background:var(--orange); color:#1a0f08;}
+.dash-section{display:none;}
+.dash-section.active{display:grid; grid-template-columns:repeat(12,1fr); gap:16px; animation:sectionIn .22s ease;}
+@keyframes sectionIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+.demo-banner{display:flex; align-items:center; gap:12px; padding:11px 16px; margin-bottom:16px;
+  border-radius:var(--r-md); background:var(--warning-soft); border:1px solid rgba(245,158,11,.28);
+  font-size:12.5px; color:var(--text-2);}
+.demo-banner .icon{width:15px; height:15px; color:var(--warning); flex-shrink:0;}
+.demo-banner b{color:var(--text);}
+body:not(.is-demo) .demo-banner{display:none;}
+
+/* --- pairing --- */
+.pair-step-row{display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid var(--border);}
+.pair-step-row:last-child{border-bottom:none;}
+.pair-num{width:26px; height:26px; border-radius:8px; flex-shrink:0; display:flex; align-items:center;
+  justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:700;
+  background:var(--orange-soft); color:var(--orange); border:1px solid var(--border-accent);}
+.pair-body{flex:1; min-width:0;}
+.pair-t{font-size:13.5px; font-weight:600;}
+.pair-d{font-size:11.5px; color:var(--text-3); margin-top:2px;}
+.pair-manual{margin-top:16px; background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:16px 20px;}
+.pair-manual summary{cursor:pointer; font-size:12.5px; font-weight:600; color:var(--text-2); list-style:none;}
+.pair-manual summary::-webkit-details-marker{display:none;}
+.pair-manual summary::before{content:"+ "; color:var(--orange); font-weight:700;}
+.pair-manual[open] summary::before{content:"– ";}
+.pair-manual summary:hover{color:var(--text);}
+@media (max-width:560px){ .pair-step-row{flex-wrap:wrap;} }
+
 /* dropdowns */
 .dropdown{position:relative;}
 .dropdown-panel{position:absolute; top:calc(100% + 8px); right:0; min-width:240px; background:var(--surface-2); border:1px solid var(--border-strong); border-radius:var(--r-md); box-shadow:var(--shadow-md); padding:6px; z-index:150; display:none;}
@@ -904,7 +942,7 @@ body.billing #billing-view{display:block;}
         <span class="hb-tr"></span><span class="hb-bl"></span>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px 14px;border-bottom:1px solid var(--border);margin-bottom:14px;">
           <div class="window-dots"><span></span><span></span><span></span></div>
-          <span class="mono text-3" style="font-size:11px">rustex.app/dashboard — Rustex Main · US-East</span>
+          <span class="mono text-3" style="font-size:11px">rustex.app/dashboard</span>
           <span class="pill pill-online"><span class="dot"></span>Live</span>
         </div>
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;padding:0 8px 8px;">
@@ -1485,20 +1523,20 @@ body.billing #billing-view{display:block;}
     <a class="sidebar-brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <a class="side-link active" href="#d-overview"><svg class="icon"><use href="#i-grid"/></svg>Overview</a>
     <div class="side-section-lbl">Squad</div>
-    <a class="side-link" href="#d-team"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
-    <a class="side-link" href="#d-threat"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
-    <a class="side-link" href="#d-alarm"><svg class="icon"><use href="#i-siren"/></svg>Raid Alarms<span class="count">1</span></a>
+    <a class="side-link" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
+    <a class="side-link" href="#" onclick="showDashSection('overview','d-threat');return false;"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
+    <a class="side-link" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Raid Alarms<span class="count">1</span></a>
     <div class="side-section-lbl">Economy</div>
-    <a class="side-link" href="#d-vending"><span class="icon-img ic-vending"></span>Vending Search</a>
-    <a class="side-link" href="#d-shopalerts"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
+    <a class="side-link" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
+    <a class="side-link" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
     <div class="side-section-lbl">Base</div>
-    <a class="side-link" href="#d-decay"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
-    <a class="side-link" href="#d-genetics"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
-    <a class="side-link" href="#d-devices"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
-    <a class="side-link" href="#d-recycler"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
+    <a class="side-link" href="#" onclick="showDashSection('base','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
+    <a class="side-link" href="#" onclick="showDashSection('tools','d-genetics');return false;"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
+    <a class="side-link" href="#" onclick="showDashSection('base','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
+    <a class="side-link" href="#" onclick="showDashSection('market','d-recycler');return false;"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
     <div class="side-section-lbl">Comms</div>
-    <a class="side-link" href="#d-chat"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
-    <a class="side-link" href="#d-heatmap"><svg class="icon"><use href="#i-map"/></svg>Heatmap</a>
+    <a class="side-link" href="#" onclick="showDashSection('tools','d-chat');return false;"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
+    <a class="side-link" href="#" onclick="showDashSection('base','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Heatmap</a>
     <div class="side-foot">
       <a class="side-link" href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
       <a class="side-link" href="#" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription</a>
@@ -1510,23 +1548,23 @@ body.billing #billing-view{display:block;}
   <div class="dash-main">
     <div class="topbar">
       <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
-      <div class="crumb"><b>Rustex Main</b> · US-East · 187/200</div>
+      <div class="crumb"><b data-acct="serverName">No server paired</b></div>
       <button class="top-search" onclick="openCmdk()"><svg class="icon" style="width:15px;height:15px"><use href="#i-search"/></svg>Search players, items, commands…<kbd>⌘K</kbd></button>
       <div class="top-actions">
         <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddServer', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-grid"/></svg><span id="serverLabel">Rustex Main</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="selector" onclick="toggleDropdown('ddServer', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-grid"/></svg><span id="serverLabel" data-acct="serverName">No server</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddServer">
             <div class="dropdown-label">Your servers</div>
-            <div class="dropdown-item selected" onclick="selectServer(this,'Rustex Main')"><svg class="icon"><use href="#i-check"/></svg>Rustex Main<span class="meta mono">187/200</span></div>
+            <div class="dropdown-item text-3" style="cursor:default;">No servers paired yet</div>
             <div class="dropdown-sep"></div>
             <div class="dropdown-item" onclick="closeDropdowns();goPairing();"><svg class="icon"><use href="#i-plus"/></svg>Pair a new server</div>
           </div>
         </div>
         <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddTeam', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-users"/></svg><span id="teamLabel">Squad 5</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="selector" onclick="toggleDropdown('ddTeam', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-users"/></svg><span id="teamLabel">No team</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddTeam">
             <div class="dropdown-label">Teams</div>
-            <div class="dropdown-item selected" onclick="selectTeam(this,'Squad 5')"><svg class="icon"><use href="#i-check"/></svg>Squad 5<span class="meta mono">4/5</span></div>
+            <div class="dropdown-item text-3" style="cursor:default;">No team data yet</div>
             <div class="dropdown-sep"></div>
             <div class="dropdown-item"><svg class="icon"><use href="#i-settings"/></svg>Manage teams</div>
           </div>
@@ -1556,28 +1594,18 @@ body.billing #billing-view{display:block;}
 
     <div class="dash-content">
       <div id="d-overview" class="dash-head">
-        <div><h1>Overview</h1><div class="sub">Rustex Main · Wipe day 3 · Everything, one glass.</div></div>
+        <div><h1>Overview</h1><div class="sub" data-acct="serverName">No server paired</div></div>
         <div style="display:flex;gap:10px;">
           <div class="dropdown">
             <button class="btn btn-outline btn-sm" onclick="toggleDropdown('ddCustomize', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-layers"/></svg>Customize</button>
             <div class="dropdown-panel" id="ddCustomize" style="width:230px;">
-              <div class="dropdown-label">Visible widgets</div>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-team',this)">Team Tracker</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-threat',this)">Threat Intel</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-decay',this)">Decay Timers</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-vending',this)">Vending Search</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-shopalerts',this)">Shop Alerts</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-devices',this)">Smart Devices</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-genetics',this)">Genetics Lab</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-recycler',this)">Recycler</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-chat',this)">Chat Assistant</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-heatmap',this)">Heatmap</label>
-              <label class="dropdown-check"><input type="checkbox" checked onchange="toggleWidget('d-alarm',this)">Activity Feed</label>
-            </div>
+              <div class="dropdown-label">Sections</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('base')"><svg class="icon"><use href="#i-lock"/></svg>Base</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</div></div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="fireToast()"><svg class="icon" style="width:14px;height:14px"><use href="#i-plus"/></svg>Quick Alert</button>
         </div>
       </div>
+
+      <div class="demo-banner"><svg class="icon"><use href="#i-flask"/></svg><span><b>Demo mode.</b> Everything on this page is sample data, not live Rust+ telemetry.</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="exitDemo()">Exit demo</button></div>
 
       <div class="stat-row">
         <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">187<span class="text-3" style="font-size:14px">/200</span></div></div>
@@ -1593,8 +1621,15 @@ body.billing #billing-view{display:block;}
         <button class="icon-btn" style="width:34px;height:34px;"><svg class="icon" style="width:14px;height:14px"><use href="#i-x"/></svg></button>
       </div>
 
-      <div class="widget-grid">
 
+      <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
+          <button class="dash-tab active" data-dsec="overview" onclick="showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</button>
+          <button class="dash-tab" data-dsec="base" onclick="showDashSection('base')"><svg class="icon"><use href="#i-lock"/></svg>Base</button>
+          <button class="dash-tab" data-dsec="market" onclick="showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</button>
+          <button class="dash-tab" data-dsec="tools" onclick="showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</button>
+      </div>
+
+      <div class="dash-section active" id="dsec-overview">
         <div class="widget card w-12" id="d-profile">
           <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
             <img data-acct="avatar" alt="" style="width:54px;height:54px;border-radius:14px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
@@ -1605,8 +1640,8 @@ body.billing #billing-view{display:block;}
             <div style="display:flex;gap:22px;flex-wrap:wrap;margin-left:auto;">
               <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Plan</div><span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>—</span></div>
               <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Rust+</div><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span></div>
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Server</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="serverName">Rustex Main</span></span></div>
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Team</div><span class="pill pill-slate"><span class="dot"></span>Squad 5 · 4 online</span></div>
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Server</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="serverName">None paired</span></span></div>
+              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Team</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="teamName">No team data</span></span></div>
               <div style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-outline btn-sm" onclick="goSettings()"><svg class="icon" style="width:14px;height:14px"><use href="#i-settings"/></svg>Account</button></div>
             </div>
           </div>
@@ -1636,31 +1671,26 @@ body.billing #billing-view{display:block;}
           </table>
         </div>
 
+        <div class="widget card w-12" id="d-alarm">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">21:04</span><svg class="icon" style="width:14px;height:14px;color:var(--crimson)"><use href="#i-item-explosive"/></svg><span class="text-2" style="font-size:12.5px;">Breach — North Wall</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">21:03</span><svg class="icon" style="width:14px;height:14px;color:var(--warning)"><use href="#i-siren"/></svg><span class="text-2" style="font-size:12.5px;">Smart Alarm triggered</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">20:58</span><svg class="icon" style="width:14px;height:14px;color:var(--orange)"><use href="#i-tag"/></svg><span class="text-2" style="font-size:12.5px;">New shop @ B12</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">20:41</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-map"/></svg><span class="text-2" style="font-size:12.5px;">Patrol Heli near J9</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">20:20</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-users"/></svg><span class="text-2" style="font-size:12.5px;">Ramsey went offline</span></div>
+            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">19:55</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-lock"/></svg><span class="text-2" style="font-size:12.5px;">TC upkeep below 70%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dash-section" id="dsec-base">
         <div class="widget card w-4" id="d-decay">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:10px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span><span class="text-2" style="flex:1;font-size:12.5px;">2by2</span><span class="mono" style="color:var(--crimson);font-weight:700;font-size:12.5px;">05:12:47</span></div>
             <div style="display:flex;align-items:center;gap:10px;"><span class="item-ic sm photo ic-metalfrag" title="Metal Fragments"></span><span class="text-2" style="flex:1;font-size:12.5px;">farm base</span><span class="mono" style="color:var(--warning);font-weight:700;font-size:12.5px;">1d 19:33</span></div>
             <div style="display:flex;align-items:center;gap:10px;"><span class="item-ic sm photo ic-stones" title="Stones"></span><span class="text-2" style="flex:1;font-size:12.5px;">stone base</span><span class="mono" style="color:var(--success);font-weight:700;font-size:12.5px;">3d 06:14</span></div>
-          </div>
-        </div>
-
-        <div class="widget card w-4" id="d-vending">
-          <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border);margin-bottom:12px;">
-            <svg class="icon" style="width:13px;height:13px;color:var(--text-3)"><use href="#i-search"/></svg><span class="text-3" style="font-size:12px">assault rifle</span>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;">
-            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span style="flex:1;">Grid B12</span><span class="mono" style="color:var(--success)">180 Scrap</span></div>
-            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span style="flex:1;">Grid F7</span><span class="mono">210 Scrap</span></div>
-          </div>
-        </div>
-
-        <div class="widget card w-4" id="d-shopalerts">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;">
-            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span class="pill pill-orange"><span class="dot"></span>New</span>AR ×3 @ B12</div>
-            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-vending" title="Vending Machine" style="opacity:.5"></span><span class="pill pill-offline"><span class="dot"></span>Gone</span>Shop @ K3 removed</div>
           </div>
         </div>
 
@@ -1675,47 +1705,6 @@ body.billing #billing-view{display:block;}
             <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-wood" title="Wood"></span>8.2k</span>
             <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-stones" title="Stones"></span>12.4k</span>
             <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
-          </div>
-        </div>
-
-        <div class="widget card w-4" id="d-genetics">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="planter planter-mini" style="margin-bottom:10px;">
-            <div class="planter-soil">
-              <div class="plant-slot is-center">
-                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
-                <div class="slot-body">
-                  <span class="slot-tag">Center · Hemp</span>
-                  <div class="gene-blocks">
-                    <span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#e5e7eb;color:#1f2937;cursor:default" title="Water (avoid)">W</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="progress"><span style="width:67%"></span></div>
-          <div class="text-3 mono" style="font-size:10.5px;margin-top:6px;">67% to target GGGYYY</div>
-        </div>
-
-        <div class="widget card w-8" id="d-recycler">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-recycle"/></svg>Recycler Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-            <div class="rc-chip"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>Assault Rifle</div>
-            <div class="rc-chip"><span class="item-ic sm photo ic-garagedoor" title="Garage Door"></span>Garage Door</div>
-          </div>
-          <div style="display:flex;gap:18px;flex-wrap:wrap;" class="mono text-2" style="font-size:12.5px;">
-            <span>Scrap <b style="color:var(--text)">35</b></span>
-            <span>Metal Frags <b style="color:var(--text)">290</b></span>
-            <span>Springs <b style="color:var(--text)">2</b></span>
-            <span>Gears <b style="color:var(--text)">2</b></span>
-          </div>
-        </div>
-
-        <div class="widget card w-4" id="d-chat">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;flex-direction:column;gap:8px;">
-            <div class="chat-bubble chat-them" style="font-size:12px;padding:8px 10px;">heli up @ J9</div>
-            <div class="chat-bubble chat-bot" style="font-size:12px;padding:8px 10px;"><b>Bot</b> — Tracking Patrol Heli near J9</div>
           </div>
         </div>
 
@@ -1740,20 +1729,72 @@ body.billing #billing-view{display:block;}
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="widget card w-12" id="d-alarm">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">21:04</span><svg class="icon" style="width:14px;height:14px;color:var(--crimson)"><use href="#i-item-explosive"/></svg><span class="text-2" style="font-size:12.5px;">Breach — North Wall</span></div>
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">21:03</span><svg class="icon" style="width:14px;height:14px;color:var(--warning)"><use href="#i-siren"/></svg><span class="text-2" style="font-size:12.5px;">Smart Alarm triggered</span></div>
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);"><span class="mono text-3" style="font-size:11px;width:40px;">20:58</span><svg class="icon" style="width:14px;height:14px;color:var(--orange)"><use href="#i-tag"/></svg><span class="text-2" style="font-size:12.5px;">New shop @ B12</span></div>
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">20:41</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-map"/></svg><span class="text-2" style="font-size:12.5px;">Patrol Heli near J9</span></div>
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">20:20</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-users"/></svg><span class="text-2" style="font-size:12.5px;">Ramsey went offline</span></div>
-            <div style="display:flex;align-items:center;gap:10px;padding:9px 0;"><span class="mono text-3" style="font-size:11px;width:40px;">19:55</span><svg class="icon" style="width:14px;height:14px;color:var(--text-3)"><use href="#i-lock"/></svg><span class="text-2" style="font-size:12.5px;">TC upkeep below 70%</span></div>
+      <div class="dash-section" id="dsec-market">
+        <div class="widget card w-4" id="d-vending">
+          <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border);margin-bottom:12px;">
+            <svg class="icon" style="width:13px;height:13px;color:var(--text-3)"><use href="#i-search"/></svg><span class="text-3" style="font-size:12px">assault rifle</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span style="flex:1;">Grid B12</span><span class="mono" style="color:var(--success)">180 Scrap</span></div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span style="flex:1;">Grid F7</span><span class="mono">210 Scrap</span></div>
           </div>
         </div>
 
+        <div class="widget card w-4" id="d-shopalerts">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;">
+            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span class="pill pill-orange"><span class="dot"></span>New</span>AR ×3 @ B12</div>
+            <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-vending" title="Vending Machine" style="opacity:.5"></span><span class="pill pill-offline"><span class="dot"></span>Gone</span>Shop @ K3 removed</div>
+          </div>
+        </div>
+
+        <div class="widget card w-8" id="d-recycler">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-recycle"/></svg>Recycler Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <div class="rc-chip"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>Assault Rifle</div>
+            <div class="rc-chip"><span class="item-ic sm photo ic-garagedoor" title="Garage Door"></span>Garage Door</div>
+          </div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;" class="mono text-2" style="font-size:12.5px;">
+            <span>Scrap <b style="color:var(--text)">35</b></span>
+            <span>Metal Frags <b style="color:var(--text)">290</b></span>
+            <span>Springs <b style="color:var(--text)">2</b></span>
+            <span>Gears <b style="color:var(--text)">2</b></span>
+          </div>
+        </div>
       </div>
+
+      <div class="dash-section" id="dsec-tools">
+        <div class="widget card w-4" id="d-genetics">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div class="planter planter-mini" style="margin-bottom:10px;">
+            <div class="planter-soil">
+              <div class="plant-slot is-center">
+                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
+                <div class="slot-body">
+                  <span class="slot-tag">Center · Hemp</span>
+                  <div class="gene-blocks">
+                    <span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#e5e7eb;color:#1f2937;cursor:default" title="Water (avoid)">W</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="progress"><span style="width:67%"></span></div>
+          <div class="text-3 mono" style="font-size:10.5px;margin-top:6px;">67% to target GGGYYY</div>
+        </div>
+
+        <div class="widget card w-4" id="d-chat">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div class="chat-bubble chat-them" style="font-size:12px;padding:8px 10px;">heli up @ J9</div>
+            <div class="chat-bubble chat-bot" style="font-size:12px;padding:8px 10px;"><b>Bot</b> — Tracking Patrol Heli near J9</div>
+          </div>
+        </div>
+      </div>
+    
     </div>
   </div>
 </div>
@@ -1800,10 +1841,10 @@ body.billing #billing-view{display:block;}
             <p class="text-3" style="font-size:12px;margin-top:5px;">For a solo player holding one base.</p>
           </div>
           <div class="price">
-            <span class="amt mono" data-price-m="6" data-price-y="58">$6</span>
+            <span class="amt mono" data-price-m="4.99" data-price-y="47.90">$4.99</span>
             <span class="per" data-per>/ month</span>
           </div>
-          <ul><li><svg class="icon"><use href="#i-check"/></svg>1 paired server</li><li><svg class="icon"><use href="#i-check"/></svg>Team tracker &amp; map</li><li><svg class="icon"><use href="#i-check"/></svg>Raid alarms to web push</li><li><svg class="icon"><use href="#i-check"/></svg>Decay timers</li><li><svg class="icon"><use href="#i-check"/></svg>7-day event history</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Phone call escalation</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Vending &amp; shop alerts</li></ul>
+          <ul><li><svg class="icon"><use href="#i-check"/></svg>2 paired servers</li><li><svg class="icon"><use href="#i-check"/></svg>Team tracker &amp; map</li><li><svg class="icon"><use href="#i-check"/></svg>Raid alarms to web push</li><li><svg class="icon"><use href="#i-check"/></svg>Decay timers</li><li><svg class="icon"><use href="#i-check"/></svg>7-day event history</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Phone call escalation</li><li class="off"><svg class="icon"><use href="#i-minus"/></svg>Vending &amp; shop alerts</li></ul>
           <button class="btn btn-outline btn-block" onclick="choosePlan('scout')">Choose Scout</button>
         </div>
         <div class="plan featured" data-plan="raider">
@@ -1813,7 +1854,7 @@ body.billing #billing-view{display:block;}
             <p class="text-3" style="font-size:12px;margin-top:5px;">For a squad running a wipe properly.</p>
           </div>
           <div class="price">
-            <span class="amt mono" data-price-m="14" data-price-y="134">$14</span>
+            <span class="amt mono" data-price-m="9.99" data-price-y="95.90">$9.99</span>
             <span class="per" data-per>/ month</span>
           </div>
           <ul><li><svg class="icon"><use href="#i-check"/></svg>Up to 5 paired servers</li><li><svg class="icon"><use href="#i-check"/></svg>Everything in Scout</li><li><svg class="icon"><use href="#i-check"/></svg>Phone call escalation</li><li><svg class="icon"><use href="#i-check"/></svg>Vending search &amp; shop alerts</li><li><svg class="icon"><use href="#i-check"/></svg>Smart device control</li><li><svg class="icon"><use href="#i-check"/></svg>Genetics lab &amp; recycler</li><li><svg class="icon"><use href="#i-check"/></svg>30-day event history</li></ul>
@@ -1826,7 +1867,7 @@ body.billing #billing-view{display:block;}
             <p class="text-3" style="font-size:12px;margin-top:5px;">For a full clan with several bases.</p>
           </div>
           <div class="price">
-            <span class="amt mono" data-price-m="32" data-price-y="306">$32</span>
+            <span class="amt mono" data-price-m="19.99" data-price-y="191.90">$19.99</span>
             <span class="per" data-per>/ month</span>
           </div>
           <ul><li><svg class="icon"><use href="#i-check"/></svg>Unlimited paired servers</li><li><svg class="icon"><use href="#i-check"/></svg>Everything in Raider</li><li><svg class="icon"><use href="#i-check"/></svg>Unlimited team members</li><li><svg class="icon"><use href="#i-check"/></svg>Priority alarm routing</li><li><svg class="icon"><use href="#i-check"/></svg>Chat assistant with custom commands</li><li><svg class="icon"><use href="#i-check"/></svg>Full event history &amp; export</li><li><svg class="icon"><use href="#i-check"/></svg>Priority support</li></ul>
@@ -1836,6 +1877,14 @@ body.billing #billing-view{display:block;}
     <p class="text-3" style="font-size:11.5px;margin-top:20px;text-align:center;">
       Prices in USD. Cancel any time — access runs to the end of the period you already paid for.
     </p>
+    <div class="card" style="margin-top:26px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <svg class="icon" style="width:18px;height:18px;color:var(--warning);flex-shrink:0;"><use href="#i-flask"/></svg>
+      <div style="flex:1;min-width:220px;">
+        <div style="font-weight:700;font-size:13.5px;margin-bottom:3px;">Checkout isn't connected yet</div>
+        <div class="text-3" style="font-size:12.5px;">No payment provider is wired up, so nothing here can charge you. You can still open the dashboard with clearly-marked sample data.</div>
+      </div>
+      <button class="btn btn-outline" onclick="enterDemo()">Open dashboard in demo mode</button>
+    </div>
   </div>
 </section>
 
@@ -2018,7 +2067,18 @@ body.billing #billing-view{display:block;}
         <div class="card"><div class="lbl">Next payment</div><div class="val mono" data-acct="nextPayment">—</div></div>
       </div>
 
-      <div class="card" id="billingActive">
+      <div class="card" id="billingNone" hidden>
+        <div style="display:flex;gap:16px;align-items:flex-start;">
+          <svg class="icon" style="width:18px;height:18px;color:var(--text-3);flex-shrink:0;margin-top:1px;"><use href="#i-tag"/></svg>
+          <div style="flex:1;">
+            <div style="font-weight:700;font-size:13.5px;margin-bottom:4px;">No active subscription</div>
+            <div class="text-3" style="font-size:12.5px;max-width:560px;">There's nothing to bill yet — no plan, no payment method on file and no invoices. Once a payment provider is connected, your plan and receipts will appear here.</div>
+            <button class="btn btn-outline btn-sm" style="margin-top:13px;" onclick="goPricing()">See plans</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="billingActive" hidden>
         <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-tag"/></svg>Plan</div><span class="pill pill-orange" data-acct="pricePill"><span class="dot"></span>—</span></div>
         <div class="field-row"><span class="fl">Renews on</span><span class="fv mono" data-acct="renewsAt">—</span></div>
         <div class="field-row"><span class="fl">Amount</span><span class="fv mono" data-acct="amount">—</span></div>
@@ -2033,11 +2093,12 @@ body.billing #billing-view{display:block;}
 
       <div class="card">
         <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-lock"/></svg>Payment method</div></div>
-        <div class="pay-card">
-          <span class="pay-brand" data-acct="cardBrand">VISA</span>
+        <div id="billingNoCard" class="text-3" style="font-size:12.5px;padding:4px 0 2px;">No payment method on file.</div>
+        <div class="pay-card" id="billingCard" hidden>
+          <span class="pay-brand" data-acct="cardBrand">CARD</span>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;">•••• •••• •••• <span class="mono" data-acct="cardLast4">4242</span></div>
-            <div class="text-3" style="font-size:11.5px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">04 / 2029</span> · <span data-acct="cardName">Steam account holder</span></div>
+            <div style="font-size:13px;font-weight:600;">•••• •••• •••• <span class="mono" data-acct="cardLast4">••••</span></div>
+            <div class="text-3" style="font-size:11.5px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">—</span> · <span data-acct="cardName">—</span></div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="updatePaymentMethod()">Update</button>
         </div>
@@ -2065,7 +2126,6 @@ body.billing #billing-view{display:block;}
 </div>
 <!-- ================================================================= PAIRING VIEW ================================================================= -->
 <div id="pairing-view">
-
 <nav class="nav scrolled" id="pairNav">
   <div class="container nav-inner">
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
@@ -2076,100 +2136,61 @@ body.billing #billing-view{display:block;}
   </div>
 </nav>
 
-<header style="padding:72px 0 44px;">
-  <div class="container">
-    <span class="eyebrow">Rust+ pairing</span>
-    <h1 style="font-size:clamp(30px,4vw,46px); margin:16px 0 14px; max-width:640px;">Pair from inside the game — nothing to type.</h1>
-    <p class="text-2" style="max-width:560px; font-size:15px;">Rustex connects the same way the official Rust+ app does: through Rust's own in-game pairing request. Log in below, pair from the pause menu, and your server shows up here automatically.</p>
-  </div>
-</header>
+<section style="padding:74px 0 110px;">
+  <div class="container" style="max-width:760px;">
 
-<section>
-  <div class="container" style="display:grid; grid-template-columns:0.82fr 1.18fr; gap:56px; align-items:start; padding-bottom:110px;">
+    <div style="text-align:center;margin-bottom:34px;">
+      <span class="eyebrow" style="justify-content:center;">Rust+ pairing</span>
+      <h1 style="font-size:clamp(27px,3.4vw,38px);margin:14px 0 12px;">Pair straight from the game.</h1>
+      <p class="text-2" style="font-size:14.5px;max-width:520px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses. Nothing to copy, nothing to type.</p>
+    </div>
 
-    <div style="display:flex; flex-direction:column; gap:16px;">
-      <div class="card">
-        <div class="card-title" style="margin-bottom:16px;"><svg class="icon"><use href="#i-wifi"/></svg>How pairing works</div>
-        <div style="display:flex; flex-direction:column; gap:16px;">
-          <div style="display:flex; gap:12px;"><span class="mono" style="width:24px;height:24px;border-radius:7px;background:var(--orange-soft);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">1</span><span class="text-2" style="font-size:13px;">Log in with Steam below — Rustex links to your Rust+ account</span></div>
-          <div style="display:flex; gap:12px;"><span class="mono" style="width:24px;height:24px;border-radius:7px;background:var(--orange-soft);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">2</span><span class="text-2" style="font-size:13px;">Load into your server, press <b class="text-1" style="color:var(--text);">ESC</b> and open the Rust+ tab</span></div>
-          <div style="display:flex; gap:12px;"><span class="mono" style="width:24px;height:24px;border-radius:7px;background:var(--orange-soft);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">3</span><span class="text-2" style="font-size:13px;">Tap <b style="color:var(--text);">Pair With Server</b> — that's the real in-game request, same as pairing the mobile app</span></div>
-          <div style="display:flex; gap:12px;"><span class="mono" style="width:24px;height:24px;border-radius:7px;background:var(--orange-soft);color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">4</span><span class="text-2" style="font-size:13px;">Rustex receives the request and the server appears below, live</span></div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="pair-step-row">
+        <span class="pair-num">1</span>
+        <div class="pair-body">
+          <div class="pair-t">Sign in with Steam</div>
+          <div class="pair-d">Links Rustex to the account you play on.</div>
+        </div>
+        <span class="pill pill-online" data-when="in entitled"><span class="dot"></span>Done</span>
+        <button class="btn btn-steam btn-sm" data-when="out" onclick="openSteamAuth('pairing')"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in</button>
+      </div>
+      <div class="pair-step-row">
+        <span class="pair-num">2</span>
+        <div class="pair-body">
+          <div class="pair-t">In Rust, press <b style="color:var(--text)">ESC</b> → <b style="color:var(--text)">Rust+</b></div>
+          <div class="pair-d">Load into the server you want to track first.</div>
         </div>
       </div>
-
-      <div class="card">
-        <div class="card-title" style="margin-bottom:14px;"><svg class="icon"><use href="#i-grid"/></svg>Paired Servers</div>
-        <div id="pairedList" style="display:flex; flex-direction:column; gap:10px;"></div>
-        <div id="pairedEmpty" style="text-align:center; padding:26px 10px;">
-          <svg class="icon" style="width:22px;height:22px;color:var(--text-3);margin:0 auto 10px;"><use href="#i-wifi"/></svg>
-          <div class="text-2" style="font-size:13px;font-weight:600;margin-bottom:3px;">No servers paired yet</div>
-          <div class="text-3" style="font-size:12px;">Log in and pair from the pause menu to see it here.</div>
+      <div class="pair-step-row">
+        <span class="pair-num">3</span>
+        <div class="pair-body">
+          <div class="pair-t">Hit <b style="color:var(--text)">Pair With Server</b></div>
+          <div class="pair-d">It appears below within a second or two.</div>
         </div>
+        <span class="pill pill-warn" id="pairListenPill"><span class="dot"></span>Waiting</span>
       </div>
     </div>
 
-    <div class="hud-frame glass" style="padding:24px;">
-      <span class="hb-tr"></span><span class="hb-bl"></span>
-      <div class="tabs" id="pairTabs" style="margin-bottom:22px;">
-        <button class="tab active" data-pt="auto" onclick="switchPairTab(this)">Log In &amp; Pair</button>
-        <button class="tab" data-pt="manual" onclick="switchPairTab(this)">Manual Entry</button>
-      </div>
-
-      <div id="pt-auto">
-        <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 10px 26px;" id="pairAutoIdle">
-          <div style="position:relative; width:120px; height:120px; margin-bottom:22px;">
-            <div style="position:absolute; inset:0; border-radius:50%; background:var(--orange-soft); display:flex; align-items:center; justify-content:center; border:1px solid var(--border-accent);">
-              <svg class="icon" style="width:32px;height:32px;color:var(--orange)"><use href="#i-wifi"/></svg>
-            </div>
-          </div>
-          <div style="font-weight:700; font-size:14.5px; margin-bottom:4px;">Log in to pair a server</div>
-          <div class="text-3" style="font-size:12px; margin-bottom:22px; max-width:280px;">Rustex uses your Steam login to receive the in-game pairing request — the same account you play Rust on.</div>
-          <button class="btn btn-primary" id="pairStartBtn" onclick="startAutoPair()"><svg class="icon" style="width:15px;height:15px"><use href="#i-users"/></svg>Log In With Steam</button>
-        </div>
-        <div id="pairAutoProgress" style="display:none;">
-          <div style="display:flex; flex-direction:column; align-items:center; text-align:center; padding:10px 10px 26px;">
-            <div style="position:relative; width:120px; height:120px; margin-bottom:22px;">
-              <div class="pulse-ring" style="inset:0; border-color:var(--orange);"></div>
-              <div class="pulse-ring" style="inset:0; border-color:var(--orange); animation-delay:1.1s;"></div>
-              <div style="position:absolute; inset:0; border-radius:50%; background:var(--orange-soft); display:flex; align-items:center; justify-content:center; border:1px solid var(--border-accent);">
-                <svg class="icon" style="width:32px;height:32px;color:var(--orange)"><use href="#i-wifi"/></svg>
-              </div>
-            </div>
-            <div style="font-weight:700; font-size:14.5px; margin-bottom:4px;" id="pairStatusText">Signed in</div>
-            <div class="text-3" style="font-size:12px; margin-bottom:6px;" id="pairStatusSub">Open Rust, press ESC, and tap Pair With Server.</div>
-          </div>
-          <div class="panel-2" style="padding:16px; display:flex; flex-direction:column; gap:14px;">
-            <div class="pair-step" data-step="1"><span class="pair-step-dot"></span>Signed in with Steam</div>
-            <div class="pair-step" data-step="2"><span class="pair-step-dot"></span>Waiting for "Pair With Server" in-game</div>
-            <div class="pair-step" data-step="3"><span class="pair-step-dot"></span>Server paired</div>
-          </div>
-        </div>
-      </div>
-
-      <div id="pt-manual" style="display:none;">
-        <div class="field">
-          <label>Server IP</label>
-          <input type="text" id="mIp" placeholder="203.0.113.42" />
-        </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
-          <div class="field">
-            <label>Query Port</label>
-            <input type="text" id="mPort" placeholder="28083" />
-          </div>
-          <div class="field">
-            <label>Player ID</label>
-            <input type="text" id="mPlayerId" placeholder="7656119..." />
-          </div>
-        </div>
-        <div class="field">
-          <label>Player Token</label>
-          <input type="text" id="mToken" placeholder="-1524638527" />
-          <span class="hint">For advanced setups only — most people should use Log In &amp; Pair instead. Encrypted at rest.</span>
-        </div>
-        <button class="btn btn-primary btn-block" onclick="saveManualPairing()">Save Pairing</button>
+    <div class="card" style="margin-top:16px;">
+      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-grid"/></svg>Paired servers</div><span class="text-3" style="font-size:11.5px;" id="pairedCount"></span></div>
+      <div id="pairedList" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div id="pairedEmpty" style="text-align:center;padding:24px 10px;">
+        <svg class="icon" style="width:20px;height:20px;color:var(--text-3);margin:0 auto 9px;"><use href="#i-wifi"/></svg>
+        <div class="text-2" style="font-size:12.5px;font-weight:600;margin-bottom:3px;">Nothing paired yet</div>
+        <div class="text-3" style="font-size:11.5px;">Complete the three steps above and your server lands here.</div>
       </div>
     </div>
+
+    <details class="pair-manual">
+      <summary>Enter connection details manually</summary>
+      <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:14px;">
+        <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;">
+        <input class="inp" type="text" id="mPort" placeholder="App port" style="max-width:none;">
+      </div>
+      <p class="text-3" style="font-size:11px;margin-top:10px;">Manual entry still needs the player ID and token the game issues, so pairing from the pause menu is almost always faster.</p>
+      <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="manualPair()">Add server</button>
+    </details>
 
   </div>
 </section>
@@ -2177,73 +2198,72 @@ body.billing #billing-view{display:block;}
 
 <script>
 // ---- session ----------------------------------------------------------------
-// NOTE: this is a client-side session for the product demo. Real authorisation has to
-// be enforced server-side — hiding a nav link never stops anyone from editing
-// localStorage. steamAuthenticate() and the plan calls below are the seams where the
-// real Rustex API (Steam OpenID + the billing provider) gets wired in.
-const RX_KEY = 'rustex.session.v2';
+// Identity is REAL: /api/auth/steam starts Steam's OpenID 2.0 flow and
+// /api/auth/callback verifies the response server-to-server with Steam before
+// issuing a signed HttpOnly cookie. The browser never decides who it is — it
+// asks /api/auth/me. Everything below is presentation on top of that.
+//
+// Payments are NOT wired. There is no provider, so we never invent a
+// subscription, an invoice or a saved card. Demo mode is opt-in and labelled.
+const RX_PREFS = 'rustex.prefs.v1';
 const PLANS = {
-  scout:  { id:'scout',  name:'Scout',  monthly:6,  yearly:58  },
-  raider: { id:'raider', name:'Raider', monthly:14, yearly:134 },
-  clan:   { id:'clan',   name:'Clan',   monthly:32, yearly:306 }
+  scout:  { id:'scout',  name:'Scout',  monthly:4.99,  yearly:47.90  },
+  raider: { id:'raider', name:'Raider', monthly:9.99,  yearly:95.90  },
+  clan:   { id:'clan',   name:'Clan',   monthly:19.99, yearly:191.90 }
 };
-const DEFAULT_PREFS = { raid:true, call:true, shop:true, decay:true, team:false, email:false, timezone:'UTC', appearance:'dark' };
+const DEFAULT_PREFS = { raid:true, call:true, shop:true, decay:true, team:false, email:false,
+                        timezone:'UTC', appearance:'dark', displayName:'' };
 
 const Session = {
-  data: null,
-  load(){
-    try { this.data = JSON.parse(localStorage.getItem(RX_KEY)) || null; } catch { this.data = null; }
-    if(this.data && !this.data.prefs) this.data.prefs = { ...DEFAULT_PREFS };
-    return this.data;
+  user: null,          // from /api/auth/me — never fabricated
+  demo: false,         // explicit, user-chosen, and labelled in the UI
+  prefs: { ...DEFAULT_PREFS },
+  servers: [],         // only ever what pairing actually returns
+  rustPlus: { connected:false, name:null },
+  plan: null,          // stays null until a real payment provider says otherwise
+  invoices: [],
+  card: null,
+
+  loadPrefs(){
+    try {
+      const p = JSON.parse(localStorage.getItem(RX_PREFS));
+      if(p && typeof p === 'object') this.prefs = { ...DEFAULT_PREFS, ...p };
+    } catch {}
+    try { this.demo = sessionStorage.getItem('rustex.demo') === '1'; } catch {}
   },
-  save(){
-    try { localStorage.setItem(RX_KEY, JSON.stringify(this.data)); } catch {}
+  savePrefs(){
+    try { localStorage.setItem(RX_PREFS, JSON.stringify(this.prefs)); } catch {}
     syncAuthUI();
   },
-  get signedIn(){ return !!(this.data && this.data.user); },
-  // a cancelled plan still grants access until the period it was paid for runs out
-  get entitled(){
-    const p = this.data && this.data.plan;
-    return !!p && (p.status === 'active' || p.status === 'canceled');
+  async refresh(){
+    try {
+      const r = await fetch('/api/auth/me', { credentials:'same-origin', cache:'no-store' });
+      this.user = r.ok ? (await r.json()).user : null;
+    } catch { this.user = null; }   // opened from file:// or the API is down
+    syncAuthUI();
+    return this.user;
   },
+  setDemo(on){
+    this.demo = !!on;
+    try { on ? sessionStorage.setItem('rustex.demo','1') : sessionStorage.removeItem('rustex.demo'); } catch {}
+    syncAuthUI();
+  },
+  get signedIn(){ return !!this.user; },
+  // Access is granted by a real subscription, or by explicitly entering demo mode.
+  get entitled(){ return !!this.plan || this.demo; },
   get state(){ return this.entitled ? 'entitled' : this.signedIn ? 'in' : 'out'; },
-  signIn(user){
-    this.data = this.data || {};
-    this.data.user = user;
-    this.data.prefs = this.data.prefs || { ...DEFAULT_PREFS };
-    this.data.rustPlus = this.data.rustPlus || { connected:true, name:user.name };
-    this.data.servers = this.data.servers || [{ name:'Rustex Main', region:'US-East', addr:'203.0.113.42:28083' }];
-    this.save();
-  },
-  signOut(){ this.data = null; try{ localStorage.removeItem(RX_KEY); }catch{} syncAuthUI(); },
-  subscribe(planId, cycle){
-    const plan = PLANS[planId]; if(!plan) return;
-    const now = new Date();
-    const renews = new Date(now); cycle === 'yearly' ? renews.setFullYear(renews.getFullYear()+1) : renews.setMonth(renews.getMonth()+1);
-    const already = this.data.plan;
-    this.data.plan = {
-      id: plan.id, cycle, status:'active',
-      startedAt: (already && already.startedAt) || now.toISOString(),
-      renewsAt: renews.toISOString()
-    };
-    this.data.card = this.data.card || { brand:'VISA', last4:'4242', exp:'04 / 2029', name:this.data.user.name };
-    this.data.invoices = this.data.invoices || [];
-    this.data.invoices.unshift({
-      id:'RX-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + '-' + String(1000 + this.data.invoices.length + 1),
-      date: now.toISOString(), plan: plan.name, cycle,
-      amount: cycle === 'yearly' ? plan.yearly : plan.monthly, status:'Paid'
-    });
-    this.save();
-  },
-  cancel(){ if(this.data && this.data.plan){ this.data.plan.status = 'canceled'; this.save(); } },
-  reactivate(){ if(this.data && this.data.plan){ this.data.plan.status = 'active'; this.save(); } }
+  get displayName(){
+    return (this.prefs.displayName || '').trim()
+      || (this.user && (this.user.name || ('Player ' + String(this.user.steamId).slice(-4))))
+      || 'Player';
+  }
 };
-Session.load();
 
 const fmtDate = iso => iso ? new Date(iso).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}) : '—';
 const money = n => '$' + Number(n).toFixed(2);
 
-// deterministic self-contained avatar — no external image request to make or leak
+// Fallback avatar only — a lettered tile, never a fake photo. Real users get the
+// avatar Steam returned.
 function avatarFor(name, seed){
   const s = String(seed || name || 'rx');
   let h = 0; for(const c of s) h = (h * 31 + c.charCodeAt(0)) % 360;
@@ -2306,50 +2326,58 @@ function requireSignIn(intent){
 function syncAuthUI(){
   const state = Session.state;
   document.body.dataset.auth = state;
+  document.body.classList.toggle('is-demo', Session.demo);
   document.querySelectorAll('[data-when]').forEach(el=>{
     el.hidden = !el.dataset.when.split(/\s+/).includes(state);
   });
-  const d = Session.data || {};
-  const u = d.user, p = d.plan, plan = p && PLANS[p.id];
+  const u = Session.user, p = Session.plan, plan = p && PLANS[p.id];
   const set = (k, fn) => document.querySelectorAll('[data-acct="' + k + '"]').forEach(fn);
+  const dash = v => v || '—';
 
-  // 'name' is what the user chose to be called; 'steamName' is what Steam actually returned
-  set('name', el => el.textContent = (u ? (d.displayName || u.name) : 'Player'));
-  set('steamName', el => el.textContent = u ? u.name : '—');
+  set('name', el => el.textContent = u ? Session.displayName : 'Player');
+  set('steamName', el => el.textContent = u ? dash(u.name) : '—');
   set('steamId', el => el.textContent = u ? u.steamId : '—');
-  set('created', el => el.textContent = u ? fmtDate(u.created) : '—');
-  set('email', el => el.textContent = u && u.email ? u.email : 'Not provided by Steam');
-  set('avatar', el => { if(u) el.src = u.avatar; else el.removeAttribute('src'); });
-  set('serverName', el => el.textContent = (d.servers && d.servers[0]) ? d.servers[0].name : 'None paired');
-  set('rustplusWho', el => el.textContent = d.rustPlus && d.rustPlus.connected ? d.rustPlus.name : 'Not linked');
+  set('created', el => el.textContent = u && u.created ? fmtDate(u.created) : 'Not shared by Steam');
+  set('email', el => el.textContent = 'Not shared by Steam');
+  set('avatar', el => {
+    if(!u){ el.removeAttribute('src'); return; }
+    el.src = u.avatar || avatarFor(Session.displayName, u.steamId);
+  });
+  set('profileUrl', el => {
+    if(u && u.profileUrl){ el.href = u.profileUrl; el.hidden = false; } else el.hidden = true;
+  });
+
+  const srv = Session.servers[0];
+  set('serverName', el => el.textContent = srv ? srv.name : 'None paired');
+  set('rustplusWho', el => el.textContent = Session.rustPlus.connected ? dash(Session.rustPlus.name) : 'Not linked');
   set('rustplusPill', el => {
-    const on = !!(d.rustPlus && d.rustPlus.connected);
+    const on = Session.rustPlus.connected;
     el.className = 'pill ' + (on ? 'pill-online' : 'pill-offline');
     el.innerHTML = '<span class="dot"></span>' + (on ? 'Connected' : 'Not linked');
   });
-  set('planName', el => el.textContent = plan ? plan.name : 'No plan');
+  set('teamName', el => el.textContent = srv ? 'No team data yet' : 'No server paired');
+
+  set('planName', el => el.textContent = plan ? plan.name : (Session.demo ? 'Demo access' : 'No plan'));
   set('planPill', el => {
-    el.className = 'pill ' + (plan ? (p.status === 'canceled' ? 'pill-warn' : 'pill-orange') : 'pill-offline');
-    el.innerHTML = '<span class="dot"></span>' + (plan ? plan.name + (p.status === 'canceled' ? ' · ending' : '') : 'No plan');
+    el.className = 'pill ' + (plan ? 'pill-orange' : Session.demo ? 'pill-warn' : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (plan ? plan.name : Session.demo ? 'Demo' : 'No plan');
   });
   set('statusPill', el => {
-    const label = !p ? 'Inactive' : p.status === 'canceled' ? 'Cancels at period end' : 'Active';
-    el.className = 'pill ' + (!p ? 'pill-offline' : p.status === 'canceled' ? 'pill-warn' : 'pill-online');
-    el.innerHTML = '<span class="dot"></span>' + label;
+    el.className = 'pill ' + (plan ? 'pill-online' : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (plan ? 'Active' : 'No subscription');
   });
-  set('cycle', el => el.textContent = p ? (p.cycle === 'yearly' ? 'Yearly' : 'Monthly') : '—');
-  set('renewsAt', el => el.textContent = p ? fmtDate(p.renewsAt) : '—');
-  set('startedAt', el => el.textContent = p ? fmtDate(p.startedAt) : '—');
-  set('nextPayment', el => el.textContent = (p && p.status === 'active') ? fmtDate(p.renewsAt) : '—');
-  set('amount', el => el.textContent = plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) + ' / ' + (p.cycle === 'yearly' ? 'year' : 'month') : '—');
-  set('pricePill', el => el.innerHTML = '<span class="dot"></span>' + (plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) + (p.cycle === 'yearly' ? '/yr' : '/mo') : '—'));
-  set('cardBrand', el => el.textContent = d.card ? d.card.brand : '—');
-  set('cardLast4', el => el.textContent = d.card ? d.card.last4 : '••••');
-  set('cardExp', el => el.textContent = d.card ? d.card.exp : '—');
-  set('cardName', el => el.textContent = d.card ? d.card.name : '—');
+  set('cycle', el => el.textContent = plan ? (p.cycle === 'yearly' ? 'Yearly' : 'Monthly') : '—');
+  set('renewsAt', el => el.textContent = plan ? fmtDate(p.renewsAt) : '—');
+  set('startedAt', el => el.textContent = plan ? fmtDate(p.startedAt) : '—');
+  set('nextPayment', el => el.textContent = plan ? fmtDate(p.renewsAt) : '—');
+  set('amount', el => el.textContent = plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) : '—');
+  set('pricePill', el => el.innerHTML = '<span class="dot"></span>' + (plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) : 'No plan'));
 }
 
 // ---- sign in with steam ----
+// The button leaves the site. Steam takes the credentials, redirects back to
+// /api/auth/callback, and that endpoint verifies the response with Steam before
+// any session exists. Nothing here can fake a sign-in.
 let authIntent = null;
 function openSteamAuth(intent){
   authIntent = intent || null;
@@ -2361,58 +2389,24 @@ function authPhase(phase){
   document.getElementById('steamAuthIdle').hidden  = phase !== 'idle';
   document.getElementById('steamAuthBusy').hidden  = phase !== 'busy';
   document.getElementById('steamAuthError').hidden = phase !== 'error';
-  if(phase === 'busy') document.querySelectorAll('#steamAuthBusy .auth-step').forEach(s=>{ s.className = 'auth-step'; s.querySelector('.mk').innerHTML = ''; });
 }
-function authStep(i, done){
-  const steps = document.querySelectorAll('#steamAuthBusy .auth-step');
-  steps.forEach((s, n) => {
-    const mk = s.querySelector('.mk');
-    if(n < i || (n === i && done)){ s.className = 'auth-step done'; mk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
-    else if(n === i){ s.className = 'auth-step on'; mk.innerHTML = '<span class="spin"></span>'; }
-    else { s.className = 'auth-step'; mk.innerHTML = ''; }
-  });
+function runSteamAuth(){
+  authPhase('busy');
+  const next = authIntent && /^[a-z]+$/.test(authIntent) ? '?next=' + authIntent : '';
+  // full-page redirect: Steam will not render in an iframe or a popup we control
+  window.location.href = '/api/auth/steam' + next;
 }
-// Seam for the real integration: redirect to Steam OpenID and verify the response
-// server-side. Resolves with the profile the backend returns.
-function steamAuthenticate(){
-  return new Promise((resolve, reject)=>{
-    const t = window.__steamAuthDelay ?? 620;
-    setTimeout(()=> authStep(0, true), t);
-    setTimeout(()=> authStep(1), t);
-    setTimeout(()=> authStep(1, true), t*2);
-    setTimeout(()=> authStep(2), t*2);
-    setTimeout(()=>{
-      if(window.__steamAuthFail){ reject(new Error(window.__steamAuthFail)); return; }
-      authStep(2, true);
-      const steamId = '7656119' + String(7000000000 + Math.floor(Math.random()*899999999));
-      const name = window.__steamAuthName || 'Kilnwatch';
-      resolve({
-        steamId, name,
-        created: new Date(Date.now() - 1000*60*60*24*(420 + Math.floor(Math.random()*900))).toISOString(),
-        email: null,
-        avatar: avatarFor(name, steamId)
-      });
-    }, t*3);
-  });
-}
-async function runSteamAuth(){
-  authPhase('busy'); authStep(0);
-  try {
-    const user = await steamAuthenticate();
-    Session.signIn(user);
-    await new Promise(r => setTimeout(r, 380));
-    closeSteamAuth();
-    fireCustomToast('Signed in', 'Welcome, ' + user.name + '. Your Steam account is linked.', 'i-check');
-    const intent = authIntent; authIntent = null;
-    if(intent === 'dashboard' || !intent) goDashboard();
-    else if(intent === 'settings') goSettings();
-    else if(intent === 'billing') goBilling();
-    else if(intent === 'pricing') goPricing();
-  } catch (err) {
-    authPhase('error');
-    document.getElementById('steamErrBody').textContent =
-      (err && err.message) ? err.message : 'Steam did not confirm the sign-in. This usually clears on a retry.';
-  }
+const STEAM_ERRORS = {
+  cancelled:        'You cancelled the sign-in on Steam, or Steam declined the request.',
+  invalid_signature:'Steam could not confirm that response was genuine. Please try again.',
+  steam_unreachable:'Steam did not answer. Their service may be down — try again shortly.',
+  bad_identity:     'Steam returned an identity we could not read.'
+};
+function showAuthError(code){
+  openSteamAuth();
+  authPhase('error');
+  document.getElementById('steamErrBody').textContent =
+    STEAM_ERRORS[code] || 'Sign-in did not complete. Please try again.';
 }
 
 // ---- pricing ----
@@ -2425,32 +2419,36 @@ function setCycle(btn){
 }
 function renderPricing(){
   document.querySelectorAll('.plan').forEach(card=>{
-    const amt = card.querySelector('.amt');
-    const per = card.querySelector('[data-per]');
+    const amt = card.querySelector('.amt'), per = card.querySelector('[data-per]');
     const m = +amt.dataset.priceM, y = +amt.dataset.priceY;
-    amt.textContent = '$' + (billingCycle === 'yearly' ? (y/12).toFixed(2).replace(/\.00$/,'') : m);
+    amt.textContent = '$' + (billingCycle === 'yearly' ? (y/12).toFixed(2) : m.toFixed(2));
     per.textContent = billingCycle === 'yearly' ? '/ month, billed yearly' : '/ month';
-    const cur = Session.data && Session.data.plan;
-    const btn = card.querySelector('.btn');
-    const isCurrent = cur && cur.id === card.dataset.plan && cur.cycle === billingCycle && cur.status === 'active';
-    btn.textContent = isCurrent ? 'Current plan' : 'Choose ' + PLANS[card.dataset.plan].name;
-    btn.disabled = !!isCurrent;
-    btn.style.opacity = isCurrent ? .55 : '';
   });
 }
+// No payment provider is connected, so this cannot take money and must not claim to.
 function choosePlan(planId){
   if(!Session.signedIn){ openSteamAuth('pricing'); return; }
-  Session.subscribe(planId, billingCycle);
-  fireCustomToast('Subscription active', PLANS[planId].name + ' is live — your dashboard is unlocked.', 'i-check');
-  setTimeout(()=> goDashboard(), 420);
+  fireCustomToast('Checkout is not connected yet',
+    PLANS[planId].name + ' can\'t be purchased until a payment provider is wired up.', 'i-lock');
+}
+function enterDemo(){
+  if(!Session.signedIn){ openSteamAuth('dashboard'); return; }
+  Session.setDemo(true);
+  fireCustomToast('Demo mode on', 'The dashboard is showing sample telemetry, not live data.', 'i-flask');
+  setTimeout(()=> goDashboard(), 320);
+}
+function exitDemo(){
+  Session.setDemo(false);
+  goPricing();
+  fireCustomToast('Demo mode off', 'Sample data cleared.', 'i-check');
 }
 
 // ---- settings ----
 function loadSettingsForm(){
-  const d = Session.data || {}, pr = d.prefs || DEFAULT_PREFS;
+  const pr = Session.prefs;
   const v = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
   const c = (id, val) => { const el = document.getElementById(id); if(el) el.checked = !!val; };
-  v('setDisplayName', d.displayName || (d.user ? d.user.name : ''));
+  v('setDisplayName', pr.displayName || (Session.user && Session.user.name) || '');
   v('setTimezone', pr.timezone || 'UTC');
   v('setAppearance', pr.appearance || 'dark');
   c('prefRaid', pr.raid); c('prefCall', pr.call); c('prefShop', pr.shop);
@@ -2459,32 +2457,30 @@ function loadSettingsForm(){
 }
 function renderSettings(){
   const wrap = document.getElementById('settingsServers'); if(!wrap) return;
-  const servers = (Session.data && Session.data.servers) || [];
-  wrap.innerHTML = servers.length ? servers.map(s =>
+  wrap.innerHTML = Session.servers.length ? Session.servers.map(s =>
     '<div class="panel-2" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">'
     + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
     + '<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:600;">' + s.name + '</div>'
-    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.region + ' · ' + s.addr + '</div></div>'
-    + '<button class="btn btn-ghost btn-sm" onclick="unpairServer(\'' + s.name.replace(/'/g,"\\'") + '\')">Unpair</button></div>'
-  ).join('') : '<div class="text-3" style="font-size:12px;">No servers paired yet.</div>';
+    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.addr + '</div></div>'
+    + '<button class="btn btn-ghost btn-sm" onclick="unpairServer(\'' + s.id + '\')">Unpair</button></div>'
+  ).join('') : '<div class="text-3" style="font-size:12px;">No servers paired yet — pair one from the pairing page.</div>';
 }
 function saveSettings(){
-  if(!Session.data) return;
   const val = id => (document.getElementById(id) || {}).value;
   const chk = id => !!(document.getElementById(id) || {}).checked;
-  Session.data.displayName = (val('setDisplayName') || '').trim() || Session.data.user.name;
-  Session.data.prefs = {
+  Session.prefs = {
+    displayName: (val('setDisplayName') || '').trim(),
     raid:chk('prefRaid'), call:chk('prefCall'), shop:chk('prefShop'),
     decay:chk('prefDecay'), team:chk('prefTeam'), email:chk('prefEmail'),
     timezone: val('setTimezone'), appearance: val('setAppearance')
   };
-  Session.save();
+  Session.savePrefs();
   const note = document.getElementById('settingsSaved');
   if(note){ note.textContent = 'Saved just now'; setTimeout(()=>{ if(note.textContent === 'Saved just now') note.textContent = ''; }, 3200); }
-  fireCustomToast('Settings saved', 'Your profile and notification preferences are up to date.', 'i-check');
+  fireCustomToast('Settings saved', 'Your preferences are stored on this device.', 'i-check');
 }
 function copySteamId(btn){
-  const id = (Session.data && Session.data.user) ? Session.data.user.steamId : '';
+  const id = Session.user ? Session.user.steamId : '';
   if(!id) return;
   navigator.clipboard?.writeText(id).then(()=>{
     const t = btn.textContent; btn.textContent = 'Copied';
@@ -2492,116 +2488,107 @@ function copySteamId(btn){
   }).catch(()=>{});
 }
 function disconnectRustPlus(){
-  if(!Session.data) return;
-  Session.data.rustPlus = { connected:false, name:'—' };
-  Session.save();
-  fireCustomToast('Rust+ disconnected', 'Pair again from the pairing page to resume live data.', 'i-wifi');
+  Session.rustPlus = { connected:false, name:null };
+  Session.servers = [];
+  syncAuthUI(); renderSettings();
+  fireCustomToast('Rust+ disconnected', 'Pair again to resume live data.', 'i-wifi');
 }
-function unpairServer(name){
-  if(!Session.data) return;
-  Session.data.servers = (Session.data.servers || []).filter(s => s.name !== name);
-  Session.save(); renderSettings();
-  fireCustomToast('Server unpaired', name + ' no longer streams to Rustex.', 'i-wifi');
+function unpairServer(id){
+  Session.servers = Session.servers.filter(s => s.id !== id);
+  if(!Session.servers.length) Session.rustPlus = { connected:false, name:null };
+  syncAuthUI(); renderSettings(); renderPairedServers();
+  fireCustomToast('Server unpaired', 'It no longer streams to Rustex.', 'i-wifi');
 }
 
 // ---- billing ----
+// Nothing here invents a record. With no provider connected the honest answer is
+// "no subscription, no card, no invoices" — so that is exactly what it shows.
 function renderBilling(){
-  const d = Session.data || {}, inv = d.invoices || [];
   const rows = document.getElementById('invoiceRows');
   const empty = document.getElementById('invoiceEmpty');
   const table = document.getElementById('invoiceTable');
   const count = document.getElementById('invoiceCount');
   if(rows){
-    rows.innerHTML = inv.map(v =>
+    rows.innerHTML = Session.invoices.map(v =>
       '<tr><td class="mono">' + v.id + '</td><td>' + fmtDate(v.date) + '</td><td>' + v.plan
       + '</td><td class="mono">' + money(v.amount) + '</td><td><span class="pill pill-online"><span class="dot"></span>'
       + v.status + '</span></td><td style="text-align:right"><button class="btn btn-ghost btn-sm" onclick="downloadInvoice(\'' + v.id + '\')">Download</button></td></tr>'
     ).join('');
-    table.style.display = inv.length ? '' : 'none';
-    empty.style.display = inv.length ? 'none' : '';
-    count.textContent = inv.length ? inv.length + (inv.length === 1 ? ' invoice' : ' invoices') : '';
+    table.style.display = Session.invoices.length ? '' : 'none';
+    empty.style.display = Session.invoices.length ? 'none' : '';
+    count.textContent = Session.invoices.length ? Session.invoices.length + ' invoices' : '';
   }
-  const p = d.plan;
-  const show = (sel, on) => document.querySelectorAll(sel).forEach(b => b.hidden = !on);
-  show('[data-bill="cancel"]', !!p && p.status === 'active');
-  show('[data-bill="reactivate"]', !!p && p.status === 'canceled');
-  show('[data-bill="upgrade"]', !!p);
-  show('[data-bill="downgrade"]', !!p);
-  const card = document.getElementById('billingActive');
-  if(card && !p) card.hidden = false;
+  const has = !!Session.plan;
+  document.querySelectorAll('[data-bill]').forEach(b => b.hidden = !has);
+  const none = document.getElementById('billingNone');
+  if(none) none.hidden = has;
+  const card = document.getElementById('billingCard');
+  if(card) card.hidden = !Session.card;
+  const noCard = document.getElementById('billingNoCard');
+  if(noCard) noCard.hidden = !!Session.card;
 }
-function cancelSub(){
-  if(!Session.data || !Session.data.plan) return;
-  Session.cancel(); renderBilling();
-  fireCustomToast('Subscription cancelled', 'You keep full access until ' + fmtDate(Session.data.plan.renewsAt) + '.', 'i-clock');
-}
-function reactivateSub(){
-  if(!Session.data || !Session.data.plan) return;
-  Session.reactivate(); renderBilling();
-  fireCustomToast('Subscription reactivated', 'Billing resumes on ' + fmtDate(Session.data.plan.renewsAt) + '.', 'i-check');
-}
-function updatePaymentMethod(){
-  if(!Session.data) return;
-  const brands = ['VISA','MASTERCARD','AMEX'];
-  Session.data.card = {
-    brand: brands[Math.floor(Math.random()*brands.length)],
-    last4: String(1000 + Math.floor(Math.random()*8999)),
-    exp: String(1 + Math.floor(Math.random()*12)).padStart(2,'0') + ' / 20' + (28 + Math.floor(Math.random()*4)),
-    name: Session.data.displayName || Session.data.user.name
-  };
-  Session.save();
-  fireCustomToast('Payment method updated', 'Future invoices will charge the new card.', 'i-check');
-}
+function cancelSub(){ fireCustomToast('No active subscription', 'There is nothing to cancel yet.', 'i-lock'); }
+function reactivateSub(){ fireCustomToast('No subscription', 'Pick a plan once checkout is connected.', 'i-lock'); }
+function updatePaymentMethod(){ fireCustomToast('Payments not connected', 'No payment provider is wired up yet.', 'i-lock'); }
 function downloadInvoice(id){
-  const d = Session.data || {};
-  const v = (d.invoices || []).find(x => x.id === id); if(!v) return;
+  const v = Session.invoices.find(x => x.id === id); if(!v) return;
   const line = (k, val) => k.padEnd(20) + val;
-  const body = [
-    'RUSTEX — TACTICAL COMPANION FOR RUST', '='.repeat(52), '',
+  const body = ['RUSTEX', '='.repeat(52), '',
     line('Invoice', v.id), line('Issued', fmtDate(v.date)), line('Status', v.status), '',
-    line('Billed to', d.displayName || d.user.name), line('Steam ID', d.user.steamId), '',
-    '-'.repeat(52),
-    line('Plan', v.plan + ' (' + v.cycle + ')'),
-    line('Amount', money(v.amount)),
-    line('Tax', money(0)),
-    '-'.repeat(52),
-    line('Total', money(v.amount)), '',
-    'Thank you. Questions: billing@rustex.app'
-  ].join('\n');
+    line('Billed to', Session.displayName), line('Steam ID', Session.user.steamId), '',
+    '-'.repeat(52), line('Plan', v.plan), line('Amount', money(v.amount)),
+    '-'.repeat(52), line('Total', money(v.amount))].join('\n');
   const url = URL.createObjectURL(new Blob([body], { type:'text/plain' }));
   const a = document.createElement('a');
   a.href = url; a.download = id + '.txt';
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=> URL.revokeObjectURL(url), 1000);
-  fireCustomToast('Invoice downloaded', v.id + ' saved to your downloads.', 'i-check');
 }
 
 // ---- logout ----
-function logOut(){
-  Session.signOut();
+async function logOut(){
+  try { await fetch('/api/auth/logout', { method:'POST', credentials:'same-origin' }); } catch {}
+  Session.user = null;
+  Session.setDemo(false);
+  Session.servers = []; Session.rustPlus = { connected:false, name:null };
   document.body.classList.remove('dash','pairing','pricing','settings','billing');
   window.scrollTo({ top:0, left:0, behavior:'auto' });
   history.replaceState(null,'','#');
-  fireCustomToast('Logged out', 'Your session on this browser has been cleared.', 'i-check');
+  syncAuthUI();
+  fireCustomToast('Logged out', 'Your Steam session on this browser has been cleared.', 'i-check');
 }
 
-// ---- boot: honour the deep link, but never past the gate ----
-(function bootView(){
+// ---- boot ----
+(async function boot(){
+  Session.loadPrefs();
+  syncAuthUI();
+
+  // surface an error the callback bounced back with, then tidy the URL
+  const qs = new URLSearchParams(location.search);
+  const err = qs.get('auth_error');
+  if(err){
+    showAuthError(err);
+    history.replaceState(null,'', location.pathname + location.hash);
+  }
+
+  await Session.refresh();
+
   const h = location.hash;
-  if(h === '#dash' || h === '#dashboard'){
-    // entitled goes through; signed-in-but-unpaid lands on pricing; signed out just
-    // gets the landing page rather than a hint that a dashboard exists
+  const want = h.replace('#','');
+  if(want === 'dash' || want === 'dashboard'){
     if(Session.entitled) document.body.classList.add('dash');
     else if(Session.signedIn) document.body.classList.add('pricing');
   }
-  else if(h === '#pairing') document.body.classList.add('pairing');
-  else if(h === '#pricing') document.body.classList.add('pricing');
-  else if(h === '#settings' && Session.signedIn) document.body.classList.add('settings');
-  else if(h === '#billing' && Session.signedIn) document.body.classList.add('billing');
+  else if(want === 'pairing') document.body.classList.add('pairing');
+  else if(want === 'pricing') document.body.classList.add('pricing');
+  else if(want === 'settings' && Session.signedIn) document.body.classList.add('settings');
+  else if(want === 'billing' && Session.signedIn) document.body.classList.add('billing');
   syncAuthUI();
+
   if(document.body.classList.contains('pricing')) renderPricing();
   if(document.body.classList.contains('settings')){ loadSettingsForm(); renderSettings(); }
   if(document.body.classList.contains('billing')) renderBilling();
+  if(document.body.classList.contains('pairing')) renderPairedServers();
 })();
 
 // ---- sticky nav ----
@@ -3171,57 +3158,58 @@ function initHeatmap(wrap){
 
 document.querySelectorAll('[data-heat]').forEach(initHeatmap);
 
+// ---- dashboard sections ----
+function showDashSection(id, focusWidget){
+  document.querySelectorAll('.dash-section').forEach(s => s.classList.toggle('active', s.id === 'dsec-' + id));
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.dsec === id));
+  document.querySelectorAll('.side-link[data-dsec]').forEach(a => a.classList.toggle('active', a.dataset.dsec === id));
+  // canvases sized while hidden measure 0, so re-fit anything that just appeared
+  window.dispatchEvent(new Event('resize'));
+  if(focusWidget){
+    const el = document.getElementById(focusWidget);
+    if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
+  }
+}
+
 // ---- pairing page ----
-function switchPairTab(btn){
-  document.querySelectorAll('#pairTabs .tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  const pt = btn.dataset.pt;
-  document.getElementById('pt-auto').style.display = pt === 'auto' ? '' : 'none';
-  document.getElementById('pt-manual').style.display = pt === 'manual' ? '' : 'none';
-}
-let pairStep = 0;
-function startAutoPair(){
-  const btn = document.getElementById('pairStartBtn');
-  if(btn.disabled) return;
-  btn.disabled = true; btn.innerHTML = 'Pairing…';
-  document.querySelectorAll('.pair-step').forEach(s=>s.classList.remove('active','done'));
-  pairStep = 0;
-  document.getElementById('pairStatusText').textContent = 'Connecting…';
-  document.getElementById('pairStatusSub').textContent = 'Talking to Rust+.';
-  advancePairStep();
-}
-function advancePairStep(){
-  const steps = document.querySelectorAll('.pair-step');
-  if(pairStep > 0) steps[pairStep-1].classList.add('done');
-  if(pairStep < steps.length){
-    steps[pairStep].classList.add('active');
-    if(pairStep===1) document.getElementById('pairStatusSub').textContent = 'In game: press ESC, open Rust+, and tap Pair With Server.';
-    pairStep++;
-    setTimeout(advancePairStep, 1300);
-  } else {
-    document.getElementById('pairStatusText').textContent = 'Paired';
-    document.getElementById('pairStatusSub').textContent = 'Rustex Main is now live.';
-    document.getElementById('pairStartBtn').disabled = false;
-    document.getElementById('pairStartBtn').innerHTML = 'Pair Another Server';
-    addPairedServer('Rustex Main', '203.0.113.42:28083');
-    fireCustomToast('Server paired', 'Rustex Main is now streaming live Rust+ data.', 'i-wifi');
+// Servers only ever come from a real pairing. Nothing is seeded, so a fresh
+// account genuinely shows an empty list until the game sends a request.
+function renderPairedServers(){
+  const list = document.getElementById('pairedList');
+  const empty = document.getElementById('pairedEmpty');
+  const count = document.getElementById('pairedCount');
+  const pill = document.getElementById('pairListenPill');
+  if(!list) return;
+  list.innerHTML = Session.servers.map(s =>
+    '<div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;">'
+    + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
+    + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">' + s.name + '</div>'
+    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.addr + '</div></div>'
+    + '<button class="icon-btn" style="width:30px;height:30px;" title="Unpair" onclick="unpairServer(\'' + s.id + '\')">'
+    + '<svg class="icon" style="width:13px;height:13px"><use href="#i-x"/></svg></button></div>'
+  ).join('');
+  empty.style.display = Session.servers.length ? 'none' : '';
+  count.textContent = Session.servers.length ? Session.servers.length + ' paired' : '';
+  if(pill){
+    const on = Session.signedIn;
+    pill.className = 'pill ' + (on ? 'pill-online' : 'pill-offline');
+    pill.innerHTML = '<span class="dot"></span>' + (on ? 'Listening' : 'Sign in first');
   }
 }
 function addPairedServer(name, addr){
-  const list = document.getElementById('pairedList');
-  const row = document.createElement('div');
-  row.className = 'panel-2';
-  row.style.cssText = 'padding:12px 14px;display:flex;align-items:center;gap:12px;';
-  row.innerHTML = '<span class="pill pill-online"><span class="dot"></span></span><div style="flex:1;"><div style="font-weight:700;font-size:13px;">'+name+'</div><div class="text-3 mono" style="font-size:10.5px;">'+addr+' · synced just now</div></div><button class="icon-btn" style="width:30px;height:30px;" onclick="this.closest(\'.panel-2\').remove()"><svg class="icon" style="width:13px;height:13px"><use href="#i-x"/></svg></button>';
-  list.prepend(row);
+  Session.servers.push({ id: 'srv_' + Math.random().toString(36).slice(2,9), name, addr });
+  Session.rustPlus = { connected:true, name: Session.displayName };
+  syncAuthUI(); renderPairedServers();
 }
-function saveManualPairing(){
-  const ip = document.getElementById('mIp').value.trim();
-  const port = document.getElementById('mPort').value.trim();
+function manualPair(){
+  if(!Session.signedIn){ openSteamAuth('pairing'); return; }
+  const ip = (document.getElementById('mIp').value || '').trim();
+  const port = (document.getElementById('mPort').value || '').trim();
   if(!ip || !port){ document.getElementById('mIp').focus(); return; }
-  addPairedServer('Manual Server', ip+':'+port);
-  fireCustomToast('Pairing saved', ip+':'+port+' added to your servers.', 'i-check');
-  ['mIp','mPort','mPlayerId','mToken'].forEach(id=>document.getElementById(id).value='');
+  addPairedServer(ip, ip + ':' + port);
+  document.getElementById('mIp').value = '';
+  document.getElementById('mPort').value = '';
+  fireCustomToast('Server added', ip + ':' + port + ' is now in your list.', 'i-check');
 }
 </script>
 
