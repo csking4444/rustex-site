@@ -44,6 +44,7 @@ async function run(req, res, base) {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
+      signal: AbortSignal.timeout(8000),
     });
     verified = /is_valid\s*:\s*true/i.test(await r.text());
   } catch {
@@ -56,14 +57,15 @@ async function run(req, res, base) {
   if (!match) return fail(res, base, 'bad_identity');
   const steamId = match[1];
 
-  // Name and avatar are a bonus: they need a Web API key. Without one the sign-in
-  // still succeeds, we just show the SteamID until a key is configured.
+  // Name and avatar are a bonus: they need a Web API key. Without one, or if Steam's
+  // API is slow/down/rate-limited, sign-in still succeeds — the verified SteamID is
+  // the thing that actually matters, so this step can never block or fail the login.
   let profile = null;
   if (process.env.STEAM_API_KEY) {
     try {
       const url = 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/'
         + `?key=${process.env.STEAM_API_KEY}&steamids=${steamId}`;
-      const r = await fetch(url);
+      const r = await fetch(url, { signal: AbortSignal.timeout(5000) });
       if (r.ok) {
         const j = await r.json();
         const p = j?.response?.players?.[0];
@@ -75,8 +77,12 @@ async function run(req, res, base) {
             created: p.timecreated ? new Date(p.timecreated * 1000).toISOString() : null,
           };
         }
+      } else {
+        console.error('[auth/callback] GetPlayerSummaries', r.status, await r.text().catch(() => ''));
       }
-    } catch { /* profile is optional — a verified SteamID is the thing that matters */ }
+    } catch (err) {
+      console.error('[auth/callback] GetPlayerSummaries failed', err);
+    }
   }
 
   if (!setSession(res, { steamId, ...profile })) return fail(res, base, 'not_configured');
