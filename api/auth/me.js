@@ -1,6 +1,7 @@
-import { readSession } from '../_lib.js';
+import { readSession, compedPlan } from '../_lib.js';
 
-/** Who is this browser? The cookie is the only source of identity. */
+/** Who is this browser, and what plan do they have? Both come from the server —
+ * the client never gets to assert its own entitlement. */
 export default function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   let s = null;
@@ -15,5 +16,6 @@ export default function handler(req, res) {
       profileUrl: s.profileUrl || null,
       created: s.created || null,
     },
+    plan: compedPlan(s.steamId),
   });
 }

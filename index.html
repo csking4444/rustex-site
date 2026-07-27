@@ -2083,6 +2083,7 @@ body.billing #billing-view{display:block;}
         <div class="field-row"><span class="fl">Renews on</span><span class="fv mono" data-acct="renewsAt">—</span></div>
         <div class="field-row"><span class="fl">Amount</span><span class="fv mono" data-acct="amount">—</span></div>
         <div class="field-row"><span class="fl">Started</span><span class="fv mono" data-acct="startedAt">—</span></div>
+        <div id="billingCompNote" class="text-3" style="font-size:11.5px;margin-top:2px;" hidden>This access was granted directly, not through a paid subscription — there's nothing to bill, upgrade or cancel.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
           <button class="btn btn-primary btn-sm" onclick="goPricing()" data-bill="upgrade"><svg class="icon" style="width:14px;height:14px"><use href="#i-trend-up"/></svg>Upgrade plan</button>
           <button class="btn btn-outline btn-sm" onclick="goPricing()" data-bill="downgrade">Change plan</button>
@@ -2220,7 +2221,7 @@ const Session = {
   prefs: { ...DEFAULT_PREFS },
   servers: [],         // only ever what pairing actually returns
   rustPlus: { connected:false, name:null },
-  plan: null,          // stays null until a real payment provider says otherwise
+  plan: null,          // from /api/auth/me — either a server-granted comp, or null; never client-set
   invoices: [],
   card: null,
 
@@ -2238,8 +2239,9 @@ const Session = {
   async refresh(){
     try {
       const r = await fetch('/api/auth/me', { credentials:'same-origin', cache:'no-store' });
-      this.user = r.ok ? (await r.json()).user : null;
-    } catch { this.user = null; }   // opened from file:// or the API is down
+      if(r.ok){ const j = await r.json(); this.user = j.user; this.plan = j.plan || null; }
+      else { this.user = null; this.plan = null; }
+    } catch { this.user = null; this.plan = null; }   // opened from file:// or the API is down
     syncAuthUI();
     return this.user;
   },
@@ -2330,7 +2332,8 @@ function syncAuthUI(){
   document.querySelectorAll('[data-when]').forEach(el=>{
     el.hidden = !el.dataset.when.split(/\s+/).includes(state);
   });
-  const u = Session.user, p = Session.plan, plan = p && PLANS[p.id];
+  const u = Session.user, p = Session.plan;
+  const isComp = !!(p && p.source === 'comp');
   const set = (k, fn) => document.querySelectorAll('[data-acct="' + k + '"]').forEach(fn);
   const dash = v => v || '—';
 
@@ -2357,21 +2360,23 @@ function syncAuthUI(){
   });
   set('teamName', el => el.textContent = srv ? 'No team data yet' : 'No server paired');
 
-  set('planName', el => el.textContent = plan ? plan.name : (Session.demo ? 'Demo access' : 'No plan'));
+  set('planName', el => el.textContent = p ? p.name : (Session.demo ? 'Demo access' : 'No plan'));
   set('planPill', el => {
-    el.className = 'pill ' + (plan ? 'pill-orange' : Session.demo ? 'pill-warn' : 'pill-offline');
-    el.innerHTML = '<span class="dot"></span>' + (plan ? plan.name : Session.demo ? 'Demo' : 'No plan');
+    el.className = 'pill ' + (p ? 'pill-orange' : Session.demo ? 'pill-warn' : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (p ? p.name : Session.demo ? 'Demo' : 'No plan');
   });
   set('statusPill', el => {
-    el.className = 'pill ' + (plan ? 'pill-online' : 'pill-offline');
-    el.innerHTML = '<span class="dot"></span>' + (plan ? 'Active' : 'No subscription');
+    el.className = 'pill ' + (p ? 'pill-online' : 'pill-offline');
+    el.innerHTML = '<span class="dot"></span>' + (isComp ? 'Complimentary access' : p ? 'Active' : 'No subscription');
   });
-  set('cycle', el => el.textContent = plan ? (p.cycle === 'yearly' ? 'Yearly' : 'Monthly') : '—');
-  set('renewsAt', el => el.textContent = plan ? fmtDate(p.renewsAt) : '—');
-  set('startedAt', el => el.textContent = plan ? fmtDate(p.startedAt) : '—');
-  set('nextPayment', el => el.textContent = plan ? fmtDate(p.renewsAt) : '—');
-  set('amount', el => el.textContent = plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) : '—');
-  set('pricePill', el => el.innerHTML = '<span class="dot"></span>' + (plan ? money(p.cycle === 'yearly' ? plan.yearly : plan.monthly) : 'No plan'));
+  // Comp grants have no cycle, no card and no renewal — there is no billing behind
+  // them, so every date/amount field says exactly that instead of inventing one.
+  set('cycle', el => el.textContent = isComp ? 'Complimentary' : p ? (p.cycle === 'yearly' ? 'Yearly' : 'Monthly') : '—');
+  set('renewsAt', el => el.textContent = isComp ? 'No billing' : p ? fmtDate(p.renewsAt) : '—');
+  set('startedAt', el => el.textContent = isComp ? '—' : p ? fmtDate(p.startedAt) : '—');
+  set('nextPayment', el => el.textContent = isComp ? 'No billing' : p ? fmtDate(p.renewsAt) : '—');
+  set('amount', el => el.textContent = isComp ? 'Comped — $0' : p ? money(p.cycle === 'yearly' ? PLANS[p.id].yearly : PLANS[p.id].monthly) : '—');
+  set('pricePill', el => el.innerHTML = '<span class="dot"></span>' + (isComp ? 'Comped' : p ? money(p.cycle === 'yearly' ? PLANS[p.id].yearly : PLANS[p.id].monthly) : 'No plan'));
 }
 
 // ---- sign in with steam ----
@@ -2520,14 +2525,21 @@ function renderBilling(){
     empty.style.display = Session.invoices.length ? 'none' : '';
     count.textContent = Session.invoices.length ? Session.invoices.length + ' invoices' : '';
   }
-  const has = !!Session.plan;
-  document.querySelectorAll('[data-bill]').forEach(b => b.hidden = !has);
+  const p = Session.plan, isComp = !!(p && p.source === 'comp'), has = !!p;
+  const active = document.getElementById('billingActive');
+  if(active) active.hidden = !has;
+  // Upgrade/downgrade/cancel/reactivate all assume a real subscription behind the
+  // plan. A comp grant has none of that to act on, so the buttons come off rather
+  // than wiring them to actions that would lie about what they did.
+  document.querySelectorAll('[data-bill]').forEach(b => b.hidden = !has || isComp);
   const none = document.getElementById('billingNone');
   if(none) none.hidden = has;
   const card = document.getElementById('billingCard');
   if(card) card.hidden = !Session.card;
   const noCard = document.getElementById('billingNoCard');
-  if(noCard) noCard.hidden = !!Session.card;
+  if(noCard) noCard.hidden = !!Session.card || isComp;
+  const compNote = document.getElementById('billingCompNote');
+  if(compNote) compNote.hidden = !isComp;
 }
 function cancelSub(){ fireCustomToast('No active subscription', 'There is nothing to cancel yet.', 'i-lock'); }
 function reactivateSub(){ fireCustomToast('No subscription', 'Pick a plan once checkout is connected.', 'i-lock'); }

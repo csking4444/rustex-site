@@ -61,6 +61,25 @@ export function readSession(req) {
   return hit ? verify(hit.slice(COOKIE.length + 1)) : null;
 }
 
+const PLAN_NAMES = { scout: 'Scout', raider: 'Raider', clan: 'Clan' };
+
+/**
+ * Manually-granted access — there is no billing provider connected yet, so this is
+ * the only way an account gets a plan. Format is a single env var:
+ *   COMPED_ACCOUNTS="76561198000000000:clan,76561198000000001:raider"
+ * Checked server-side only; the client is never trusted to say what plan it has.
+ */
+export function compedPlan(steamId) {
+  const raw = process.env.COMPED_ACCOUNTS || '';
+  for (const pair of raw.split(',')) {
+    const [id, planId] = pair.split(':').map(s => (s || '').trim());
+    if (id && id === String(steamId) && PLAN_NAMES[planId]) {
+      return { id: planId, name: PLAN_NAMES[planId], source: 'comp' };
+    }
+  }
+  return null;
+}
+
 /** Absolute origin of this deployment, honouring Vercel's proxy headers. */
 export function origin(req) {
   if (process.env.PUBLIC_ORIGIN) return process.env.PUBLIC_ORIGIN.replace(/\/$/, '');
