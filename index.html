@@ -2400,7 +2400,9 @@ const STEAM_ERRORS = {
   cancelled:        'You cancelled the sign-in on Steam, or Steam declined the request.',
   invalid_signature:'Steam could not confirm that response was genuine. Please try again.',
   steam_unreachable:'Steam did not answer. Their service may be down — try again shortly.',
-  bad_identity:     'Steam returned an identity we could not read.'
+  bad_identity:     'Steam returned an identity we could not read.',
+  not_configured:   'Steam verified you, but this deployment has no SESSION_SECRET set, so it can\'t issue a session. Set it in the hosting environment variables and redeploy.',
+  server_error:     'Steam verified you, but the sign-in callback failed. Check the function logs for the cause.'
 };
 function showAuthError(code){
   openSteamAuth();

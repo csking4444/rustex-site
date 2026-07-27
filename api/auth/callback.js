@@ -1,4 +1,4 @@
-import { origin, setSession } from '../_lib.js';
+import { origin, setSession, isConfigured } from '../_lib.js';
 import { STEAM_OPENID } from './steam.js';
 
 const CLAIMED = /^https?:\/\/steamcommunity\.com\/openid\/id\/(\d{17})$/;
@@ -8,9 +8,24 @@ function fail(res, base, code) {
   res.end();
 }
 
+// Anything that escapes here becomes a bare FUNCTION_INVOCATION_FAILED with no clue
+// what went wrong, so the whole handler runs inside a catch that redirects instead.
 export default async function handler(req, res) {
   const base = origin(req);
+  try {
+    return await run(req, res, base);
+  } catch (err) {
+    console.error('[auth/callback]', err);
+    return fail(res, base, 'server_error');
+  }
+}
+
+async function run(req, res, base) {
   const q = req.query || {};
+
+  // Check before talking to Steam: without a signing key we cannot issue a session,
+  // and failing here is far clearer than failing after the user has already logged in.
+  if (!isConfigured()) return fail(res, base, 'not_configured');
 
   if (q['openid.mode'] !== 'id_res') return fail(res, base, 'cancelled');
 
@@ -64,7 +79,7 @@ export default async function handler(req, res) {
     } catch { /* profile is optional — a verified SteamID is the thing that matters */ }
   }
 
-  setSession(res, { steamId, ...profile });
+  if (!setSession(res, { steamId, ...profile })) return fail(res, base, 'not_configured');
 
   const next = typeof q.next === 'string' ? q.next.replace(/[^a-z]/gi, '') : '';
   res.writeHead(302, { Location: `${base}/${next ? `#${next}` : '#settings'}` });

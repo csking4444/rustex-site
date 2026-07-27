@@ -16,7 +16,19 @@ everything under `api/` becomes a Node serverless function.
 | `STEAM_API_KEY`  | no       | Steam Web API key from <https://steamcommunity.com/dev/apikey>. Without it sign-in still works and you get a verified SteamID, but no display name or avatar. |
 | `PUBLIC_ORIGIN`  | no       | Overrides the origin used for OpenID `realm`/`return_to`. Only needed if the proxy headers are wrong. |
 
-Set them in **Project → Settings → Environment Variables**, then redeploy.
+Set them in **Project → Settings → Environment Variables**, then **redeploy** —
+existing deployments do not pick up new variables on their own.
+
+### Checking the config
+
+Visit `/api/auth/health` on the deployment. It reports whether each variable is
+present (never its value) plus the origin and callback URL it will use:
+
+```json
+{ "ok": true, "sessionSecret": "set", "steamApiKey": "set", ... }
+```
+
+If `ok` is `false`, sign-in will bounce back to `/?auth_error=not_configured`.
 
 ## How sign-in works
 

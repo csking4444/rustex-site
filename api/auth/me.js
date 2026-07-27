@@ -2,8 +2,9 @@ import { readSession } from '../_lib.js';
 
 /** Who is this browser? The cookie is the only source of identity. */
 export default function handler(req, res) {
-  const s = readSession(req);
   res.setHeader('Cache-Control', 'no-store');
+  let s = null;
+  try { s = readSession(req); } catch (err) { console.error('[auth/me]', err); }
   if (!s) return res.status(401).json({ signedIn: false });
   res.status(200).json({
     signedIn: true,

@@ -3,11 +3,12 @@ import crypto from 'node:crypto';
 export const COOKIE = 'rx_session';
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
+/** null rather than a throw: callers turn this into a readable error, not a 500. */
 function secret() {
-  const s = process.env.SESSION_SECRET;
-  if (!s) throw new Error('SESSION_SECRET is not set');
-  return s;
+  return process.env.SESSION_SECRET || null;
 }
+
+export const isConfigured = () => !!process.env.SESSION_SECRET;
 
 /**
  * Sessions are a signed payload, not an encrypted one — nothing secret lives in
@@ -15,16 +16,20 @@ function secret() {
  * compare is enough for that, and it keeps the whole thing dependency free.
  */
 export function sign(payload) {
+  const key = secret();
+  if (!key) return null;
   const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  const mac = crypto.createHmac('sha256', secret()).update(body).digest('base64url');
+  const mac = crypto.createHmac('sha256', key).update(body).digest('base64url');
   return `${body}.${mac}`;
 }
 
 export function verify(token) {
+  const key = secret();
+  if (!key) return null;
   if (typeof token !== 'string' || !token.includes('.')) return null;
   const [body, mac] = token.split('.');
   if (!body || !mac) return null;
-  const expected = crypto.createHmac('sha256', secret()).update(body).digest('base64url');
+  const expected = crypto.createHmac('sha256', key).update(body).digest('base64url');
   const a = Buffer.from(mac);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
@@ -37,10 +42,13 @@ export function verify(token) {
   }
 }
 
+/** Returns false when the signing key is missing, so callers can say why. */
 export function setSession(res, payload) {
   const token = sign({ ...payload, exp: Date.now() + MAX_AGE * 1000 });
+  if (!token) return false;
   res.setHeader('Set-Cookie',
     `${COOKIE}=${token}; Path=/; HttpOnly; SameSite=Lax; Secure; Max-Age=${MAX_AGE}`);
+  return true;
 }
 
 export function clearSession(res) {
