@@ -2293,9 +2293,23 @@ body.billing #billing-view{display:block;}
     <div style="text-align:center;margin-bottom:34px;">
       <span class="eyebrow" style="justify-content:center;">Rust+ pairing</span>
       <h1 style="font-size:clamp(27px,3.4vw,38px);margin:14px 0 12px;">Pair straight from the game.</h1>
-      <p class="text-2" style="font-size:14.5px;max-width:520px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses. Nothing to copy, nothing to type.</p>
+      <p class="text-2" style="font-size:14.5px;max-width:560px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses — after a one-time setup on your PC.</p>
     </div>
 
+
+    <div class="card" style="margin-bottom:16px;border-color:var(--border-accent);background:var(--orange-soft);">
+      <div style="display:flex;gap:13px;align-items:flex-start;">
+        <svg class="icon" style="width:17px;height:17px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-wifi"/></svg>
+        <div style="min-width:0;">
+          <div style="font-weight:700;font-size:13.5px;margin-bottom:5px;">Pairing isn&rsquo;t live on this deployment yet</div>
+          <div class="text-2" style="font-size:12.5px;line-height:1.6;">
+            Receiving Rust+ pairings needs a service that stays connected to Google&rsquo;s push network
+            and holds a socket open to your game server. This site is served as static files, which
+            cannot do either &mdash; so the steps below describe the flow, but nothing is listening right now.
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="card" style="padding:0;overflow:hidden;">
       <div class="pair-step-row">
         <span class="pair-num">1</span>
@@ -2309,17 +2323,27 @@ body.billing #billing-view{display:block;}
       <div class="pair-step-row">
         <span class="pair-num">2</span>
         <div class="pair-body">
+          <div class="pair-t">Run <b style="color:var(--text)" class="mono">rustex-pair</b> on your PC &mdash; once</div>
+          <div class="pair-d">Rust+ hands its login token to a mobile app WebView, which a website cannot
+            read. A small helper does it locally instead, so your Steam password never reaches our
+            servers. It stays valid about two weeks.</div>
+        </div>
+        <span class="pill pill-offline"><span class="dot"></span>Not available</span>
+      </div>
+      <div class="pair-step-row">
+        <span class="pair-num">3</span>
+        <div class="pair-body">
           <div class="pair-t">In Rust, press <b style="color:var(--text)">ESC</b> → <b style="color:var(--text)">Rust+</b></div>
           <div class="pair-d">Load into the server you want to track first.</div>
         </div>
       </div>
       <div class="pair-step-row">
-        <span class="pair-num">3</span>
+        <span class="pair-num">4</span>
         <div class="pair-body">
           <div class="pair-t">Hit <b style="color:var(--text)">Pair With Server</b></div>
-          <div class="pair-d">It appears below within a second or two.</div>
+          <div class="pair-d">Once the service above is running, it lands here within a second or two.</div>
         </div>
-        <span class="pill pill-warn" id="pairListenPill"><span class="dot"></span>Waiting</span>
+        <span class="pill pill-offline" id="pairListenPill"><span class="dot"></span>Not listening</span>
       </div>
     </div>
 
@@ -2329,7 +2353,7 @@ body.billing #billing-view{display:block;}
       <div id="pairedEmpty" style="text-align:center;padding:24px 10px;">
         <svg class="icon" style="width:20px;height:20px;color:var(--text-3);margin:0 auto 9px;"><use href="#i-wifi"/></svg>
         <div class="text-2" style="font-size:12.5px;font-weight:600;margin-bottom:3px;">Nothing paired yet</div>
-        <div class="text-3" style="font-size:11.5px;">Complete the three steps above and your server lands here.</div>
+        <div class="text-3" style="font-size:11.5px;">Servers land here once pairing is connected.</div>
       </div>
     </div>
 
