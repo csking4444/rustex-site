@@ -2402,12 +2402,12 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:12px;">
-        <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;" autocomplete="off">
-        <input class="inp" type="text" id="mPort" placeholder="App port (28082)" style="max-width:none;" inputmode="numeric" autocomplete="off" value="28082">
+        <input class="inp" type="text" id="mIp" onpaste="handleFieldPaste(event)" placeholder="Server IP" style="max-width:none;" autocomplete="off">
+        <input class="inp" type="text" id="mPort" onpaste="handleFieldPaste(event)" placeholder="App port (28082)" style="max-width:none;" inputmode="numeric" autocomplete="off" value="28082">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
-        <input class="inp" type="text" id="mPlayerId" placeholder="Player ID (Steam 64)" style="max-width:none;" inputmode="numeric" autocomplete="off">
-        <input class="inp" type="text" id="mToken" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
+        <input class="inp" type="text" id="mPlayerId" onpaste="handleFieldPaste(event)" placeholder="Player ID (Steam 64)" style="max-width:none;" inputmode="numeric" autocomplete="off">
+        <input class="inp" type="text" id="mToken" onpaste="handleFieldPaste(event)" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
       <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
         <b style="color:var(--text)">1.</b> On your PC, run this once. It opens the Rust+ login for you,
@@ -3672,6 +3672,21 @@ async function rustPlus(server, action){
  * is easy to fumble. Handles the JSON the listener prints (including when the useful part is a
  * nested, JSON-encoded string), and falls back to scanning loose text.
  */
+/**
+ * Catches the pairing blob pasted into one of the individual fields rather than the box above.
+ * Those fields are adjacent and look like the obvious target, so requiring the right one was a
+ * trap. Anything that is clearly a single value is left alone.
+ */
+function handleFieldPaste(e){
+  const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
+  if(text.length < 40 || !/playerToken|"ip"|ip\s*[:=]/i.test(text)) return;  // a plain value, let it through
+
+  e.preventDefault();
+  const box = document.getElementById('mPaste');
+  if(box) box.value = text;
+  parsePairing(text);
+}
+
 function parsePairing(text){
   const note = document.getElementById('pasteNote');
   const raw = (text || '').trim();
