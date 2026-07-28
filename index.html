@@ -2410,26 +2410,23 @@ body.billing #billing-view{display:block;}
         <input class="inp" type="text" id="mToken" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
       <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
-        <b style="color:var(--text)">1.</b> Sign in to Rust+ first, in this browser. The setup command
-        below then reuses that session instead of asking you to log into Steam again.
-        <br>
-        <a class="btn btn-outline btn-sm" style="margin:8px 0 12px;" target="_blank" rel="noopener"
-           href="https://companion-rust.facepunch.com/login">
-          <svg class="icon" style="width:14px;height:14px"><use href="#i-steam"/></svg>Sign in to Rust+
-        </a>
-        <br><b style="color:var(--text)">2.</b> On your PC, run this once. It links that Rust+ session to a
-        push listener. Nothing is sent to Rustex.
+        <b style="color:var(--text)">1.</b> On your PC, run this once. It opens the Rust+ login for you,
+        links your Steam account, and saves the result locally. Nothing is sent to Rustex.
         <br><span class="mono" style="display:inline-block;margin:6px 0 10px;padding:6px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);">npx @liamcottle/rustplus.js fcm-register</span>
-        <br><b style="color:var(--text)">3.</b> Leave <span class="mono">npx @liamcottle/rustplus.js fcm-listen</span>
+        <br><b style="color:var(--text)">2.</b> Leave <span class="mono">npx @liamcottle/rustplus.js fcm-listen</span>
         running, load into your server, and press <b style="color:var(--text)">ESC → Rust+ → Pair With Server</b>.
-        <br><b style="color:var(--text)">4.</b> Paste what it prints into the box above. The fields fill themselves.
+        You have to be connected to that server at the time; Rust+ pairs the one you are on.
+        <br><b style="color:var(--text)">3.</b> Paste what it prints into the box above. The fields fill themselves.
+        <br><br>
+        <b style="color:var(--text)">Do not open the Rust+ login page directly in a browser tab.</b>
+        It reports <span class="mono">Failed to send login message to the Rust+ app</span>, because it hands
+        its token to the mobile app rather than to the page. The command above supplies what it expects,
+        which is why the login has to go through it.
         <br><br>
         <b style="color:var(--text)">App port is not the port you connect to play on.</b> Rust+ listens
         separately, normally on <span class="mono">28082</span>. The pairing gives you the right one.
         <br><br>
-        Signing in above does not by itself hand Rustex a token, because Rust+ returns it to a mobile app
-        view a website cannot read. It only saves you the second login. These details stay in this browser
-        and are sent only when loading data from that server.
+        These stay in this browser and are sent only when loading data from that server.
 </p>
       <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="mPairBtn" onclick="manualPair(this)">Connect server</button>
     </section>
