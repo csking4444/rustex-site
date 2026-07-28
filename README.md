@@ -69,3 +69,55 @@ Opening `index.html` directly still renders the site; it just reports signed-out
 - **Illustrative:** the feature mock-ups on the landing page and the sample
   telemetry in the demo dashboard. These are examples of what the product shows,
   not anyone's data.
+
+## Live Rust+ data
+
+`POST /api/rustplus/request` performs one Rust+ request against a game server and returns the
+decoded response. Body: `{ host, port, playerId, playerToken, action }`.
+
+`action` is restricted to reads: `getInfo`, `getTime`, `getMap`, `getTeamInfo`, `getTeamChat`,
+`getMapMarkers`. Mutating calls such as `setEntityValue` are refused.
+
+### What this can and cannot do
+
+Rust+ is request/response over a WebSocket, so a serverless function can connect, ask, and close
+well inside its execution window. That covers live population, team roster and positions, map
+markers, and team chat.
+
+It cannot do the half of the protocol that needs a socket held open: `setSubscription` and the
+broadcasts it enables, and the FCM listener behind automatic pairing and Smart Alarm push
+notifications. Those need a process that stays alive, which static hosting does not provide.
+
+### Credentials
+
+`playerId` and `playerToken` come from a Rust+ pairing and authorise one server, not the Rustex
+account. They are supplied by the caller rather than stored here, because this deployment has no
+database; the browser keeps them in `localStorage` under `rustex.servers.v1`.
+
+Obtain them by running `rustex-pair --print-only` locally and pairing from the game's pause menu.
+
+### Security
+
+The caller supplies the address this function connects to, so `resolvePublicHost` rejects
+loopback, private, link-local (including cloud metadata at 169.254.169.254), carrier-grade NAT
+and multicast ranges. Hostnames are resolved first and every answer must be public, then the
+connection is made to the resolved literal so a second lookup cannot substitute a different
+address. Requests require a signed-in session, so this is not an open relay.
+
+`RUSTPLUS_ALLOW_PRIVATE=1` disables those range checks for local development against a LAN
+server. It must stay unset in production.
+
+### Regenerating the protobuf descriptor
+
+`api/rustplus/_descriptor.js` is generated from `rustplus.proto`, which is copied from the server
+project (itself taken field-for-field from liamcottle/rustplus.js). To regenerate after a schema
+change:
+
+```bash
+node --input-type=module -e "
+import protobuf from 'protobufjs';
+import { writeFileSync } from 'node:fs';
+const root = await protobuf.load('rustplus.proto');
+writeFileSync('api/rustplus/_descriptor.js', 'export default ' + JSON.stringify(root.toJSON()) + ';\n');
+"
+```

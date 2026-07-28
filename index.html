@@ -330,6 +330,9 @@ img,svg{display:block;}
   border-top-color:var(--orange); animation:spin .7s linear infinite; flex-shrink:0;}
 .auth-step.on .mk .spin{width:9px; height:9px; border-width:1.6px;}
 @keyframes spin{to{transform:rotate(360deg)}}
+/* Inline progress inside a button while a request is in flight (see busyButton). */
+.btn .spin{width:12px; height:12px; margin-right:7px; display:inline-block; vertical-align:-1px;}
+.btn:disabled{opacity:.62; cursor:not-allowed;}
 .auth-error{display:flex; gap:10px; text-align:left; padding:12px 13px; border-radius:var(--r-md);
   background:var(--crimson-soft); border:1px solid rgba(179,38,30,.32); margin-bottom:16px;}
 .auth-error .icon{width:16px; height:16px; color:#ef6a62; flex-shrink:0; margin-top:1px;}
@@ -431,6 +434,30 @@ body:not(.is-demo) .demo-banner{display:none;}
 
 /* The KPI row lives inside Overview now, so the grid gap provides its spacing. */
 .dash-section .stat-row{margin-bottom:0;}
+
+/* Live status strip. Says where the numbers came from and when, so a stale panel is
+   distinguishable from a fresh one at a glance. */
+.live-state{display:flex; align-items:center; gap:9px; padding:9px 14px; border-radius:var(--r-md);
+  font-size:12px; font-weight:600; border:1px solid var(--border); background:var(--surface-2);
+  color:var(--text-2);}
+.live-state::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor;
+  flex-shrink:0;}
+.live-state.loading{color:var(--text-3);}
+.live-state.ok{color:var(--success); border-color:rgba(95,168,92,.3); background:var(--success-soft);}
+.live-state.err{color:var(--warning); border-color:rgba(200,146,46,.3); background:var(--warning-soft);}
+
+/* Roster rows rendered from live team data. */
+.team-row{display:flex; align-items:center; gap:12px; padding:11px 0;
+  border-bottom:1px solid var(--border);}
+.team-row:last-child{border-bottom:0;}
+.team-row .av{width:28px; height:28px; border-radius:var(--r-sm); background:var(--surface-3);
+  display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800;
+  color:var(--text-2); flex-shrink:0;}
+.team-row .nm{flex:1; min-width:0; font-size:13px; font-weight:600; display:flex;
+  align-items:center; gap:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.team-row .nm .tag{font-size:9px; font-weight:800; letter-spacing:.08em; padding:2px 5px;
+  border-radius:2px; background:var(--orange-soft); color:var(--orange); flex-shrink:0;}
+.team-row .grid{font-size:11.5px; color:var(--text-3); flex-shrink:0;}
 
 /* --- Rust-flavoured surface treatment -------------------------------------
    Three things carry most of the in-game feel: square corners (handled by the
@@ -1791,14 +1818,15 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section active" id="dsec-overview">
+        <div class="live-state w-12" id="liveState" hidden></div>
         <div class="stat-row w-12">
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">187<span class="text-3" style="font-size:14px"> of 200</span></div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">3<span class="text-3" style="font-size:14px"> days</span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="pop">187</span><span class="text-3" style="font-size:14px"><span data-live="maxPop"> of 200</span></span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="wipeAge">3</span><span class="text-3" style="font-size:14px"> days</span></div></div>
           <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Active Alarms</span><span class="trend down"><svg class="icon" style="width:11px;height:11px"><use href="#i-siren"/></svg></span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)">1</div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">4<span class="text-3" style="font-size:14px"> of 5</span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="squadOnline">4</span><span class="text-3" style="font-size:14px"><span data-live="squadTotal"> of 5</span></span></div></div>
         </div>
         <div class="widget card w-6" id="d-team">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div><div id="teamRows">
           <table class="table">
             <tbody>
               <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--orange);width:26px;height:26px;font-size:10px">KL</span>Kaelthorn <span class="badge badge-leader" style="margin-left:6px">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
@@ -1809,7 +1837,7 @@ body.billing #billing-view{display:block;}
           </table>
         </div>
 
-        <div class="widget card w-6" id="d-threat">
+        </div><div class="widget card w-6" id="d-threat">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intelligence</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <table class="table">
             <thead><tr><th>Player</th><th></th><th>KD</th><th>Threat</th><th>Last seen</th></tr></thead>
@@ -2301,11 +2329,12 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;gap:13px;align-items:flex-start;">
         <svg class="icon" style="width:17px;height:17px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-wifi"/></svg>
         <div style="min-width:0;">
-          <div style="font-weight:700;font-size:13.5px;margin-bottom:5px;">Pairing isn&rsquo;t live on this deployment yet</div>
+          <div style="font-weight:700;font-size:13.5px;margin-bottom:5px;">Automatic pairing isn&rsquo;t available here</div>
           <div class="text-2" style="font-size:12.5px;line-height:1.6;">
-            Receiving Rust+ pairings needs a service that stays connected to Google&rsquo;s push network
-            and holds a socket open to your game server. This site is served as static files, which
-            cannot do either &mdash; so the steps below describe the flow, but nothing is listening right now.
+            Catching the in-game <b>Pair With Server</b> push needs a service that stays connected to
+            Google&rsquo;s push network, which static hosting cannot do. Live raid alarms need the same thing.
+            <b style="color:var(--text)">Everything else works today</b>: connect a server by hand below and
+            Rustex reads live population, team positions and map markers straight from it.
           </div>
         </div>
       </div>
@@ -2360,11 +2389,19 @@ body.billing #billing-view{display:block;}
     <details class="pair-manual">
       <summary>Enter connection details manually</summary>
       <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:14px;">
-        <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;">
-        <input class="inp" type="text" id="mPort" placeholder="App port" style="max-width:none;">
+        <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;" autocomplete="off">
+        <input class="inp" type="text" id="mPort" placeholder="App port" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
-      <p class="text-3" style="font-size:11px;margin-top:10px;">Manual entry still needs the player ID and token the game issues, so pairing from the pause menu is almost always faster.</p>
-      <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="manualPair()">Add server</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+        <input class="inp" type="text" id="mPlayerId" placeholder="Player ID (Steam 64)" style="max-width:none;" inputmode="numeric" autocomplete="off">
+        <input class="inp" type="text" id="mToken" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
+      </div>
+      <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
+        All four come from one Rust+ pairing. Run <span class="mono">rustex-pair --print-only</span> on your
+        PC, pair from the pause menu, and it prints them without sending anything anywhere. They stay in this
+        browser and are sent only when loading data from that server.
+      </p>
+      <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="mPairBtn" onclick="manualPair(this)">Connect server</button>
     </details>
 
   </div>
@@ -2492,6 +2529,7 @@ function goDashboard(){
     return;
   }
   showView('dash');
+  refreshLiveData();
 }
 function requireSignIn(intent){
   if(Session.signedIn) return true;
@@ -2677,8 +2715,19 @@ function disconnectRustPlus(){
 function unpairServer(id){
   Session.servers = Session.servers.filter(s => s.id !== id);
   if(!Session.servers.length) Session.rustPlus = { connected:false, name:null };
+  saveServers();
   syncAuthUI(); renderSettings(); renderPairedServers();
-  fireCustomToast('Server unpaired', 'It no longer streams to Rustex.', 'i-wifi');
+  fireCustomToast('Server removed', 'Its credentials have been cleared from this browser.', 'i-wifi');
+}
+
+/** Disables a button and shows progress for the duration of a request, so a slow network
+ *  cannot be double-submitted. Returns a restore function. */
+function busyButton(btn, label){
+  if(!btn) return ()=>{};
+  const original = btn.innerHTML, wasDisabled = btn.disabled;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spin" aria-hidden="true"></span>' + (label || 'Working…');
+  return ()=>{ btn.disabled = wasDisabled; btn.innerHTML = original; };
 }
 
 // ---- billing ----
@@ -2749,6 +2798,7 @@ async function logOut(){
 // ---- boot ----
 (async function boot(){
   Session.loadPrefs();
+  loadServers();
   syncAuthUI();
 
   // surface an error the callback bounced back with, then tidy the URL
@@ -3402,15 +3452,205 @@ function addPairedServer(name, addr){
   Session.rustPlus = { connected:true, name: Session.displayName };
   syncAuthUI(); renderPairedServers();
 }
-function manualPair(){
+
+// ---- Rust+ over the API -----------------------------------------------------
+// The player token authorises one server pairing, not the Rustex account, and this
+// deployment has no database — so credentials live in this browser and travel with
+// each request rather than being stored server-side.
+const RX_SERVERS = 'rustex.servers.v1';
+
+function loadServers(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(RX_SERVERS));
+    Session.servers = Array.isArray(raw) ? raw : [];
+  } catch { Session.servers = []; }
+  Session.rustPlus = Session.servers.length
+    ? { connected:true, name: Session.displayName }
+    : { connected:false, name:null };
+  return Session.servers;
+}
+function saveServers(){
+  try { localStorage.setItem(RX_SERVERS, JSON.stringify(Session.servers)); } catch {}
+}
+
+/**
+ * Pulls live data for the first connected server and writes it into the dashboard.
+ *
+ * Only fills in what actually came back. A failed read leaves the previous value rather than
+ * blanking the panel, so a momentary timeout does not make the dashboard look broken — and
+ * nothing here invents a number when the server did not send one.
+ */
+async function refreshLiveData(){
+  const server = Session.servers[0];
+  const banner = document.getElementById('liveState');
+  if(!server){ if(banner) banner.hidden = true; return; }
+
+  const setText = (sel, value) => {
+    const el = document.querySelector(sel);
+    if(el && value !== undefined && value !== null) el.textContent = value;
+  };
+
+  if(banner){
+    banner.hidden = false;
+    banner.className = 'live-state loading';
+    banner.textContent = 'Loading live data from ' + (server.name || server.addr) + '…';
+  }
+
+  try {
+    const [info, team] = await Promise.all([
+      rustPlus(server, 'getInfo').catch(()=>null),
+      rustPlus(server, 'getTeamInfo').catch(()=>null),
+    ]);
+
+    if(info?.info){
+      const i = info.info;
+      setText('[data-live="pop"]', i.players);
+      setText('[data-live="maxPop"]', ' of ' + i.maxPlayers);
+      setText('[data-live="serverName"]', i.name);
+      if(i.wipeTime){
+        const days = Math.max(0, Math.floor((Date.now()/1000 - Number(i.wipeTime)) / 86400));
+        setText('[data-live="wipeAge"]', days);
+      }
+    }
+
+    if(team?.teamInfo?.members){
+      const members = team.teamInfo.members;
+      setText('[data-live="squadOnline"]', members.filter(m => m.isOnline).length);
+      setText('[data-live="squadTotal"]', ' of ' + members.length);
+      renderLiveTeam(members, team.teamInfo.leaderSteamId, info?.info?.mapSize);
+    }
+
+    if(banner){
+      const ok = !!(info || team);
+      banner.className = 'live-state ' + (ok ? 'ok' : 'err');
+      banner.textContent = ok
+        ? 'Live from ' + (info?.info?.name || server.name) + ' · updated ' + new Date().toLocaleTimeString()
+        : 'Could not reach ' + (server.name || server.addr) + '. Showing the last values received.';
+    }
+  } catch (err) {
+    if(banner){ banner.className = 'live-state err'; banner.textContent = err.message; }
+  }
+}
+
+/**
+ * World coordinates to Rust's on-screen grid reference, e.g. "K6".
+ *
+ * Ported from GridConverter.cs, which follows the community rustplusplus reference. Three
+ * details are easy to get wrong and all of them change the answer: the cell is 146.25 units
+ * (not the commonly assumed 150), the map size is snapped to a grid boundary first, and the
+ * grid numbers count from the top while the game's Y axis counts from the bottom — so the row
+ * has to be inverted. Returns null off the edge of the grid rather than a bogus reference.
+ */
+const GRID_DIAMETER = 146.25;
+
+function correctedMapSize(mapSize){
+  const remainder = mapSize % GRID_DIAMETER;
+  return remainder < 120 ? mapSize - remainder : mapSize + (GRID_DIAMETER - remainder);
+}
+/** Bijective base-26: 1→A, 26→Z, 27→AA. Naive base-26 breaks at multiples of 26. */
+function numberToLetters(num){
+  const mod = num % 26;
+  let pow = Math.floor(num / 26), result;
+  if(mod !== 0){ result = String.fromCharCode(64 + mod); }
+  else { pow--; result = 'Z'; }
+  return pow > 0 ? numberToLetters(pow) + result : result;
+}
+function toGrid(x, y, mapSize){
+  const size = correctedMapSize(mapSize);
+  if(x < 0 || x > size || y < 0 || y > size) return null;
+
+  let letters = null, counter = 1;
+  for(let start = 0; start < size; start += GRID_DIAMETER){
+    if(x >= start && x <= start + GRID_DIAMETER){ letters = numberToLetters(counter); break; }
+    counter++;
+  }
+  let number = null;
+  const total = Math.floor(size / GRID_DIAMETER);
+  counter = 1;
+  for(let start = 0; start < size; start += GRID_DIAMETER){
+    if(y >= start && y <= start + GRID_DIAMETER){ number = total - counter; break; }
+    counter++;
+  }
+  return (letters === null || number === null) ? null : letters + number;
+}
+
+/** Replaces the sample roster with the real one. */
+function renderLiveTeam(members, leaderId, mapSize){
+  const body = document.getElementById('teamRows');
+  if(!body) return;
+  const grid = (x, y) => toGrid(x, y, mapSize || 4000) || 'off grid';
+  body.innerHTML = members.map(m => {
+    const state = !m.isOnline ? ['pill-offline','Offline'] : m.isAlive ? ['pill-online','Online'] : ['pill-warn','Dead'];
+    const initials = (m.name || '?').slice(0,2).toUpperCase();
+    return '<div class="team-row">'
+      + '<span class="av">' + escapeHtml(initials) + '</span>'
+      + '<span class="nm">' + escapeHtml(m.name || 'Unknown')
+      + (String(m.steamId) === String(leaderId) ? '<span class="tag">LEADER</span>' : '') + '</span>'
+      + '<span class="mono grid">' + escapeHtml(grid(m.x, m.y)) + '</span>'
+      + '<span class="pill ' + state[0] + '"><span class="dot"></span>' + state[1] + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+/** Rust+ returns player names straight from the game, so they are escaped before use. */
+function escapeHtml(value){
+  return String(value == null ? '' : value)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+/** One Rust+ read. The server does the socket work; this just asks. */
+async function rustPlus(server, action){
+  const r = await fetch('/api/rustplus/request', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    credentials:'same-origin',
+    body: JSON.stringify({
+      host: server.ip, port: Number(server.port),
+      playerId: server.playerId, playerToken: Number(server.playerToken),
+      action
+    })
+  });
+  const body = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(body.message || 'That request failed.');
+  return body.response;
+}
+
+async function manualPair(btn){
   if(!Session.signedIn){ openSteamAuth('pairing'); return; }
-  const ip = (document.getElementById('mIp').value || '').trim();
-  const port = (document.getElementById('mPort').value || '').trim();
-  if(!ip || !port){ document.getElementById('mIp').focus(); return; }
-  addPairedServer(ip, ip + ':' + port);
-  document.getElementById('mIp').value = '';
-  document.getElementById('mPort').value = '';
-  fireCustomToast('Server added', ip + ':' + port + ' is now in your list.', 'i-check');
+  const get = id => (document.getElementById(id).value || '').trim();
+  const ip = get('mIp'), port = get('mPort'), playerId = get('mPlayerId'), token = get('mToken');
+
+  const bad = !ip ? 'mIp' : !port ? 'mPort' : !/^\d{17}$/.test(playerId) ? 'mPlayerId'
+            : !/^-?\d+$/.test(token) ? 'mToken' : null;
+  if(bad){
+    document.getElementById(bad).focus();
+    fireCustomToast('Check that field', bad === 'mPlayerId'
+      ? 'A player ID is the 17-digit number from your Rust+ pairing.'
+      : 'All four fields are needed to reach the server.', 'i-lock');
+    return;
+  }
+
+  const server = { id:'srv_' + Math.random().toString(36).slice(2,9), ip, port, playerId, playerToken: token };
+  const done = busyButton(btn, 'Connecting…');
+  try {
+    // Verified before saving, so a wrong token fails here rather than silently producing an
+    // entry that never loads.
+    const info = await rustPlus(server, 'getInfo');
+    server.name = info?.info?.name || (ip + ':' + port);
+    server.addr = ip + ':' + port;
+
+    Session.servers = Session.servers.filter(s => !(s.ip === ip && s.port === port));
+    Session.servers.push(server);
+    saveServers();
+    Session.rustPlus = { connected:true, name: Session.displayName };
+
+    ['mIp','mPort','mPlayerId','mToken'].forEach(id => document.getElementById(id).value = '');
+    syncAuthUI(); renderPairedServers();
+    fireCustomToast('Connected', server.name + ' is live in your dashboard.', 'i-check');
+  } catch(err){
+    fireCustomToast('Could not connect', err.message, 'i-lock');
+  } finally { done(); }
 }
 </script>
 
