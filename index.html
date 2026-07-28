@@ -435,6 +435,23 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* The KPI row lives inside Overview now, so the grid gap provides its spacing. */
 .dash-section .stat-row{margin-bottom:0;}
 
+/* Setup commands. Both steps get identical weight; previously one sat in a highlighted block
+   and the other was buried mid-sentence, which read as though there were only one command. */
+.cmd-row{display:flex; align-items:stretch; gap:0; margin:8px 0 14px; max-width:520px;}
+.cmd{flex:1; min-width:0; font-family:var(--font-mono); font-size:11.5px; padding:9px 11px;
+  background:var(--surface-2); border:1px solid var(--border); border-right:0;
+  border-radius:var(--r-sm) 0 0 var(--r-sm); color:var(--text); overflow-x:auto;
+  white-space:nowrap; line-height:1.4;}
+.cmd-copy{flex-shrink:0; padding:0 13px; font-size:11px; font-weight:700; cursor:pointer;
+  background:var(--surface-3); color:var(--text-2); border:1px solid var(--border);
+  border-radius:0 var(--r-sm) var(--r-sm) 0; transition:background .15s ease, color .15s ease;}
+.cmd-copy:hover{background:var(--orange); color:#140D0A; border-color:var(--orange);}
+.cmd-copy.done{background:var(--success); color:#04160a; border-color:var(--success);}
+
+/* Build stamp, so "which version am I on" is a glance rather than a guess. */
+.build-stamp{position:fixed; right:8px; bottom:6px; z-index:90; font-family:var(--font-mono);
+  font-size:9.5px; color:var(--text-3); opacity:.55; pointer-events:none; letter-spacing:.04em;}
+
 /* Live status strip. Says where the numbers came from and when, so a stale panel is
    distinguishable from a fresh one at a glance. */
 .live-state{display:flex; align-items:center; gap:9px; padding:9px 14px; border-radius:var(--r-md);
@@ -2410,18 +2427,21 @@ body.billing #billing-view{display:block;}
         <input class="inp" type="text" id="mToken" onpaste="handleFieldPaste(event)" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
       <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
-        <b style="color:var(--text)">1.</b> On your PC, run this once. It opens the Rust+ login for you,
-        links your Steam account, and saves the result locally. Nothing is sent to Rustex.
-        <br><span class="mono" style="display:inline-block;margin:6px 0 10px;padding:6px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);">npx @liamcottle/rustplus.js fcm-register</span>
-        <br><b style="color:var(--text)">2.</b> Leave <span class="mono">npx @liamcottle/rustplus.js fcm-listen</span>
-        running, load into your server, and press <b style="color:var(--text)">ESC → Rust+ → Pair With Server</b>.
-        You have to be connected to that server at the time; Rust+ pairs the one you are on.
-        <br><b style="color:var(--text)">3.</b> Paste what it prints into the box above. The fields fill themselves.
+        <b style="color:var(--text)">Step 1.</b> Link your Steam account. Runs once, opens the Rust+
+        login, saves the result on your PC. Nothing is sent to Rustex.
+        <span class="cmd-row"><code class="cmd">npx @liamcottle/rustplus.js fcm-register</code><button class="cmd-copy" type="button" onclick="copyCmd(this)">Copy</button></span>
+        <b style="color:var(--text)">Step 2.</b> Start the listener and <u>leave this window open</u>.
+        <span class="cmd-row"><code class="cmd">npx @liamcottle/rustplus.js fcm-listen</code><button class="cmd-copy" type="button" onclick="copyCmd(this)">Copy</button></span>
+        <b style="color:var(--text)">Step 3.</b> In game, load into your server, then press
+        <b style="color:var(--text)">ESC → Rust+ → Pair With Server</b>. You must be connected to that
+        server right now; Rust+ pairs the one you are on. The listener prints a block of details.
+        <br><br>
+        <b style="color:var(--text)">Step 4.</b> Copy everything it printed and paste it into any box on
+        this panel. The fields fill themselves.
         <br><br>
         <b style="color:var(--text)">Do not open the Rust+ login page directly in a browser tab.</b>
         It reports <span class="mono">Failed to send login message to the Rust+ app</span>, because it hands
-        its token to the mobile app rather than to the page. The command above supplies what it expects,
-        which is why the login has to go through it.
+        its token to the mobile app rather than to the page. Step 1 supplies what it expects.
         <br><br>
         <b style="color:var(--text)">App port is not the port you connect to play on.</b> Rust+ listens
         separately, normally on <span class="mono">28082</span>. The pairing gives you the right one.
@@ -3677,6 +3697,27 @@ async function rustPlus(server, action){
  * Those fields are adjacent and look like the obvious target, so requiring the right one was a
  * trap. Anything that is clearly a single value is left alone.
  */
+/** Copies a command to the clipboard so it cannot be mistyped. */
+function copyCmd(btn){
+  const text = btn.previousElementSibling?.textContent?.trim();
+  if(!text) return;
+  const done = () => {
+    const original = btn.textContent;
+    btn.textContent = 'Copied'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('done'); }, 1400);
+  };
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{});
+  } else {
+    // Older browsers, and any context where the clipboard API is unavailable.
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch {}
+    document.body.removeChild(ta);
+  }
+}
+
 function handleFieldPaste(e){
   const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
   if(text.length < 40 || !/playerToken|"ip"|ip\s*[:=]/i.test(text)) return;  // a plain value, let it through
@@ -3844,5 +3885,6 @@ async function manualPair(btn){
 }
 </script>
 
+<div class="build-stamp">build 2026-07-28 10:37 UTC</div>
 </body>
 </html>
