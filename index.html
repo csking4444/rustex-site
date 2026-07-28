@@ -1778,15 +1778,14 @@ body.billing #billing-view{display:block;}
     <a class="side-link" data-dsec="overview" data-target="d-team" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
     <a class="side-link" data-dsec="overview" data-target="d-threat" href="#" onclick="showDashSection('overview','d-threat');return false;"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
     <a class="side-link" data-dsec="overview" data-target="d-alarm" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</a>
-    <div class="side-section-lbl">Base</div>
-    <a class="side-link" data-dsec="base" data-target="d-decay" href="#" onclick="showDashSection('base','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
-    <a class="side-link" data-dsec="base" data-target="d-devices" href="#" onclick="showDashSection('base','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
-    <a class="side-link" data-dsec="base" data-target="d-heatmap" href="#" onclick="showDashSection('base','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</a>
+        <div class="side-section-lbl">Tools</div>
+<a class="side-link" data-dsec="tools" data-target="d-decay" href="#" onclick="showDashSection('tools','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
+    <a class="side-link" data-dsec="tools" data-target="d-devices" href="#" onclick="showDashSection('tools','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
+    <a class="side-link" data-dsec="tools" data-target="d-heatmap" href="#" onclick="showDashSection('tools','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</a>
     <div class="side-section-lbl">Market</div>
     <a class="side-link" data-dsec="market" data-target="d-vending" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
     <a class="side-link" data-dsec="market" data-target="d-shopalerts" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
     <a class="side-link" data-dsec="market" data-target="d-recycler" href="#" onclick="showDashSection('market','d-recycler');return false;"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
-    <div class="side-section-lbl">Tools</div>
     <a class="side-link" data-dsec="tools" data-target="d-genetics" href="#" onclick="showDashSection('tools','d-genetics');return false;"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
     <a class="side-link" data-dsec="tools" data-target="d-chat" href="#" onclick="showDashSection('tools','d-chat');return false;"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
     <div class="side-foot">
@@ -1851,7 +1850,7 @@ body.billing #billing-view{display:block;}
           <div class="dropdown">
             <button class="btn btn-outline btn-sm" onclick="toggleDropdown('ddCustomize', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-layers"/></svg>Customize</button>
             <div class="dropdown-panel" id="ddCustomize" style="width:230px;">
-              <div class="dropdown-label">Sections</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('base')"><svg class="icon"><use href="#i-lock"/></svg>Base</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</div></div>
+              <div class="dropdown-label">Sections</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</div></div>
           </div>
           <button class="btn btn-primary btn-sm" onclick="fireToast()"><svg class="icon" style="width:14px;height:14px"><use href="#i-plus"/></svg>Quick Alert</button>
         </div>
@@ -1868,7 +1867,6 @@ body.billing #billing-view{display:block;}
 
       <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
           <button class="dash-tab active" data-dsec="overview" onclick="showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</button>
-          <button class="dash-tab" data-dsec="base" onclick="showDashSection('base')"><svg class="icon"><use href="#i-lock"/></svg>Base</button>
           <button class="dash-tab" data-dsec="market" onclick="showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</button>
           <button class="dash-tab" data-dsec="tools" onclick="showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</button>
       </div>
@@ -1912,82 +1910,6 @@ body.billing #billing-view{display:block;}
         </div>
           </div>
         </div>
-      </div>
-
-      <div class="dash-section" id="dsec-base">
-        <div class="widget card w-6" id="d-decay">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="decay-calc">
-            <div class="decay-row">
-              <label class="decay-lbl" for="decayMat">Material</label>
-              <select class="inp" id="decayMat" onchange="renderDecay()">
-                <option value="twig">Twig</option>
-                <option value="wood">Wood</option>
-                <option value="stone" selected>Stone</option>
-                <option value="sheet">Sheet Metal</option>
-                <option value="armored">Armoured</option>
-              </select>
-            </div>
-
-            <div class="decay-row">
-              <label class="decay-lbl" for="decayHp">Current HP</label>
-              <input class="inp" id="decayHp" type="number" min="0" inputmode="numeric" oninput="renderDecay()">
-            </div>
-
-            <input type="range" id="decayPct" class="decay-slider" min="1" max="100" value="100"
-                   oninput="setDecayPct(this.value)" aria-label="Percent health remaining">
-            <div class="decay-pct"><span id="decayPctLabel">100%</span><span id="decayMax" class="text-3"></span></div>
-
-            <div class="decay-out">
-              <div class="decay-time" id="decayTime">--</div>
-              <div class="decay-sub text-3" id="decaySub">until it collapses</div>
-            </div>
-
-            <p class="text-3" style="font-size:10.5px;line-height:1.55;margin:0;">
-              Assumes no Tool Cupboard upkeep. Decay only runs once the building has been outside
-              upkeep for a while, so treat this as the time you have after it starts, not a countdown
-              from right now.
-            </p>
-          </div>
-        </div>
-        </div>
-
-        <div class="widget card w-6" id="d-devices">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;flex-direction:column;gap:9px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
-          </div>
-          <div class="progress" style="margin-top:12px"><span style="width:64%"></span></div>
-          <div style="display:flex;gap:12px;margin-top:8px;">
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-wood" title="Wood"></span>8.2k</span>
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-stones" title="Stones"></span>12.4k</span>
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
-          </div>
-        </div>
-
-        <div class="widget card w-12" id="d-heatmap">
-          <div class="card-head">
-            <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
-              <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
-              <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
-              <button type="button" class="pill pill-offline heat-key" data-layer="stone" aria-pressed="true"><span class="dot"></span>Stone</button>
-              <button type="button" class="pill pill-online heat-key" data-layer="spawn" aria-pressed="true"><span class="dot"></span>Spawns</button>
-            </div>
-          </div>
-          <div class="heat-wrap" data-heat>
-            <canvas id="heatCanvas2" style="height:320px;" role="img" aria-label="Resource density heatmap of sulfur, metal and stone nodes with player spawn points"></canvas>
-            <div class="heat-tip" data-heat-tip></div>
-            <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
-            <div class="heat-zoom">
-              <button type="button" data-heat-zoom="in" aria-label="Zoom in" title="Zoom in"><svg class="icon"><use href="#i-plus"/></svg></button>
-              <button type="button" data-heat-zoom="out" aria-label="Zoom out" title="Zoom out"><svg class="icon"><use href="#i-minus"/></svg></button>
-              <button type="button" data-heat-zoom="reset" aria-label="Reset view" title="Reset view"><svg class="icon"><use href="#i-crosshair"/></svg></button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div class="dash-section" id="dsec-market">
         <div class="widget card w-6" id="d-vending">
@@ -2025,6 +1947,78 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section" id="dsec-tools">
+        <div class="widget card w-6" id="d-decay">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div class="decay-calc">
+            <div class="decay-row">
+              <label class="decay-lbl" for="decayMat">Material</label>
+              <select class="inp" id="decayMat" onchange="renderDecay()">
+                <option value="twig">Twig</option>
+                <option value="wood">Wood</option>
+                <option value="stone" selected>Stone</option>
+                <option value="sheet">Sheet Metal</option>
+                <option value="armored">Armoured</option>
+              </select>
+            </div>
+
+            <div class="decay-row">
+              <label class="decay-lbl" for="decayHp">Current HP</label>
+              <input class="inp" id="decayHp" type="number" min="0" inputmode="numeric" oninput="renderDecay()">
+            </div>
+
+            <input type="range" id="decayPct" class="decay-slider" min="1" max="100" value="100"
+                   oninput="setDecayPct(this.value)" aria-label="Percent health remaining">
+            <div class="decay-pct"><span id="decayPctLabel">100%</span><span id="decayMax" class="text-3"></span></div>
+
+            <div class="decay-out">
+              <div class="decay-time" id="decayTime">--</div>
+              <div class="decay-sub text-3" id="decaySub">until it collapses</div>
+            </div>
+
+            <p class="text-3" style="font-size:10.5px;line-height:1.55;margin:0;">
+              Assumes no Tool Cupboard upkeep. Decay only runs once the building has been outside
+              upkeep for a while, so treat this as the time you have after it starts, not a countdown
+              from right now.
+            </p>
+          </div>
+        </div>
+
+        <div class="widget card w-6" id="d-devices">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+          </div>
+          <div class="progress" style="margin-top:12px"><span style="width:64%"></span></div>
+          <div style="display:flex;gap:12px;margin-top:8px;">
+            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-wood" title="Wood"></span>8.2k</span>
+            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-stones" title="Stones"></span>12.4k</span>
+            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
+          </div>
+        </div>
+
+        <div class="widget card w-12" id="d-heatmap">
+          <div class="card-head">
+            <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
+              <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
+              <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
+              <button type="button" class="pill pill-offline heat-key" data-layer="stone" aria-pressed="true"><span class="dot"></span>Stone</button>
+              <button type="button" class="pill pill-online heat-key" data-layer="spawn" aria-pressed="true"><span class="dot"></span>Spawns</button>
+            </div>
+          </div>
+          <div class="heat-wrap" data-heat>
+            <canvas id="heatCanvas2" style="height:320px;" role="img" aria-label="Resource density heatmap of sulfur, metal and stone nodes with player spawn points"></canvas>
+            <div class="heat-tip" data-heat-tip></div>
+            <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
+            <div class="heat-zoom">
+              <button type="button" data-heat-zoom="in" aria-label="Zoom in" title="Zoom in"><svg class="icon"><use href="#i-plus"/></svg></button>
+              <button type="button" data-heat-zoom="out" aria-label="Zoom out" title="Zoom out"><svg class="icon"><use href="#i-minus"/></svg></button>
+              <button type="button" data-heat-zoom="reset" aria-label="Reset view" title="Reset view"><svg class="icon"><use href="#i-crosshair"/></svg></button>
+            </div>
+          </div>
+        </div>
+
         <div class="widget card w-6" id="d-genetics">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div class="planter planter-mini" style="margin-bottom:10px;">
@@ -3548,7 +3542,7 @@ function showDashSection(id, focusWidget){
   if(head && tab) head.textContent = tab.textContent.trim();
   // canvases sized while hidden measure 0, so re-fit anything that just appeared
   window.dispatchEvent(new Event('resize'));
-  if(id === 'base' && document.getElementById('decayMat')) renderDecay();
+  if(id === 'tools' && document.getElementById('decayMat')) renderDecay();
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
