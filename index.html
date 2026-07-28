@@ -410,6 +410,84 @@ select.inp{cursor:pointer;}
 .demo-banner b{color:var(--text);}
 body:not(.is-demo) .demo-banner{display:none;}
 
+/* --- dashboard layout & responsive ---------------------------------------
+   The dashboard sections are their own 12-column grid, so the older
+   `.widget-grid` breakpoint never applied to them: widgets kept `span 4` all
+   the way down to phone width. Combined with grid items defaulting to
+   min-width:auto, this forced ~326px of horizontal page scroll at 414px.
+   ------------------------------------------------------------------------ */
+
+/* Section tabs stay reachable while scrolling a long section. */
+.dash-tabs{position:sticky; top:56px; z-index:40; margin-bottom:18px;
+  background:var(--surface-2); backdrop-filter:blur(10px);}
+
+.widget:focus-within{border-color:var(--orange); outline:none;}
+
+/* Let grid and flex children shrink; without this a single unbreakable run of
+   content forces its whole track wider than the viewport. */
+.dash-section.active > *{min-width:0;}
+.widget, .card{min-width:0;}
+.widget *, .card *{min-width:0;}
+
+@media (max-width:1080px){
+  /* Tablet: two up, rather than collapsing straight to one column. */
+  .dash-section.active > .w-4,
+  .dash-section.active > .w-5,
+  .dash-section.active > .w-7,
+  .dash-section.active > .w-8{grid-column:span 6;}
+  .dash-tabs{top:0;}
+}
+@media (max-width:760px){
+  /* Phone: one card per row, tighter gutters, 44px touch targets. */
+  .dash-section.active{gap:12px;}
+  .dash-section.active > .w-4,
+  .dash-section.active > .w-5,
+  .dash-section.active > .w-6,
+  .dash-section.active > .w-7,
+  .dash-section.active > .w-8{grid-column:span 12;}
+  .card{padding:16px;}
+  .stat-row{grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px;}
+  .topbar{padding:10px 16px; gap:10px;}
+  .dash-tab{padding:11px 14px; min-height:44px;}
+  .btn{min-height:40px;}
+}
+@media (max-width:430px){
+  .stat-row{grid-template-columns:1fr;}
+}
+
+/* The topbar's control row was a fixed ~377px that never shrank, pushing the
+   document to 740px wide on a phone. Let it shrink, then drop the labels that
+   are only convenience. */
+.topbar{min-width:0;}
+.topbar > *:not(.top-actions){min-width:0;}
+.top-actions{min-width:0; flex-shrink:1;}
+@media (max-width:760px){
+  .top-actions .selector{padding:0 9px; gap:5px;}
+  .top-actions .selector span{display:none;}
+  .top-actions{gap:7px;}
+  .top-actions .user-chip span{display:none;}
+  .top-actions .user-chip{padding:4px; gap:4px;}
+}
+@media (max-width:520px){
+  /* Team selection is reachable from its own section, so it is the one that goes. */
+  .top-actions > .dropdown:nth-child(2){display:none;}
+}
+@media (max-width:400px){
+  .top-actions > .dropdown:first-child{display:none;}
+  .topbar{padding:10px 12px;}
+  .container{padding:0 14px;}
+}
+
+/* Command palette trigger: the full placeholder and ⌘K hint spilled out from
+   under the icons on a phone. Collapses to the search icon, same palette. */
+.topbar .top-search{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+@media (max-width:900px){ .topbar .top-search kbd{display:none;} }
+@media (max-width:760px){
+  .topbar .top-search{font-size:0; gap:0; padding:0; width:38px; height:38px; max-width:38px;
+    justify-content:center; flex:0 0 auto;}
+  .topbar .top-search .icon{width:16px; height:16px;}
+}
+
 /* --- pairing --- */
 .pair-step-row{display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid var(--border);}
 .pair-step-row:last-child{border-bottom:none;}
