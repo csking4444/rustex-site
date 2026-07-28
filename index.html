@@ -435,6 +435,73 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* The KPI row lives inside Overview now, so the grid gap provides its spacing. */
 .dash-section .stat-row{margin-bottom:0;}
 
+/* A button must never clip its own label. Without nowrap the text wraps and then gets cut
+   by the button's height; without flex-shrink:0 a crowded row squeezes it narrower than
+   its content. */
+.btn{white-space:nowrap; flex-shrink:0;}
+
+/* --- marketing nav on small screens ---------------------------------------
+   The nav had no mobile treatment at all: at 414px the links and actions ran to
+   811px, dragging the page sideways on every marketing view.
+   -------------------------------------------------------------------------- */
+@media (max-width:860px){
+  .nav-inner{gap:12px; padding:10px 12px;}
+  /* Section links duplicate the page content below; the actions are what people need. */
+  .nav-links{display:none;}
+  .nav-actions{gap:7px; min-width:0; flex-wrap:wrap; justify-content:flex-end;}
+  .nav-actions .btn{padding:8px 11px; font-size:12.5px;}
+}
+@media (max-width:560px){
+  /* Keep the primary action and the account chip; the rest is reachable from the page. */
+  .nav-actions .btn-ghost{display:none;}
+  .nav-actions .user-chip span{display:none;}
+  .nav-actions .user-chip{padding:4px; gap:0;}
+  .nav-inner{padding:8px 10px;}
+  .brand span:not(.brand-mark){font-size:15px;}
+}
+@media (max-width:430px){
+  /* The build stamp is a diagnostic; on a phone it competes with real content. */
+  .build-stamp{display:none;}
+}
+
+/* --- hero mockup on small screens -----------------------------------------
+   The decorative dashboard preview is laid out at desktop proportions and ran to
+   808px inside a 414px viewport, dragging the landing page sideways.
+   -------------------------------------------------------------------------- */
+@media (max-width:860px){
+  .hero-mock,.feature-mock{max-width:100%; overflow:hidden;}
+  .feature-mock{transform:none;}
+  .hud-frame{max-width:100%; min-width:0;}
+  .hud-frame .alert-banner{flex-wrap:wrap; gap:8px;}
+  .hud-frame .alert-banner .btn{margin-left:0;}
+}
+@media (max-width:560px){
+  /* Below this the preview is illegible anyway, and it is decoration, not content. */
+  .feature-mock,.hero-mock{display:none;}
+}
+
+/* Dashboard topbar: the account chip was the last thing pushing past the edge. */
+@media (max-width:430px){
+  .topbar .top-actions{max-width:46%;}
+  .topbar .user-chip img{width:20px; height:20px;}
+  .topbar .user-chip{padding:3px;}
+  .topbar .user-chip svg{display:none;}
+}
+
+/* Marketing nav: let it wrap rather than run off the side, and drop the label on the
+   primary action once there is no room for it. */
+@media (max-width:560px){
+  .nav-inner{flex-wrap:wrap; row-gap:8px;}
+  .nav-actions{min-width:0; max-width:100%;}
+  .nav-actions .btn-primary{padding:8px 12px;}
+}
+
+/* Remaining hero decoration. These are illustrations of the product, not content, and
+   at phone width they are unreadable as well as too wide. */
+@media (max-width:560px){
+  .phone,.hud-frame{display:none;}
+}
+
 /* Decay calculator */
 .decay-calc{display:flex; flex-direction:column; gap:11px;}
 
@@ -1912,11 +1979,11 @@ body.billing #billing-view{display:block;}
         </div>
 
         <div class="widget card w-12" id="d-alarm">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
             <div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>
           </div>
         </div>
-          </div>
         </div>
 
       <div class="dash-section" id="dsec-market">
@@ -2047,7 +2114,8 @@ body.billing #billing-view{display:block;}
         </div>
 
         <div class="widget card w-6" id="d-chat">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><div class="chat-log" id="chatLog">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div class="chat-log" id="chatLog">
             <div class="text-3" style="font-size:11.5px;">Connect a server to load team chat.</div>
           </div>
           <div class="chat-send">
@@ -2071,7 +2139,6 @@ body.billing #billing-view{display:block;}
 
           <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="loadTeamChat(this)">Refresh chat</button>
         </div>
-          </div>
         </div>
       </div>
     
@@ -4181,6 +4248,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-28 11:13 UTC</div>
+<div class="build-stamp">build 2026-07-28 11:25 UTC</div>
 </body>
 </html>
