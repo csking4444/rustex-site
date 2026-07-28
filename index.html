@@ -2841,6 +2841,27 @@ async function logOut(){
 
   await Session.refresh();
 
+  // A pairing link finishes the job the local listener started. Handle it before routing, and
+  // pick up one that was stashed if signing in had to happen first.
+  let pendingPair = null;
+  try {
+    const raw = sessionStorage.getItem('rustex.pendingPair');
+    if(raw){ pendingPair = JSON.parse(raw); sessionStorage.removeItem('rustex.pendingPair'); }
+  } catch {}
+
+  if(await consumePairingLink()){
+    goPairing();
+    return;
+  }
+  if(pendingPair && Session.signedIn){
+    try {
+      const srv = await connectServer(pendingPair);
+      goPairing();
+      fireCustomToast('Server connected', srv.name + ' is live in your dashboard.', 'i-check');
+      return;
+    } catch(err){ fireCustomToast('Could not connect', err.message, 'i-lock'); }
+  }
+
   const h = location.hash;
   const want = h.replace('#','');
   if(want === 'dash' || want === 'dashboard'){
@@ -3717,6 +3738,57 @@ function extractPairing(raw){
   return out;
 }
 
+/**
+ * Connects a server straight from a link, so a pairing never has to be copy-pasted.
+ *
+ *   /#pair?ip=…&port=…&playerId=…&playerToken=…&name=…
+ *
+ * The local listener opens this once a pairing arrives, which is as close to "the button ran
+ * the commands for you" as a browser allows: a page cannot start a process on your machine,
+ * but a process on your machine can finish the job in the page.
+ */
+async function consumePairingLink(){
+  const hash = location.hash || '';
+  if(!hash.startsWith('#pair?')) return false;
+
+  const q = new URLSearchParams(hash.slice(6));
+  const server = {
+    id: 'srv_' + Math.random().toString(36).slice(2,9),
+    ip: q.get('ip'), port: q.get('port'),
+    playerId: q.get('playerId'), playerToken: q.get('playerToken'),
+    name: q.get('name') || undefined,
+  };
+  // Credentials should not linger in the address bar or the back button.
+  history.replaceState(null, '', location.pathname);
+
+  if(!server.ip || !server.port || !server.playerId || !server.playerToken){
+    fireCustomToast('Incomplete pairing link', 'That link was missing some details.', 'i-lock');
+    return true;
+  }
+  if(!Session.signedIn){
+    // Nothing to connect to without a session; stash it and finish after sign-in.
+    try { sessionStorage.setItem('rustex.pendingPair', JSON.stringify(server)); } catch {}
+    openSteamAuth('pairing');
+    return true;
+  }
+  await connectServer(server);
+  return true;
+}
+
+/** Verifies a server against the real thing, then saves it. Shared by the link and the form. */
+async function connectServer(server){
+  const info = await rustPlus(server, 'getInfo').catch(err => { throw err; });
+  server.name = info?.info?.name || server.name || (server.ip + ':' + server.port);
+  server.addr = server.ip + ':' + server.port;
+
+  Session.servers = Session.servers.filter(s => !(s.ip === server.ip && s.port === server.port));
+  Session.servers.push(server);
+  saveServers();
+  Session.rustPlus = { connected:true, name: Session.displayName };
+  syncAuthUI(); renderPairedServers();
+  return server;
+}
+
 /** Opens the connect panel. Sign-in first, since the request needs a session. */
 function openConnect(){
   if(!Session.signedIn){ openSteamAuth('pairing'); return; }
@@ -3745,20 +3817,14 @@ async function manualPair(btn){
   const server = { id:'srv_' + Math.random().toString(36).slice(2,9), ip, port, playerId, playerToken: token };
   const done = busyButton(btn, 'Connecting…');
   try {
-    // Verified before saving, so a wrong token fails here rather than silently producing an
-    // entry that never loads.
-    const info = await rustPlus(server, 'getInfo');
-    server.name = info?.info?.name || (ip + ':' + port);
-    server.addr = ip + ':' + port;
-
-    Session.servers = Session.servers.filter(s => !(s.ip === ip && s.port === port));
-    Session.servers.push(server);
-    saveServers();
-    Session.rustPlus = { connected:true, name: Session.displayName };
+    // Verified against the real server before saving, so a wrong token fails here rather than
+    // silently producing an entry that never loads.
+    await connectServer(server);
 
     ['mIp','mPlayerId','mToken'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('mPort').value = '28082';
-    syncAuthUI(); renderPairedServers();
+    const paste = document.getElementById('mPaste');
+    if(paste){ paste.value = ''; document.getElementById('pasteNote').hidden = true; }
     fireCustomToast('Connected', server.name + ' is live in your dashboard.', 'i-check');
   } catch(err){
     fireCustomToast('Could not connect', err.message, 'i-lock');
