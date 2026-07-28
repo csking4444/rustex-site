@@ -160,7 +160,7 @@ export async function rustPlusRequest({ host, port, playerId, playerToken, actio
 /** Rust+ error strings are terse; these are the ones a user can actually act on. */
 function mapError(code) {
   switch (code) {
-    case 'not_found':          return 'That server did not recognise the request.';
+    case 'not_found':          return 'This pairing is no longer valid on that server. Servers invalidate pairings when they wipe, so pair again to get a fresh token.';
     case 'invalid_playerid':   return 'The player ID does not match this pairing.';
     case 'invalid_token':      return 'The player token is wrong or has expired. Pair again to get a fresh one.';
     case 'access_denied':      return 'This server refused the request. The pairing may have been revoked.';
