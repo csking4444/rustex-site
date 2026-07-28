@@ -2617,6 +2617,7 @@ body.billing #billing-view{display:block;}
 // Payments are NOT wired. There is no provider, so we never invent a
 // subscription, an invoice or a saved card. Demo mode is opt-in and labelled.
 const RX_PREFS = 'rustex.prefs.v1';
+const RX_SERVERS = 'rustex.servers.v1';
 const RX_ANNOUNCE = 'rustex.announce.v1';
 // Announcements write into the squad's chat, so every one of these starts off.
 const ANNOUNCE_DEFAULTS = { cargo:false, heli:false, crate:false, death:false, online:false };
@@ -2911,6 +2912,7 @@ function copySteamId(btn){
 function disconnectRustPlus(){
   Session.rustPlus = { connected:false, name:null };
   Session.servers = [];
+  saveServers();
   syncAuthUI(); renderSettings();
   fireCustomToast('Rust+ disconnected', 'Pair again to resume live data.', 'i-wifi');
 }
@@ -3682,20 +3684,25 @@ function addPairedServer(name, addr){
 // The player token authorises one server pairing, not the Rustex account, and this
 // deployment has no database — so credentials live in this browser and travel with
 // each request rather than being stored server-side.
-const RX_SERVERS = 'rustex.servers.v1';
 
 function loadServers(){
+  Session.servers = [];
   try {
-    const raw = JSON.parse(localStorage.getItem(RX_SERVERS));
-    Session.servers = Array.isArray(raw) ? raw : [];
-  } catch { Session.servers = []; }
+    const raw = JSON.parse(localStorage.getItem(RX_SERVERS) || 'null');
+    if(Array.isArray(raw)) Session.servers = raw;
+  } catch(err) {
+    // Corrupt stored JSON is recoverable and expected; anything else is a bug we want to see
+    // rather than silently start with no servers.
+    if(!(err instanceof SyntaxError)) console.error('loadServers', err);
+  }
   Session.rustPlus = Session.servers.length
     ? { connected:true, name: Session.displayName }
     : { connected:false, name:null };
   return Session.servers;
 }
 function saveServers(){
-  try { localStorage.setItem(RX_SERVERS, JSON.stringify(Session.servers)); } catch {}
+  try { localStorage.setItem(RX_SERVERS, JSON.stringify(Session.servers)); }
+  catch(err) { console.error('saveServers', err); }
 }
 
 /**
@@ -4248,6 +4255,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-28 11:25 UTC</div>
+<div class="build-stamp">build 2026-07-28 17:25 UTC</div>
 </body>
 </html>
