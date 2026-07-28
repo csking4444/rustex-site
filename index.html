@@ -2325,6 +2325,12 @@ body.billing #billing-view{display:block;}
     </div>
 
 
+    <div style="text-align:center;margin-bottom:18px;">
+      <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="openConnect()">
+        <svg class="icon" style="width:16px;height:16px"><use href="#i-wifi"/></svg>Connect Rust+ account
+      </button>
+    </div>
+
     <div class="card" style="margin-bottom:16px;border-color:var(--border-accent);background:var(--orange-soft);">
       <div style="display:flex;gap:13px;align-items:flex-start;">
         <svg class="icon" style="width:17px;height:17px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-wifi"/></svg>
@@ -2352,27 +2358,27 @@ body.billing #billing-view{display:block;}
       <div class="pair-step-row">
         <span class="pair-num">2</span>
         <div class="pair-body">
-          <div class="pair-t">Run <b style="color:var(--text)" class="mono">rustex-pair</b> on your PC &mdash; once</div>
+          <div class="pair-t">Get your Rust+ credentials on your PC</div>
           <div class="pair-d">Rust+ hands its login token to a mobile app WebView, which a website cannot
-            read. A small helper does it locally instead, so your Steam password never reaches our
-            servers. It stays valid about two weeks.</div>
+            read, so this part runs locally. Your Steam password never reaches our servers.
+            Run <span class="mono">npx @liamcottle/rustplus.js fcm-register</span>, then leave
+            <span class="mono">fcm-listen</span> running.</div>
         </div>
-        <span class="pill pill-offline"><span class="dot"></span>Not available</span>
       </div>
       <div class="pair-step-row">
         <span class="pair-num">3</span>
         <div class="pair-body">
           <div class="pair-t">In Rust, press <b style="color:var(--text)">ESC</b> → <b style="color:var(--text)">Rust+</b></div>
-          <div class="pair-d">Load into the server you want to track first.</div>
+          <div class="pair-d">You have to be connected to that server at the moment you press it. Rust+ pairs the server you are on, not one from your history.</div>
         </div>
       </div>
       <div class="pair-step-row">
         <span class="pair-num">4</span>
         <div class="pair-body">
-          <div class="pair-t">Hit <b style="color:var(--text)">Pair With Server</b></div>
-          <div class="pair-d">Once the service above is running, it lands here within a second or two.</div>
+          <div class="pair-t">Hit <b style="color:var(--text)">Pair With Server</b>, then paste the details</div>
+          <div class="pair-d">The listener prints the server IP, app port and player token. Put them into
+            <b style="color:var(--text)">Connect Rust+ account</b> above and Rustex starts reading live data.</div>
         </div>
-        <span class="pill pill-offline" id="pairListenPill"><span class="dot"></span>Not listening</span>
       </div>
     </div>
 
@@ -2386,8 +2392,8 @@ body.billing #billing-view{display:block;}
       </div>
     </div>
 
-    <details class="pair-manual">
-      <summary>Enter connection details manually</summary>
+    <section class="pair-manual" id="connectPanel" hidden>
+      <div class="card-title" style="margin-bottom:4px;">Connect a server</div>
       <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:14px;">
         <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;" autocomplete="off">
         <input class="inp" type="text" id="mPort" placeholder="App port (28082)" style="max-width:none;" inputmode="numeric" autocomplete="off" value="28082">
@@ -2397,16 +2403,21 @@ body.billing #billing-view{display:block;}
         <input class="inp" type="text" id="mToken" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
       <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
-        All four come from one Rust+ pairing. Run <span class="mono">rustex-pair --print-only</span> on your
-        PC, pair from the pause menu, and it prints them without sending anything anywhere. They stay in this
-        browser and are sent only when loading data from that server.
+        <b style="color:var(--text)">1.</b> On your PC, run this once. It opens a browser for the
+        Steam login and prints your credentials. Nothing is sent to Rustex.
+        <br><span class="mono" style="display:inline-block;margin:6px 0 10px;padding:6px 9px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);">npx @liamcottle/rustplus.js fcm-register</span>
+        <br><b style="color:var(--text)">2.</b> Then run <span class="mono">npx @liamcottle/rustplus.js fcm-listen</span>,
+        load into your server, and press <b style="color:var(--text)">ESC → Rust+ → Pair With Server</b>. The
+        listener prints the server IP, app port and player token.
+        <br><b style="color:var(--text)">3.</b> Paste all four below.
         <br><br>
         <b style="color:var(--text)">App port is not the port you connect to play on.</b> Rust+ listens
-        separately, normally on <span class="mono">28082</span> (the game port plus 67). The pairing gives you
-        the right one, so use that rather than guessing.
-      </p>
+        separately, normally on <span class="mono">28082</span>. The pairing gives you the right one.
+        <br><br>
+        These stay in this browser and are sent only when loading data from that server.
+</p>
       <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="mPairBtn" onclick="manualPair(this)">Connect server</button>
-    </details>
+    </section>
 
   </div>
 </section>
@@ -3620,6 +3631,16 @@ async function rustPlus(server, action){
   return body.response;
 }
 
+/** Opens the connect panel. Sign-in first, since the request needs a session. */
+function openConnect(){
+  if(!Session.signedIn){ openSteamAuth('pairing'); return; }
+  const panel = document.getElementById('connectPanel');
+  if(!panel) return;
+  panel.hidden = false;
+  panel.scrollIntoView({ block:'center', behavior:'smooth' });
+  setTimeout(()=>{ const f = document.getElementById('mIp'); if(f) f.focus(); }, 320);
+}
+
 async function manualPair(btn){
   if(!Session.signedIn){ openSteamAuth('pairing'); return; }
   const get = id => (document.getElementById(id).value || '').trim();
@@ -3649,7 +3670,8 @@ async function manualPair(btn){
     saveServers();
     Session.rustPlus = { connected:true, name: Session.displayName };
 
-    ['mIp','mPort','mPlayerId','mToken'].forEach(id => document.getElementById(id).value = '');
+    ['mIp','mPlayerId','mToken'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mPort').value = '28082';
     syncAuthUI(); renderPairedServers();
     fireCustomToast('Connected', server.name + ' is live in your dashboard.', 'i-check');
   } catch(err){
