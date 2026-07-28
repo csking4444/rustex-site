@@ -2390,7 +2390,7 @@ body.billing #billing-view{display:block;}
       <summary>Enter connection details manually</summary>
       <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:14px;">
         <input class="inp" type="text" id="mIp" placeholder="Server IP" style="max-width:none;" autocomplete="off">
-        <input class="inp" type="text" id="mPort" placeholder="App port" style="max-width:none;" inputmode="numeric" autocomplete="off">
+        <input class="inp" type="text" id="mPort" placeholder="App port (28082)" style="max-width:none;" inputmode="numeric" autocomplete="off" value="28082">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
         <input class="inp" type="text" id="mPlayerId" placeholder="Player ID (Steam 64)" style="max-width:none;" inputmode="numeric" autocomplete="off">
@@ -2400,6 +2400,10 @@ body.billing #billing-view{display:block;}
         All four come from one Rust+ pairing. Run <span class="mono">rustex-pair --print-only</span> on your
         PC, pair from the pause menu, and it prints them without sending anything anywhere. They stay in this
         browser and are sent only when loading data from that server.
+        <br><br>
+        <b style="color:var(--text)">App port is not the port you connect to play on.</b> Rust+ listens
+        separately, normally on <span class="mono">28082</span> (the game port plus 67). The pairing gives you
+        the right one, so use that rather than guessing.
       </p>
       <button class="btn btn-outline btn-sm" style="margin-top:12px;" id="mPairBtn" onclick="manualPair(this)">Connect server</button>
     </details>
