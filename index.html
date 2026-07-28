@@ -417,9 +417,18 @@ body:not(.is-demo) .demo-banner{display:none;}
    min-width:auto, this forced ~326px of horizontal page scroll at 414px.
    ------------------------------------------------------------------------ */
 
-/* Section tabs stay reachable while scrolling a long section. */
+/* Section tabs stay reachable while scrolling a long section. They now sit directly
+   above the content they switch, rather than buried below the KPI row and alert. */
 .dash-tabs{position:sticky; top:56px; z-index:40; margin-bottom:18px;
   background:var(--surface-2); backdrop-filter:blur(10px);}
+
+/* The KPI row lives inside Overview now, so the grid gap provides its spacing. */
+.dash-section .stat-row{margin-bottom:0;}
+
+/* Sidebar groups mirror the tabs one-for-one. A little more air above each heading
+   makes the four groups read as groups rather than one long list. */
+.side-section-lbl{margin-top:16px;}
+.sidebar > .side-section-lbl:first-of-type{margin-top:6px;}
 
 .widget:focus-within{border-color:var(--orange); outline:none;}
 
@@ -1599,22 +1608,22 @@ body.billing #billing-view{display:block;}
 <div class="dash-shell">
   <aside class="sidebar">
     <a class="sidebar-brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
-    <a class="side-link active" href="#d-overview"><svg class="icon"><use href="#i-grid"/></svg>Overview</a>
-    <div class="side-section-lbl">Squad</div>
-    <a class="side-link" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
-    <a class="side-link" href="#" onclick="showDashSection('overview','d-threat');return false;"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
-    <a class="side-link" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Raid Alarms<span class="count">1</span></a>
-    <div class="side-section-lbl">Economy</div>
-    <a class="side-link" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
-    <a class="side-link" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
+    <div class="side-section-lbl">Overview</div>
+    <a class="side-link active" data-dsec="overview" data-target="" href="#" onclick="showDashSection('overview');return false;"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
+    <a class="side-link" data-dsec="overview" data-target="d-team" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
+    <a class="side-link" data-dsec="overview" data-target="d-threat" href="#" onclick="showDashSection('overview','d-threat');return false;"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
+    <a class="side-link" data-dsec="overview" data-target="d-alarm" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</a>
     <div class="side-section-lbl">Base</div>
-    <a class="side-link" href="#" onclick="showDashSection('base','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
-    <a class="side-link" href="#" onclick="showDashSection('tools','d-genetics');return false;"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
-    <a class="side-link" href="#" onclick="showDashSection('base','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
-    <a class="side-link" href="#" onclick="showDashSection('market','d-recycler');return false;"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
-    <div class="side-section-lbl">Comms</div>
-    <a class="side-link" href="#" onclick="showDashSection('tools','d-chat');return false;"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
-    <a class="side-link" href="#" onclick="showDashSection('base','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Heatmap</a>
+    <a class="side-link" data-dsec="base" data-target="d-decay" href="#" onclick="showDashSection('base','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
+    <a class="side-link" data-dsec="base" data-target="d-devices" href="#" onclick="showDashSection('base','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
+    <a class="side-link" data-dsec="base" data-target="d-heatmap" href="#" onclick="showDashSection('base','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</a>
+    <div class="side-section-lbl">Market</div>
+    <a class="side-link" data-dsec="market" data-target="d-vending" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
+    <a class="side-link" data-dsec="market" data-target="d-shopalerts" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
+    <a class="side-link" data-dsec="market" data-target="d-recycler" href="#" onclick="showDashSection('market','d-recycler');return false;"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
+    <div class="side-section-lbl">Tools</div>
+    <a class="side-link" data-dsec="tools" data-target="d-genetics" href="#" onclick="showDashSection('tools','d-genetics');return false;"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
+    <a class="side-link" data-dsec="tools" data-target="d-chat" href="#" onclick="showDashSection('tools','d-chat');return false;"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
     <div class="side-foot">
       <a class="side-link" href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
       <a class="side-link" href="#" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription</a>
@@ -1685,20 +1694,12 @@ body.billing #billing-view{display:block;}
 
       <div class="demo-banner"><svg class="icon"><use href="#i-flask"/></svg><span><b>Demo mode.</b> Everything on this page is sample data, not live Rust+ telemetry.</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="exitDemo()">Exit demo</button></div>
 
-      <div class="stat-row">
-        <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">187<span class="text-3" style="font-size:14px">/200</span></div></div>
-        <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">3<span class="text-3" style="font-size:14px"> days</span></div></div>
-        <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Active Alarms</span><span class="trend down"><svg class="icon" style="width:11px;height:11px"><use href="#i-siren"/></svg></span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)">1</div></div>
-        <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">4<span class="text-3" style="font-size:14px">/5</span></div></div>
-      </div>
-
       <div class="alert-banner">
         <span class="alert-icon blink"><svg class="icon"><use href="#i-siren"/></svg></span>
         <div class="alert-body"><div class="t">RAID DETECTED — Main Base, North Wall</div><div class="d mono">Smart Alarm tripped 00:14 ago · 2 breach events logged</div></div>
         <button class="btn btn-primary btn-sm">Call Squad</button>
         <button class="icon-btn" style="width:34px;height:34px;"><svg class="icon" style="width:14px;height:14px"><use href="#i-x"/></svg></button>
       </div>
-
 
       <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
           <button class="dash-tab active" data-dsec="overview" onclick="showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</button>
@@ -1708,23 +1709,12 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section active" id="dsec-overview">
-        <div class="widget card w-12" id="d-profile">
-          <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
-            <img data-acct="avatar" alt="" style="width:54px;height:54px;border-radius:14px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
-            <div style="min-width:0;">
-              <div style="font-weight:800;font-size:16px;" data-acct="name">Player</div>
-              <div class="text-3" style="font-size:11.5px;margin-top:3px;">Steam ID <span class="mono" data-acct="steamId">—</span></div>
-            </div>
-            <div style="display:flex;gap:22px;flex-wrap:wrap;margin-left:auto;">
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Plan</div><span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>—</span></div>
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Rust+</div><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span></div>
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Server</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="serverName">None paired</span></span></div>
-              <div><div class="lbl" style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);font-weight:700;margin-bottom:5px;">Team</div><span class="pill pill-slate"><span class="dot"></span><span data-acct="teamName">No team data</span></span></div>
-              <div style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-outline btn-sm" onclick="goSettings()"><svg class="icon" style="width:14px;height:14px"><use href="#i-settings"/></svg>Account</button></div>
-            </div>
-          </div>
+        <div class="stat-row w-12">
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">187<span class="text-3" style="font-size:14px">/200</span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">3<span class="text-3" style="font-size:14px"> days</span></div></div>
+          <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Active Alarms</span><span class="trend down"><svg class="icon" style="width:11px;height:11px"><use href="#i-siren"/></svg></span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)">1</div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">4<span class="text-3" style="font-size:14px">/5</span></div></div>
         </div>
-
         <div class="widget card w-5" id="d-team">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <table class="table">
@@ -3254,7 +3244,20 @@ document.querySelectorAll('[data-heat]').forEach(initHeatmap);
 function showDashSection(id, focusWidget){
   document.querySelectorAll('.dash-section').forEach(s => s.classList.toggle('active', s.id === 'dsec-' + id));
   document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.dsec === id));
-  document.querySelectorAll('.side-link[data-dsec]').forEach(a => a.classList.toggle('active', a.dataset.dsec === id));
+
+  // Exactly one sidebar link is active: the widget you asked for, or the section's own
+  // entry when you just switched tabs. Marking every link in the section (the obvious
+  // reading of "matches this section") would highlight four rows at once.
+  const links = [...document.querySelectorAll('.side-link[data-dsec]')];
+  const inSection = links.filter(a => a.dataset.dsec === id);
+  const chosen = (focusWidget && inSection.find(a => a.dataset.target === focusWidget)) || inSection[0];
+  links.forEach(a => a.classList.toggle('active', a === chosen));
+
+  // Keep the page title in step with the section, so the heading is never describing
+  // content that is no longer on screen.
+  const head = document.querySelector('.dash-head h1');
+  const tab = document.querySelector(`.dash-tab[data-dsec="${id}"]`);
+  if(head && tab) head.textContent = tab.textContent.trim();
   // canvases sized while hidden measure 0, so re-fit anything that just appeared
   window.dispatchEvent(new Event('resize'));
   if(focusWidget){
