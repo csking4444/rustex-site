@@ -425,6 +425,51 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* The KPI row lives inside Overview now, so the grid gap provides its spacing. */
 .dash-section .stat-row{margin-bottom:0;}
 
+/* --- calmer, larger cards -------------------------------------------------
+   Every feature card is now half-width, so they pair as equals. Previously the
+   grid mixed 5/7 and 4/4/8 splits, and no two cards agreed on a size — which is
+   most of what made the dashboard read as busy. With one card size, the extra
+   room goes into padding and type instead of more columns.
+   -------------------------------------------------------------------------- */
+.dash-section.active{gap:20px;}
+.dash-section.active > .widget{padding:26px;}
+
+/* Bigger, calmer headings with real separation from the content beneath. */
+.dash-section.active .card-title,
+.dash-section.active .w-title{font-size:15px; letter-spacing:-.01em;}
+.dash-section.active .card-head,
+.dash-section.active .w-head{margin-bottom:18px; padding-bottom:14px;
+  border-bottom:1px solid var(--border);}
+
+/* Only the paired half-width cards get a floor — it keeps a short card from making
+   an otherwise even row look lopsided. Applying it to full-width cards just left a
+   large empty area under short content like the activity feed. */
+.dash-section.active > .widget.w-6{min-height:300px;}
+
+/* Roomier rows inside the cards — the density, not the card count, is what made
+   this tiring to scan. */
+.dash-section.active .widget table td,
+.dash-section.active .widget table th{padding-top:11px; padding-bottom:11px;}
+
+/* One accent at a time. The drag handles put a fidgety dot-grid on every card;
+   they only matter on hover. */
+.dash-section.active .drag-handle{opacity:0; transition:opacity .15s ease;}
+.dash-section.active .widget:hover .drag-handle{opacity:.5;}
+
+/* KPI strip: match the new card padding so it does not look cramped beside them. */
+.dash-section.active .stat-card{padding:20px 22px;}
+
+@media (max-width:1080px){
+  /* Once cards go full width the floor only creates dead space. */
+  .dash-section.active > .widget.w-6{min-height:0;}
+}
+@media (max-width:760px){
+  .dash-section.active{gap:14px;}
+  .dash-section.active > .widget{padding:18px;}
+  .dash-section.active .card-title,
+  .dash-section.active .w-title{font-size:14px;}
+}
+
 /* Sidebar groups mirror the tabs one-for-one. A little more air above each heading
    makes the four groups read as groups rather than one long list. */
 .side-section-lbl{margin-top:16px;}
@@ -1715,7 +1760,7 @@ body.billing #billing-view{display:block;}
           <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Active Alarms</span><span class="trend down"><svg class="icon" style="width:11px;height:11px"><use href="#i-siren"/></svg></span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)">1</div></div>
           <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;">4<span class="text-3" style="font-size:14px">/5</span></div></div>
         </div>
-        <div class="widget card w-5" id="d-team">
+        <div class="widget card w-6" id="d-team">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <table class="table">
             <tbody>
@@ -1727,7 +1772,7 @@ body.billing #billing-view{display:block;}
           </table>
         </div>
 
-        <div class="widget card w-7" id="d-threat">
+        <div class="widget card w-6" id="d-threat">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intelligence</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <table class="table">
             <thead><tr><th>Player</th><th></th><th>K/D</th><th>Threat</th><th>Last seen</th></tr></thead>
@@ -1753,7 +1798,7 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section" id="dsec-base">
-        <div class="widget card w-4" id="d-decay">
+        <div class="widget card w-6" id="d-decay">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;gap:10px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span><span class="text-2" style="flex:1;font-size:12.5px;">2by2</span><span class="mono" style="color:var(--crimson);font-weight:700;font-size:12.5px;">05:12:47</span></div>
@@ -1762,7 +1807,7 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
 
-        <div class="widget card w-4" id="d-devices">
+        <div class="widget card w-6" id="d-devices">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;flex-direction:column;gap:9px;">
             <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
@@ -1776,7 +1821,7 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
 
-        <div class="widget card w-8" id="d-heatmap">
+        <div class="widget card w-12" id="d-heatmap">
           <div class="card-head">
             <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
@@ -1800,7 +1845,7 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section" id="dsec-market">
-        <div class="widget card w-4" id="d-vending">
+        <div class="widget card w-6" id="d-vending">
           <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:var(--r-sm);background:var(--surface-2);border:1px solid var(--border);margin-bottom:12px;">
             <svg class="icon" style="width:13px;height:13px;color:var(--text-3)"><use href="#i-search"/></svg><span class="text-3" style="font-size:12px">assault rifle</span>
@@ -1811,7 +1856,7 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
 
-        <div class="widget card w-4" id="d-shopalerts">
+        <div class="widget card w-6" id="d-shopalerts">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;">
             <div style="display:flex;align-items:center;gap:8px;"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span><span class="pill pill-orange"><span class="dot"></span>New</span>AR ×3 @ B12</div>
@@ -1819,7 +1864,7 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
 
-        <div class="widget card w-8" id="d-recycler">
+        <div class="widget card w-12" id="d-recycler">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-recycle"/></svg>Recycler Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
             <div class="rc-chip"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>Assault Rifle</div>
@@ -1835,7 +1880,7 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="dash-section" id="dsec-tools">
-        <div class="widget card w-4" id="d-genetics">
+        <div class="widget card w-6" id="d-genetics">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div class="planter planter-mini" style="margin-bottom:10px;">
             <div class="planter-soil">
@@ -1854,7 +1899,7 @@ body.billing #billing-view{display:block;}
           <div class="text-3 mono" style="font-size:10.5px;margin-top:6px;">67% to target GGGYYY</div>
         </div>
 
-        <div class="widget card w-4" id="d-chat">
+        <div class="widget card w-6" id="d-chat">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <div class="chat-bubble chat-them" style="font-size:12px;padding:8px 10px;">heli up @ J9</div>
