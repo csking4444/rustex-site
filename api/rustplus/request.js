@@ -1,5 +1,5 @@
 import { readSession } from '../_lib.js';
-import { rustPlusRequest, RustPlusError, READ_ACTIONS } from './_client.js';
+import { rustPlusRequest, RustPlusError, READ_ACTIONS, WRITE_ACTIONS, MAX_MESSAGE_LENGTH } from './_client.js';
 
 /**
  * Live Rust+ data, fetched on demand.
@@ -23,12 +23,21 @@ export default async function handler(req, res) {
   try { session = readSession(req); } catch { /* treated as signed out */ }
   if (!session) return res.status(401).json({ error: 'not_signed_in', message: 'Sign in to load live data.' });
 
-  const { host, port, playerId, playerToken, action } = req.body ?? {};
+  const { host, port, playerId, playerToken, action, message } = req.body ?? {};
 
   if (!host || typeof host !== 'string')
     return res.status(400).json({ error: 'bad_request', message: 'A server address is required.' });
-  if (!READ_ACTIONS.has(action))
+  if (!READ_ACTIONS.has(action) && !WRITE_ACTIONS.has(action))
     return res.status(400).json({ error: 'bad_request', message: `Unknown action '${action}'.` });
+  // Writes post into the player's team chat, so the text is checked before we open a socket.
+  if (WRITE_ACTIONS.has(action)) {
+    const text = String(message ?? '').trim();
+    if (!text)
+      return res.status(400).json({ error: 'bad_request', message: 'A message is required.' });
+    if (text.length > MAX_MESSAGE_LENGTH)
+      return res.status(400).json({ error: 'bad_request',
+        message: `Messages are limited to ${MAX_MESSAGE_LENGTH} characters.` });
+  }
   // Steam ids exceed the safe integer range, so the id stays a string all the way through.
   if (!/^\d{1,20}$/.test(String(playerId ?? '')))
     return res.status(400).json({ error: 'bad_request', message: 'A valid player ID is required.' });
@@ -42,6 +51,7 @@ export default async function handler(req, res) {
       playerId: String(playerId),
       playerToken: Number(playerToken),
       action,
+      message,
     });
     return res.status(200).json({ ok: true, action, response });
   } catch (err) {

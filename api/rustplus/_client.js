@@ -14,6 +14,14 @@ export const READ_ACTIONS = new Set([
   'getInfo', 'getTime', 'getMap', 'getTeamInfo', 'getTeamChat', 'getMapMarkers',
 ]);
 
+/** Actions that change something in the game. Kept separate from the reads so a write can
+ *  never be reached by a caller that only meant to fetch data, and so adding a read later
+ *  cannot accidentally grant write access. */
+export const WRITE_ACTIONS = new Set(['sendTeamMessage']);
+
+/** Rust+ rejects anything longer, and a very long line is unreadable in the game's chat box. */
+export const MAX_MESSAGE_LENGTH = 250;
+
 /**
  * The address is supplied by whoever is calling, and this runs server-side, so without a
  * check it is a server-side request forgery hole: point it at 169.254.169.254 and the
@@ -81,19 +89,31 @@ export class RustPlusError extends Error {
  * that needs a socket held open, which a serverless function cannot do — so this covers the
  * request/response half of the protocol only.
  */
-export async function rustPlusRequest({ host, port, playerId, playerToken, action, timeoutMs = 8000 }) {
-  if (!READ_ACTIONS.has(action)) throw new RustPlusError(`Unsupported action '${action}'.`, 400);
+export async function rustPlusRequest({ host, port, playerId, playerToken, action, message, timeoutMs = 8000 }) {
+  const isWrite = WRITE_ACTIONS.has(action);
+  if (!READ_ACTIONS.has(action) && !isWrite)
+    throw new RustPlusError(`Unsupported action '${action}'.`, 400);
 
   const address = await resolvePublicHost(host);
   if (!address) throw new RustPlusError('That server address is not a reachable public host.', 400);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new RustPlusError('Invalid port.', 400);
 
   const seq = (Date.now() % 2_000_000) + 1;
+  // Reads take an empty message; sendTeamMessage carries the text.
+  let body = {};
+  if (isWrite) {
+    const text = String(message ?? '').trim();
+    if (!text) throw new RustPlusError('A message is required.', 400);
+    if (text.length > MAX_MESSAGE_LENGTH)
+      throw new RustPlusError(`Messages are limited to ${MAX_MESSAGE_LENGTH} characters.`, 400);
+    body = { message: text };
+  }
+
   const payload = AppRequest.encode(AppRequest.create({
     seq,
     playerId: String(playerId),
     playerToken: Number(playerToken),
-    [action]: {},
+    [action]: body,
   })).finish();
 
   const ws = new WebSocket(`ws://${address}:${port}`, { handshakeTimeout: timeoutMs });

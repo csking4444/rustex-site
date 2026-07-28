@@ -439,6 +439,14 @@ body:not(.is-demo) .demo-banner{display:none;}
 .decay-calc{display:flex; flex-direction:column; gap:11px;}
 
 /* Team chat */
+.chat-send{display:flex; gap:8px; margin-top:10px;}
+.chat-send .inp{flex:1; min-width:0; max-width:none;}
+.announce{margin-top:14px; padding-top:12px; border-top:1px solid var(--border);}
+.announce-hd{font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-3); margin-bottom:6px;}
+.announce-row{display:flex; align-items:center; gap:9px; padding:5px 0; font-size:12.5px;
+  color:var(--text-2); cursor:pointer;}
+.announce-row input{accent-color:var(--orange); width:15px; height:15px; cursor:pointer;}
 .chat-log{display:flex; flex-direction:column; gap:7px; max-height:230px; overflow-y:auto;}
 .chat-line{display:flex; gap:8px; font-size:12px; line-height:1.45;}
 .chat-who{color:var(--orange); font-weight:700; flex-shrink:0; max-width:110px;
@@ -2042,6 +2050,25 @@ body.billing #billing-view{display:block;}
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><div class="chat-log" id="chatLog">
             <div class="text-3" style="font-size:11.5px;">Connect a server to load team chat.</div>
           </div>
+          <div class="chat-send">
+            <input class="inp" id="chatSend" type="text" maxlength="250" placeholder="Message your team"
+                   onkeydown="if(event.key==='Enter')sendChatFromBox(this.nextElementSibling)">
+            <button class="btn btn-primary btn-sm" onclick="sendChatFromBox(this)">Send</button>
+          </div>
+
+          <div class="announce">
+            <div class="announce-hd">Announce to team chat</div>
+            <p class="text-3" style="font-size:10.5px;margin:0 0 9px;line-height:1.5;">
+              Rustex posts these into your squad&rsquo;s chat as they happen, once each. Everything is
+              off until you turn it on.
+            </p>
+            <label class="announce-row"><input type="checkbox" data-ann="cargo"  onchange="toggleAnnounce(this)"><span>Cargo Ship</span></label>
+            <label class="announce-row"><input type="checkbox" data-ann="heli"   onchange="toggleAnnounce(this)"><span>Patrol Helicopter</span></label>
+            <label class="announce-row"><input type="checkbox" data-ann="crate"  onchange="toggleAnnounce(this)"><span>Locked Crate</span></label>
+            <label class="announce-row"><input type="checkbox" data-ann="death"  onchange="toggleAnnounce(this)"><span>Teammate dies</span></label>
+            <label class="announce-row"><input type="checkbox" data-ann="online" onchange="toggleAnnounce(this)"><span>Teammate comes online</span></label>
+          </div>
+
           <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="loadTeamChat(this)">Refresh chat</button>
         </div>
           </div>
@@ -2523,6 +2550,9 @@ body.billing #billing-view{display:block;}
 // Payments are NOT wired. There is no provider, so we never invent a
 // subscription, an invoice or a saved card. Demo mode is opt-in and labelled.
 const RX_PREFS = 'rustex.prefs.v1';
+const RX_ANNOUNCE = 'rustex.announce.v1';
+// Announcements write into the squad's chat, so every one of these starts off.
+const ANNOUNCE_DEFAULTS = { cargo:false, heli:false, crate:false, death:false, online:false };
 const PLANS = {
   scout:  { id:'scout',  name:'Scout',  monthly:4.99,  yearly:47.90  },
   raider: { id:'raider', name:'Raider', monthly:9.99,  yearly:95.90  },
@@ -2904,6 +2934,7 @@ async function logOut(){
 (async function boot(){
   Session.loadPrefs();
   loadServers();
+  loadAnnounce();
   syncAuthUI();
 
   // surface an error the callback bounced back with, then tidy the URL
@@ -3650,6 +3681,9 @@ async function refreshLiveData(){
 
     loadActivity();
     loadTeamChat();
+    rustPlus(Session.servers[0], 'getMapMarkers')
+      .then(mk => runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members))
+      .catch(()=>{});
 
     if(banner){
       const ok = !!(info || team);
@@ -3778,6 +3812,93 @@ function copyCmd(btn){
     document.body.appendChild(ta); ta.select();
     try { document.execCommand('copy'); done(); } catch {}
     document.body.removeChild(ta);
+  }
+}
+
+// ---- announcements into team chat -------------------------------------------
+// Rustex writes into your squad's chat, so nothing is announced unless it is switched
+// on here, and each event fires once. Preferences live with the other prefs.
+
+function loadAnnounce(){
+  try {
+    const raw = JSON.parse(localStorage.getItem(RX_ANNOUNCE));
+    Session.announce = { ...ANNOUNCE_DEFAULTS, ...(raw && typeof raw === 'object' ? raw : {}) };
+  } catch { Session.announce = { ...ANNOUNCE_DEFAULTS }; }
+  // Reflect the stored state onto the checkboxes once the markup exists.
+  document.querySelectorAll('[data-ann]').forEach(el => { el.checked = !!Session.announce[el.dataset.ann]; });
+  return Session.announce;
+}
+/** Checkbox handler; also keeps the stored preference in step. */
+function toggleAnnounce(el){
+  setAnnounce(el.dataset.ann, el.checked);
+  if(el.checked) fireCustomToast('Announcement on',
+    'Rustex will post this into your team chat when it happens.', 'i-check');
+}
+
+function setAnnounce(key, on){
+  Session.announce = { ...(Session.announce || ANNOUNCE_DEFAULTS), [key]: !!on };
+  try { localStorage.setItem(RX_ANNOUNCE, JSON.stringify(Session.announce)); } catch {}
+}
+
+/** Posts a line into the team chat. */
+async function sendTeamMessage(text){
+  const server = Session.servers[0];
+  if(!server) throw new Error('No server connected.');
+  return rustPlusSend(server, text);
+}
+async function rustPlusSend(server, text){
+  const r = await fetch('/api/rustplus/request', {
+    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin',
+    body: JSON.stringify({
+      host: server.ip, port: Number(server.port), playerId: server.playerId,
+      playerToken: Number(server.playerToken), action:'sendTeamMessage', message: text })
+  });
+  const body = await r.json().catch(()=>({}));
+  if(!r.ok) throw new Error(body.message || 'Could not send that message.');
+  return body.response;
+}
+
+async function sendChatFromBox(btn){
+  const box = document.getElementById('chatSend');
+  const text = (box?.value || '').trim();
+  if(!text) return;
+  const done = busyButton(btn, 'Sending…');
+  try {
+    await sendTeamMessage(text);
+    box.value = '';
+    await loadTeamChat();
+  } catch(err){ fireCustomToast('Not sent', err.message, 'i-lock'); }
+  finally { done(); }
+}
+
+// Fired events are remembered so the same cargo is not announced on every refresh.
+const announced = new Set();
+
+/** Compares this refresh against the last one and announces only what is newly true. */
+async function runAnnouncements(markers, members){
+  const opts = Session.announce || loadAnnounce();
+  if(!Session.servers.length) return;
+  const lines = [];
+
+  const once = (key, line) => { if(!announced.has(key)){ announced.add(key); lines.push(line); } };
+
+  for(const m of (markers || [])){
+    const type = m.type;
+    const key = type + ':' + m.id;
+    if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship inbound');
+    if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter on the map');
+    if(opts.crate && type === 'Crate')            once(key, '[Rustex] Locked Crate is up');
+  }
+
+  for(const m of (members || [])){
+    if(opts.death && !m.isAlive)
+      once('dead:' + m.steamId + ':' + (m.deathTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' died');
+    if(opts.online && m.isOnline)
+      once('on:' + m.steamId + ':' + (m.spawnTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' is online');
+  }
+
+  for(const line of lines.slice(0, 3)){          // never flood the chat on a first load
+    try { await sendTeamMessage(line); } catch { /* a failed announcement must not break the refresh */ }
   }
 }
 
