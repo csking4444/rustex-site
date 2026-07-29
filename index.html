@@ -1325,7 +1325,7 @@ body.billing #billing-view{display:block;}
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-siren"/></svg>Trigger test raid alarm<span class="k">G R</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-tag"/></svg>Search vending: "AK47"<span class="k">↵</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-flask"/></svg>Open Genetics Lab<span class="k">G G</span></div>
-      <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-map"/></svg>Open Resource Heatmap<span class="k">G H</span></div>
+      <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-map"/></svg>Open Activity Heatmap<span class="k">G H</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Pair a new server<span class="k">G P</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goLanding();"><svg class="icon"><use href="#i-home"/></svg>Back to landing page<span class="k">G L</span></div>
     </div>
@@ -1900,19 +1900,19 @@ body.billing #billing-view{display:block;}
       <span class="num-tag">11</span>
       <span class="eyebrow">Map intelligence</span>
       <h2>See the whole map's<br/>loot before you rotate.</h2>
-      <p class="desc">A live density heatmap of sulfur, metal and stone nodes plus every player spawn point, so you can plan your farming route before you leave base.</p>
+      <p class="desc">Every explosion, crate, cargo run and shop this server has shown you, built up over the wipe on the server's own map so you can see where the action actually is.</p>
       <ul class="feature-list">
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Sulfur, metal & stone node density</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Player spawn point overlay</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Built on the real map image</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggleable layers</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Explore Heatmap<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Heatmap<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-head">
-        <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
+        <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
           <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
           <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
@@ -1921,7 +1921,7 @@ body.billing #billing-view{display:block;}
         </div>
       </div>
       <div class="heat-wrap" data-heat>
-        <canvas id="heatCanvas" style="height:400px;" role="img" aria-label="Resource density heatmap of sulfur, metal and stone nodes with player spawn points"></canvas>
+        <canvas id="heatCanvas" style="height:400px;" role="img" aria-label="Activity heatmap of observed explosions, crates, cargo, helicopters and shops"></canvas>
         <div class="heat-tip" data-heat-tip></div>
         <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
         <div class="heat-zoom">
@@ -1966,7 +1966,7 @@ body.billing #billing-view{display:block;}
         <div class="side-section-lbl">Tools</div>
 <a class="side-link" data-dsec="tools" data-target="d-decay" href="#" onclick="showDashSection('tools','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
     <a class="side-link" data-dsec="tools" data-target="d-devices" href="#" onclick="showDashSection('tools','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
-    <a class="side-link" data-dsec="tools" data-target="d-heatmap" href="#" onclick="showDashSection('tools','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</a>
+    <a class="side-link" data-dsec="tools" data-target="d-heatmap" href="#" onclick="showDashSection('tools','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</a>
     <div class="side-section-lbl">Market</div>
     <a class="side-link" data-dsec="market" data-target="d-vending" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
     <a class="side-link" data-dsec="market" data-target="d-shopalerts" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
@@ -2177,7 +2177,7 @@ body.billing #billing-view{display:block;}
 
         <div class="widget card w-12" id="d-heatmap">
           <div class="card-head">
-            <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
+            <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
               <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
               <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
@@ -2186,7 +2186,7 @@ body.billing #billing-view{display:block;}
             </div>
           </div>
           <div class="heat-wrap" data-heat>
-            <canvas id="heatCanvas2" style="height:320px;" role="img" aria-label="Resource density heatmap of sulfur, metal and stone nodes with player spawn points"></canvas>
+            <canvas id="heatCanvas2" style="height:320px;" role="img" aria-label="Activity heatmap of observed explosions, crates, cargo, helicopters and shops"></canvas>
             <div class="heat-tip" data-heat-tip></div>
             <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
             <div class="heat-zoom">
@@ -3363,50 +3363,95 @@ function renderRc(){
 // Four node types only: sulfur, metal, stone density clusters (real Rust nodes spawn in small
 // rocky clusters, not lone points) plus player spawn points, which are discrete locations rendered
 // as pins rather than a density blob.
-const HEAT_NODE_COLOR = { sulfur:'245,158,11', metal:'139,150,163', stone:'168,150,130', spawn:'74,222,128' };
-const HEAT_CLUSTERS = [
-  {type:'sulfur', x:.22, y:.30, count:3, spread:.05, r:26},
-  {type:'sulfur', x:.62, y:.20, count:2, spread:.04, r:24},
-  {type:'sulfur', x:.50, y:.68, count:3, spread:.05, r:26},
-  {type:'metal',  x:.34, y:.55, count:3, spread:.045, r:24},
-  {type:'metal',  x:.78, y:.42, count:2, spread:.04, r:22},
-  {type:'metal',  x:.20, y:.66, count:3, spread:.05, r:24},
-  {type:'stone',  x:.44, y:.18, count:3, spread:.05, r:26},
-  {type:'stone',  x:.70, y:.62, count:3, spread:.045, r:24},
-  {type:'stone',  x:.28, y:.82, count:2, spread:.04, r:22},
-];
-// Rust drops fresh spawns on the beach in the low-tier temperate biome, never in snow or
-// desert. These three were read off the map image itself: each sits on grassland shoreline
-// (~60% grass / ~33% water in its neighbourhood) on the north-west, east and west coasts.
-const HEAT_SPAWNS = [
-  {x:.252, y:.164}, {x:.828, y:.476}, {x:.180, y:.672}
-];
-
-const HEAT_NODE_LABEL = { sulfur:'Sulfur node', metal:'Metal node', stone:'Stone node', spawn:'Player spawn' };
+// Heat is built from events actually seen on the connected server, never invented. Rust+
+// exposes no resource or ore call of any kind, so a sulfur/metal/stone density map cannot be
+// real here. What it does expose is where things happen — explosions, crates, and the cargo
+// and heli routes — which is the more useful map anyway.
+const HEAT_NODE_COLOR = { raid:'229,90,60', crate:'245,158,11', cargo:'96,165,250',
+                          heli:'229,60,60', shop:'74,222,128', monument:'150,152,160' };
+const HEAT_NODE_LABEL = { raid:'Explosions', crate:'Locked crates', cargo:'Cargo ship',
+                          heli:'Patrol helicopter', shop:'Vending machines', monument:'Monument' };
 const HEAT_GRID = 16;              // map is divided A0..P15, same refs the tooltips quote
-const HEAT_AUTHOR_W = 640;         // cluster radii below were authored against a 640px canvas
+const HEAT_AUTHOR_W = 640;         // blob radii are authored against a 640px canvas
 const HEAT_MAX_SCALE = 6;
 
-// Nodes are generated ONCE from a fixed seed. Rendering and hit-testing then read the same
-// list, so the blob you hover is provably the blob that was painted — regenerating per draw
-// (as the old static version did) would drift the two apart the moment anything resized.
-const HEAT_NODES = (()=>{
-  let seed = 42;
-  const rand = () => { seed = (seed*9301+49297)%233280; return seed/233280; };
-  const out = [];
-  HEAT_CLUSTERS.forEach(cl=>{
-    for(let i=0;i<cl.count;i++){
-      const x = cl.x + (rand()-0.5)*cl.spread*2;
-      const y = cl.y + (rand()-0.5)*cl.spread*2;
-      const r = cl.r*(0.8+rand()*0.4);
-      out.push({ type:cl.type, x, y, r,
-                 density: Math.max(1, Math.min(100, Math.round(r/31.2*100))),
-                 amount: Math.round(r*11) });
-    }
-  });
-  HEAT_SPAWNS.forEach((s,i)=> out.push({ type:'spawn', x:s.x, y:s.y, r:9, spawnNo:i+1 }));
-  return out;
-})();
+/** Marker types worth accumulating, and the heat layer each belongs to. */
+const HEAT_MARKER_KIND = { Explosion:'raid', Crate:'crate', CargoShip:'cargo',
+                           PatrolHelicopter:'heli', VendingMachine:'shop' };
+const HEAT_BUCKETS = 48;           // map is bucketed this finely before being drawn
+
+/** Blobs the canvas paints and hit-tests. Rebuilt from observed counts, never authored. */
+const HEAT_NODES = [];
+let heatCounts = {};               // "kind:col:row" -> times seen
+let heatMonuments = [];
+let heatKey = null;
+
+/** Per server and per wipe: a new wipe is a new map, so old positions mean nothing. */
+function heatStoreKey(server, info){
+  return 'rustex.heat.' + (server?.id || 'none') + '.'
+    + (info?.info?.seed || 0) + '.' + (info?.info?.wipeTime || 0);
+}
+
+function loadHeat(key){
+  heatKey = key;
+  try { heatCounts = JSON.parse(localStorage.getItem(key) || '{}') || {}; }
+  catch(err){ if(!(err instanceof SyntaxError)) throw err; heatCounts = {}; }
+  rebuildHeatNodes();
+}
+
+function saveHeat(){
+  if(!heatKey) return;
+  try { localStorage.setItem(heatKey, JSON.stringify(heatCounts)); } catch {}
+}
+
+/**
+ * Folds one marker refresh into the running counts. Markers carry ids that persist while the
+ * thing exists, so a cargo ship sitting on the map for an hour would otherwise be counted on
+ * every poll; each id is only ever counted once per bucket.
+ */
+const heatSeen = new Set();
+function recordHeatEvents(markers, mapSize){
+  if(!heatKey) return;
+  let touched = false;
+  for(const m of (markers || [])){
+    const kind = HEAT_MARKER_KIND[m.type] || HEAT_MARKER_KIND[String(m.type)];
+    if(!kind) continue;
+    const id = kind + ':' + m.id;
+    if(heatSeen.has(id)) continue;
+    heatSeen.add(id);
+    const size = mapSize || 4000;
+    const col = Math.max(0, Math.min(HEAT_BUCKETS - 1, Math.floor((Number(m.x) / size) * HEAT_BUCKETS)));
+    // Rust's Y axis runs the other way to a canvas, the same inversion the grid refs use.
+    const row = Math.max(0, Math.min(HEAT_BUCKETS - 1, Math.floor((1 - Number(m.y) / size) * HEAT_BUCKETS)));
+    const key = kind + ':' + col + ':' + row;
+    heatCounts[key] = (heatCounts[key] || 0) + 1;
+    touched = true;
+  }
+  if(touched){ saveHeat(); rebuildHeatNodes(); heatInstances.forEach(fn => fn()); }
+}
+
+/** Turns the bucket counts into the blob list the canvas draws. */
+function rebuildHeatNodes(){
+  HEAT_NODES.length = 0;
+  const counts = Object.values(heatCounts);
+  const peak = counts.length ? Math.max(...counts) : 1;
+  for(const [key, n] of Object.entries(heatCounts)){
+    const [kind, col, row] = key.split(':');
+    if(!HEAT_NODE_COLOR[kind]) continue;
+    HEAT_NODES.push({
+      type: kind,
+      x: (Number(col) + 0.5) / HEAT_BUCKETS,
+      y: (Number(row) + 0.5) / HEAT_BUCKETS,
+      r: 12 + Math.min(26, Math.sqrt(n) * 9),
+      count: n,
+      density: Math.max(1, Math.round((n / peak) * 100)),
+      amount: n,
+    });
+  }
+  for(const mon of heatMonuments)
+    HEAT_NODES.push({ type:'monument', x:mon.x, y:mon.y, r:8, label:mon.label, count:0,
+                      density:0, amount:0 });
+}
 
 const heatGridRef = (x,y) =>
   String.fromCharCode(65 + Math.min(HEAT_GRID-1, Math.max(0, Math.floor(x*HEAT_GRID))))
@@ -3442,6 +3487,49 @@ let heatOcean = '#12333c';
   };
   heatMapImg.src = m[2];
 })();
+
+/** Monument tokens come through as "airfield_display_name" and similar. */
+function monumentLabel(token){
+  return String(token || '').replace(/_display_name$/, '').split(/[_\s]+/)
+    .filter(Boolean)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ') || 'Monument';
+}
+
+let heatMapLoadedFor = null;
+
+/**
+ * Swaps the stock artwork for the connected server's own map. getMap returns the real JPEG
+ * plus every monument with real coordinates, so both the background and the labels stop
+ * being decorative. Fetched once per server, since the image only changes on a wipe.
+ */
+async function loadServerMap(){
+  const server = Session.servers[0];
+  if(!server || heatMapLoadedFor === server.id) return;
+  heatMapLoadedFor = server.id;
+  try {
+    const res = await rustPlus(server, 'getMap');
+    const map = res?.map;
+    if(!map) return;
+    const size = Math.max(Number(map.width) || 0, Number(map.height) || 0) || 4000;
+    heatMonuments = (map.monuments || []).map(mn => ({
+      // Monument coordinates are in world units on the same inverted Y axis as the markers.
+      x: Math.max(0, Math.min(1, Number(mn.x) / size)),
+      y: Math.max(0, Math.min(1, 1 - Number(mn.y) / size)),
+      label: monumentLabel(mn.token),
+    }));
+    rebuildHeatNodes();
+    if(map.jpgImage){
+      // The decoder hands bytes back base64 encoded.
+      heatMapReady = false;
+      heatMapImg.src = 'data:image/jpeg;base64,' + map.jpgImage;
+    } else {
+      heatInstances.forEach(fn => fn());
+    }
+  } catch {
+    heatMapLoadedFor = null;      // let a later visit try again
+  }
+}
 
 function initHeatmap(wrap){
   const canvas = wrap.querySelector('canvas');
@@ -3753,6 +3841,8 @@ function showDashSection(id, focusWidget){
   if(id === 'market' && document.getElementById('rcGrid')) buildRecycler();
   // Vending data is only worth fetching when the panel that shows it is open.
   if(id === 'market' && document.getElementById('vendResults')) refreshVending();
+  // The heatmap lives in tools; fetch the server's real map the first time it is opened.
+  if(id === 'tools' && document.getElementById('heatCanvas2')) loadServerMap();
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -4337,6 +4427,9 @@ async function loadActivity(){
       rustPlus(server, 'getInfo').catch(()=>null),
     ]);
     const mapSize = info?.info?.mapSize || 4000;
+    // Same refresh feeds the heatmap, so watching the map costs no extra requests.
+    if(!heatKey) loadHeat(heatStoreKey(server, info));
+    recordHeatEvents(markers?.mapMarkers?.markers, mapSize);
     // Players are the bulk of the list and are already on the team panel; the interesting
     // events are everything else.
     const list = (markers?.mapMarkers?.markers || [])
@@ -4702,7 +4795,7 @@ function formatDuration(minutes){
 
 function handleFieldPaste(e){
   const text = (e.clipboardData || window.clipboardData)?.getData('text') || '';
-  if(text.length < 40 || !/playerToken|"ip"|ip\s*[:=]/i.test(text)) return;  // a plain value, let it through
+  if(text.length < 40 || !/playerToken|"ip"|\bip\s*[:=]/i.test(text)) return;  // a plain value, let it through
 
   e.preventDefault();
   const box = document.getElementById('mPaste');
@@ -4867,6 +4960,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 04:48 UTC</div>
+<div class="build-stamp">build 2026-07-29 05:18 UTC</div>
 </body>
 </html>
