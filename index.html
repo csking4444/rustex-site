@@ -1411,10 +1411,10 @@ body.billing #billing-view{display:block;}
           <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
           <a href="#f01" class="btn btn-outline">See it in action</a>
         </div>
-        <div class="dl-row" id="dlRow" hidden>
-          <a class="btn btn-outline dl-btn" id="dlBtn" href="https://github.com/csking4444/rustex-app/releases/latest" target="_blank" rel="noopener">
+        <div class="dl-row" id="dlRow">
+          <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup-0.1.0.exe" download>
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">Runs the dashboard on your own machine. The browser version needs no install.</span>
+          <span class="dl-note" id="dlNote">v0.1.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3113,23 +3113,24 @@ async function logOut(){
 })();
 
 /**
- * The download button is hidden until there is something behind it.
+ * The installer is served from this site, so the button works with no GitHub repo behind it.
  *
- * A button that 404s is worse than no button, and the release is published by hand, so the
- * page asks GitHub whether one exists and links straight at the installer when it does.
- * Everything about this fails quiet: no release, no network, rate limited or offline all
- * leave the button hidden rather than showing an error nobody can act on.
+ * If a release is ever published it takes over, since a release page gives people checksums,
+ * older versions and release notes that a bare file cannot. Everything about that check fails
+ * quiet: no release, no network, rate limited or a malformed answer all simply leave the
+ * self-hosted link in place rather than breaking the button.
  */
 const DL_RELEASE_API = 'https://api.github.com/repos/csking4444/rustex-app/releases/latest';
 
 async function checkDownload(){
-  if(IS_DESKTOP) return;                     // already running it
   const row = document.getElementById('dlRow');
-  const nav = document.getElementById('navDl');
   if(!row) return;
+  // Already running the app: offering to download it again is noise.
+  if(IS_DESKTOP){ row.hidden = true; return; }
+  const nav = document.getElementById('navDl');
   try {
     const r = await fetch(DL_RELEASE_API, { headers:{ Accept:'application/vnd.github+json' } });
-    if(!r.ok) return;                        // 404 until the first release is published
+    if(!r.ok) return;                        // no release yet; the file served here still works
     const rel = await r.json();
     if(!rel || rel.draft) return;
 
@@ -3137,6 +3138,10 @@ async function checkDownload(){
     const assets = Array.isArray(rel.assets) ? rel.assets : [];
     const pick = assets.find(a => /\.exe$/i.test(a.name)) || assets.find(a => /\.zip$/i.test(a.name));
     if(!pick) return;                        // a release with nothing attached is not a download
+
+    // Only now is it worth pointing away from the file this site already serves.
+    const btn0 = document.getElementById('dlBtn');
+    if(btn0) btn0.removeAttribute('download');   // cross-origin, so let the browser handle it
 
     const btn = document.getElementById('dlBtn');
     const label = document.getElementById('dlLabel');
@@ -3151,7 +3156,7 @@ async function checkDownload(){
         + 'Runs on your own machine. Unsigned, so Windows will ask you to confirm.';
     }
     row.hidden = false;
-  } catch { /* offline or blocked: leave it hidden */ }
+  } catch { /* offline or blocked: the self-hosted link stays */ }
 }
 checkDownload();
 
@@ -5217,6 +5222,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 23:02 UTC</div>
+<div class="build-stamp">build 2026-07-29 23:18 UTC</div>
 </body>
 </html>
