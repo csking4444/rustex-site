@@ -1411,10 +1411,10 @@ body.billing #billing-view{display:block;}
           <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
           <a href="#f01" class="btn btn-outline">See it in action</a>
         </div>
-        <div class="dl-row">
-          <a class="btn btn-outline dl-btn" href="https://github.com/csking4444/rustex-app/releases/latest" target="_blank" rel="noopener">
-            <svg class="icon"><use href="#i-download"/></svg>Download for Windows</a>
-          <span class="dl-note">Runs the dashboard on your own machine. The browser version needs no install.</span>
+        <div class="dl-row" id="dlRow" hidden>
+          <a class="btn btn-outline dl-btn" id="dlBtn" href="https://github.com/csking4444/rustex-app/releases/latest" target="_blank" rel="noopener">
+            <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
+          <span class="dl-note" id="dlNote">Runs the dashboard on your own machine. The browser version needs no install.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3111,6 +3111,49 @@ async function logOut(){
   if(document.body.classList.contains('billing')) renderBilling();
   if(document.body.classList.contains('pairing')) renderPairedServers();
 })();
+
+/**
+ * The download button is hidden until there is something behind it.
+ *
+ * A button that 404s is worse than no button, and the release is published by hand, so the
+ * page asks GitHub whether one exists and links straight at the installer when it does.
+ * Everything about this fails quiet: no release, no network, rate limited or offline all
+ * leave the button hidden rather than showing an error nobody can act on.
+ */
+const DL_RELEASE_API = 'https://api.github.com/repos/csking4444/rustex-app/releases/latest';
+
+async function checkDownload(){
+  if(IS_DESKTOP) return;                     // already running it
+  const row = document.getElementById('dlRow');
+  const nav = document.getElementById('navDl');
+  if(!row) return;
+  try {
+    const r = await fetch(DL_RELEASE_API, { headers:{ Accept:'application/vnd.github+json' } });
+    if(!r.ok) return;                        // 404 until the first release is published
+    const rel = await r.json();
+    if(!rel || rel.draft) return;
+
+    // Prefer the installer, fall back to the portable zip.
+    const assets = Array.isArray(rel.assets) ? rel.assets : [];
+    const pick = assets.find(a => /\.exe$/i.test(a.name)) || assets.find(a => /\.zip$/i.test(a.name));
+    if(!pick) return;                        // a release with nothing attached is not a download
+
+    const btn = document.getElementById('dlBtn');
+    const label = document.getElementById('dlLabel');
+    const note = document.getElementById('dlNote');
+    if(btn) btn.href = pick.browser_download_url;
+    if(nav){ nav.href = pick.browser_download_url; nav.hidden = false; }
+    if(label) label.textContent = 'Download for Windows';
+    if(note){
+      const mb = Math.round((Number(pick.size) || 0) / 1048576);
+      note.textContent = (rel.tag_name ? rel.tag_name + ' · ' : '')
+        + (mb ? mb + ' MB · ' : '')
+        + 'Runs on your own machine. Unsigned, so Windows will ask you to confirm.';
+    }
+    row.hidden = false;
+  } catch { /* offline or blocked: leave it hidden */ }
+}
+checkDownload();
 
 // Marketing chrome belongs to the website, not to the app window.
 if(IS_DESKTOP) document.body.classList.add('is-app');
@@ -5174,6 +5217,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 19:43 UTC</div>
+<div class="build-stamp">build 2026-07-29 23:02 UTC</div>
 </body>
 </html>
