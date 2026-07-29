@@ -546,6 +546,17 @@ body:not(.is-demo) .demo-only{display:none !important;}
   .rc-yield{grid-column:2; text-align:left;}
 }
 
+/* Scrollbars. The OS default is a bright light bar that reads as a seam down a dark panel,
+   so every scrolling area gets the site's own instead. */
+*{scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;}
+::-webkit-scrollbar{width:10px; height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:6px;
+  border:2px solid transparent; background-clip:content-box;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-3); background-clip:content-box;}
+::-webkit-scrollbar-thumb:active{background:var(--orange); background-clip:content-box;}
+::-webkit-scrollbar-corner{background:transparent;}
+
 /* Vending search and shop alerts */
 .vend-bar{display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; margin-bottom:12px;
   border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--border);}
@@ -554,19 +565,26 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .vend-bar input{flex:1; min-width:0; border:0; background:transparent; color:var(--text);
   font-size:12px; outline:none;}
 .vend-bar input::placeholder{color:var(--text-3);}
-.vend-list{display:flex; flex-direction:column; gap:7px; font-size:12px;
-  max-height:250px; overflow-y:auto;}
-.vend-row{display:grid; grid-template-columns:1fr auto auto 34px; align-items:center; gap:9px;}
-.vend-row.alert{grid-template-columns:auto 1fr;}
+.vend-list{display:flex; flex-direction:column; gap:2px; font-size:12px;
+  max-height:264px; overflow-y:auto; margin:0 -4px; padding:0 4px;}
+.vend-sum{display:flex; align-items:baseline; gap:8px; font-size:10.5px; color:var(--text-3);
+  text-transform:uppercase; letter-spacing:.06em; padding:0 6px 6px; margin-bottom:2px;
+  border-bottom:1px solid var(--border);}
+.vend-best{margin-left:auto; color:var(--success); letter-spacing:0; text-transform:none;
+  font-family:var(--font-mono); font-size:11px;}
+.vend-row{display:grid; grid-template-columns:1fr auto 34px 30px; align-items:center; gap:10px;
+  padding:5px 6px; border-radius:var(--r-sm);}
+.vend-row:hover{background:var(--surface-2);}
+.vend-row.alert{grid-template-columns:auto 1fr; gap:8px;}
 .vend-item{color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .vend-x{color:var(--text-3); margin-left:5px;}
 .vend-bp{font-size:9px; color:var(--orange); border:1px solid var(--orange); border-radius:3px;
-  padding:0 3px; vertical-align:middle;}
-.vend-grid{color:var(--text-3); font-size:11px;}
-.vend-cost{color:var(--success); font-size:11px; white-space:nowrap;}
+  padding:0 3px; margin-left:5px; vertical-align:middle;}
+.vend-grid{color:var(--text-3); font-size:11px; text-align:right;}
+.vend-cost{color:var(--success); font-size:11px; white-space:nowrap; text-align:right;}
 .vend-stock{color:var(--text-3); font-size:11px; text-align:right;}
 @media (max-width:520px){
-  .vend-row{grid-template-columns:1fr auto auto;}
+  .vend-row{grid-template-columns:1fr auto 32px;}
   .vend-stock{display:none;}
 }
 
@@ -4137,14 +4155,25 @@ async function sendChatFromBox(btn){
 
 // Fired events are remembered so the same cargo is not announced on every refresh.
 const announced = new Set();
+/** Announcements raised but not yet confirmed sent. Kept separate from `announced` so a
+ *  send that fails is retried rather than being marked done and lost. */
+const announceQueue = [];
+const ANNOUNCE_PER_REFRESH = 3;   // pace the chat, but carry the rest forward
+const ANNOUNCE_QUEUE_MAX = 30;
 
 /** Compares this refresh against the last one and announces only what is newly true. */
 async function runAnnouncements(markers, members, mapSize){
   const opts = Session.announce || loadAnnounce();
   if(!Session.servers.length) return;
-  const lines = [];
 
-  const once = (key, line) => { if(!announced.has(key)){ announced.add(key); lines.push(line); } };
+  // Queue it. Nothing is marked announced until the send actually succeeds, otherwise a
+  // rate limited or timed out send silently suppresses that event for good.
+  const once = (key, line) => {
+    if(announced.has(key)) return;
+    if(announceQueue.some(q => q.key === key)) return;
+    if(announceQueue.length >= ANNOUNCE_QUEUE_MAX) return;
+    announceQueue.push({ key, line });
+  };
 
   // Grid reference makes an announcement actionable: "Cargo Ship at J12" tells the squad
   // where to go, "Cargo Ship inbound" does not.
@@ -4171,8 +4200,20 @@ async function runAnnouncements(markers, members, mapSize){
       once('on:' + m.steamId + ':' + (m.spawnTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' is online');
   }
 
-  for(const line of lines.slice(0, 3)){          // never flood the chat on a first load
-    try { await sendTeamMessage(line); } catch { /* a failed announcement must not break the refresh */ }
+  // Send a few per refresh so the chat is not flooded, but anything left over stays queued
+  // for the next one instead of being thrown away. A failure stops the run and keeps its
+  // place in the queue, so the event goes out on a later refresh rather than never.
+  let sent = 0;
+  while(announceQueue.length && sent < ANNOUNCE_PER_REFRESH){
+    const item = announceQueue[0];
+    try {
+      await sendTeamMessage(item.line);
+    } catch {
+      break;                       // leave it queued; the next refresh retries it
+    }
+    announced.add(item.key);
+    announceQueue.shift();
+    sent++;
   }
 }
 
@@ -4404,13 +4445,21 @@ function runVendSearch(){
       + escapeHtml(q) + '" is for sale right now.</div>';
     return;
   }
-  list.innerHTML = hits.map(o =>
+
+  // One summary line so the count and the best price are readable without scanning rows.
+  const shops = new Set(hits.map(o => o.shop.id)).size;
+  const head = '<div class="vend-sum">' + hits.length + ' listing' + (hits.length === 1 ? '' : 's')
+    + ' in ' + shops + ' shop' + (shops === 1 ? '' : 's')
+    + '<span class="vend-best">from ' + hits[0].cost + ' ' + escapeHtml(hits[0].currency) + '</span></div>';
+
+  list.innerHTML = head + hits.map(o =>
     '<div class="vend-row">'
-    + '<span class="vend-item">' + escapeHtml(o.name) + (o.bp ? ' <span class="vend-bp">BP</span>' : '')
+    + '<span class="vend-item">' + escapeHtml(o.name)
+    +   (o.bp ? '<span class="vend-bp">BP</span>' : '')
     +   (o.qty > 1 ? '<span class="vend-x">&times;' + o.qty + '</span>' : '') + '</span>'
-    + '<span class="mono vend-grid">' + escapeHtml(o.shop.grid) + '</span>'
     + '<span class="mono vend-cost">' + o.cost + ' ' + escapeHtml(o.currency) + '</span>'
-    + '<span class="mono vend-stock">' + o.stock + '</span>'
+    + '<span class="mono vend-grid">' + escapeHtml(o.shop.grid) + '</span>'
+    + '<span class="mono vend-stock" title="in stock">' + o.stock + '</span>'
     + '</div>').join('');
 }
 
@@ -4818,6 +4867,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 04:31 UTC</div>
+<div class="build-stamp">build 2026-07-29 04:48 UTC</div>
 </body>
 </html>
