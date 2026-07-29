@@ -44,7 +44,7 @@
   --warning-soft:rgba(200,146,46,0.16);
   /* Boxy. Rust's UI is built from square plates — the old 8–20px radii were the
      single biggest thing making this read as a generic SaaS dashboard. */
-  --r-sm:2px; --r-md:3px; --r-lg:4px; --r-xl:6px;
+  --r-sm:0px; --r-md:2px; --r-lg:2px; --r-xl:3px;
   --shadow-sm:0 2px 8px rgba(0,0,0,0.35);
   --shadow-md:0 8px 28px rgba(0,0,0,0.45);
   --shadow-lg:0 24px 64px rgba(0,0,0,0.55);
@@ -75,7 +75,7 @@ button{font-family:inherit; cursor:pointer;}
 ul{margin:0; padding:0; list-style:none;}
 img,svg{display:block;}
 ::selection{background:var(--orange); color:#1a0f08;}
-:focus-visible{outline:2px solid var(--orange); outline-offset:2px; border-radius:4px;}
+:focus-visible{outline:2px solid var(--orange); outline-offset:2px; border-radius:var(--r-sm);}
 .container{max-width:var(--container); margin:0 auto; padding:0 48px;}
 .mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
 .eyebrow{
@@ -127,7 +127,7 @@ img,svg{display:block;}
 .hud-frame .hb-bl{bottom:-1px; left:-1px; border-bottom:2px solid; border-left:2px solid; border-bottom-left-radius:6px;}
 
 /* status pill */
-.pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px 4px 8px; border-radius:99px; font-size:11.5px; font-weight:600; letter-spacing:.02em; border:1px solid var(--border);}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px 4px 8px; border-radius:var(--r-sm); font-size:11.5px; font-weight:600; letter-spacing:.02em; border:1px solid var(--border);}
 .pill .dot{width:6px; height:6px; border-radius:50%; flex-shrink:0;}
 .pill-online{background:var(--success-soft); color:var(--success); border-color:rgba(74,222,128,.25);}
 .pill-online .dot{background:var(--success); box-shadow:0 0 0 3px rgba(74,222,128,.18);}
@@ -143,12 +143,12 @@ img,svg{display:block;}
 .pill-slate .dot{background:#8b96a3;}
 
 /* badge (role tags) */
-.badge{display:inline-flex; align-items:center; padding:3px 9px; border-radius:6px; font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:var(--surface-3); color:var(--text-2); border:1px solid var(--border);}
+.badge{display:inline-flex; align-items:center; padding:3px 9px; border-radius:var(--r-sm); font-size:11px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:var(--surface-3); color:var(--text-2); border:1px solid var(--border);}
 .badge-leader{color:var(--orange); border-color:var(--border-accent); background:var(--orange-soft);}
 
 /* progress bar */
-.progress{height:6px; border-radius:99px; background:var(--surface-3); overflow:hidden; position:relative;}
-.progress > span{display:block; height:100%; border-radius:99px; background:linear-gradient(90deg, var(--orange), #f0a06e); transition:width .5s ease;}
+.progress{height:6px; border-radius:var(--r-sm); background:var(--surface-3); overflow:hidden; position:relative;}
+.progress > span{display:block; height:100%; border-radius:var(--r-sm); background:linear-gradient(90deg, var(--orange), #f0a06e); transition:width .5s ease;}
 .progress.crimson > span{background:linear-gradient(90deg, var(--crimson), #e0574b);}
 .progress.success > span{background:linear-gradient(90deg, #2fa866, var(--success));}
 
@@ -174,20 +174,20 @@ img,svg{display:block;}
 /* toggle switch */
 .switch{position:relative; display:inline-block; width:38px; height:22px; flex-shrink:0;}
 .switch input{opacity:0; width:0; height:0;}
-.switch .track{position:absolute; inset:0; background:var(--surface-3); border:1px solid var(--border-strong); border-radius:99px; transition:.2s;}
+.switch .track{position:absolute; inset:0; background:var(--surface-3); border:1px solid var(--border-strong); border-radius:var(--r-sm); transition:.2s;}
 .switch .track::before{content:""; position:absolute; width:16px; height:16px; left:2px; top:2px; background:var(--text-2); border-radius:50%; transition:.2s;}
 .switch input:checked + .track{background:var(--orange-soft); border-color:var(--border-accent);}
 .switch input:checked + .track::before{transform:translateX(16px); background:var(--orange);}
 
 /* tabs */
 .tabs{display:inline-flex; padding:3px; background:var(--surface-3); border:1px solid var(--border); border-radius:var(--r-md); gap:2px;}
-.tab{padding:7px 14px; font-size:12.5px; font-weight:600; color:var(--text-2); border-radius:7px; background:transparent; border:none; transition:.15s;}
+.tab{padding:7px 14px; font-size:12.5px; font-weight:600; color:var(--text-2); border-radius:var(--r-sm); background:transparent; border:none; transition:.15s;}
 .tab.active{background:var(--orange); color:#1a0f08;}
 
 /* item icons — real Rust item categories, color-coded */
-.item-ic{width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 1px 0 rgba(255,255,255,.12) inset;}
+.item-ic{width:34px; height:34px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 1px 0 rgba(255,255,255,.12) inset;}
 .item-ic svg{width:17px; height:17px; stroke-width:1.6; fill:none; stroke:currentColor;}
-.item-ic.sm{width:24px; height:24px; border-radius:6px;}
+.item-ic.sm{width:24px; height:24px; border-radius:var(--r-sm);}
 .item-ic.sm svg{width:12px; height:12px;}
 .item-ic.wood{background:linear-gradient(145deg,#a2703f,#5e3a1f); color:#f6e2c5;}
 .item-ic.stone{background:linear-gradient(145deg,#9296a0,#5c5f66); color:#f1f2f4;}
@@ -252,7 +252,7 @@ img,svg{display:block;}
 .heat-zoom{position:absolute; right:10px; bottom:10px; z-index:3; display:flex; flex-direction:column; gap:4px;}
 .heat-zoom button{
   width:28px; height:28px; display:flex; align-items:center; justify-content:center; padding:0;
-  border-radius:7px; border:1px solid var(--border-strong); background:rgba(16,16,16,.82);
+  border-radius:var(--r-sm); border:1px solid var(--border-strong); background:rgba(16,16,16,.82);
   color:var(--text-2); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
   transition:background .15s ease, color .15s ease, border-color .15s ease, opacity .15s ease;
 }
@@ -262,7 +262,7 @@ img,svg{display:block;}
 .heat-hint{
   position:absolute; left:10px; bottom:10px; z-index:3; pointer-events:none;
   font-size:10.5px; color:var(--text-3); background:rgba(16,16,16,.72);
-  border:1px solid var(--border); border-radius:6px; padding:4px 8px;
+  border:1px solid var(--border); border-radius:var(--r-sm); padding:4px 8px;
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   transition:opacity .2s ease;
 }
@@ -284,7 +284,7 @@ img,svg{display:block;}
 .plan.featured{border-color:var(--border-accent); background:linear-gradient(180deg, rgba(217,119,69,.07), var(--surface) 42%);
   box-shadow:0 0 0 1px rgba(217,119,69,.14), 0 22px 50px -26px var(--orange-glow);}
 .plan .plan-tag{position:absolute; top:-10px; left:24px; font-size:10px; font-weight:700; letter-spacing:.09em;
-  text-transform:uppercase; color:#1a0f08; background:var(--orange); padding:4px 9px; border-radius:99px;}
+  text-transform:uppercase; color:#1a0f08; background:var(--orange); padding:4px 9px; border-radius:var(--r-sm);}
 .plan h3{font-size:15px; font-weight:700;}
 .plan .price{display:flex; align-items:baseline; gap:6px;}
 .plan .price .amt{font-family:var(--font-mono); font-size:34px; font-weight:700; letter-spacing:-.02em;}
@@ -297,7 +297,7 @@ img,svg{display:block;}
 .plan .btn{margin-top:auto;}
 .billing-toggle{display:inline-flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-2);}
 .save-chip{font-size:10.5px; font-weight:700; color:var(--success); background:var(--success-soft);
-  border:1px solid rgba(74,222,128,.25); padding:2px 7px; border-radius:99px;}
+  border:1px solid rgba(74,222,128,.25); padding:2px 7px; border-radius:var(--r-sm);}
 
 /* --- sign in with steam --- */
 .btn-steam{background:linear-gradient(180deg,#2a475e,#1b2838); color:#fff; border:1px solid #3d6a8a;
@@ -314,7 +314,7 @@ img,svg{display:block;}
 @keyframes authPop{from{opacity:0; transform:translateY(12px) scale(.97)} to{opacity:1; transform:none}}
 .auth-card h3{font-size:17px; margin-bottom:7px;}
 .auth-card .auth-sub{font-size:12.5px; color:var(--text-3); margin-bottom:20px; line-height:1.55;}
-.auth-badge{width:56px; height:56px; margin:0 auto 16px; border-radius:15px; display:flex; align-items:center;
+.auth-badge{width:56px; height:56px; margin:0 auto 16px; border-radius:var(--r-md); display:flex; align-items:center;
   justify-content:center; background:linear-gradient(180deg,#2a475e,#1b2838); border:1px solid #3d6a8a;}
 .auth-badge .steam-glyph{width:30px; height:30px; fill:#fff;}
 .auth-step{display:flex; align-items:center; gap:9px; font-size:12px; color:var(--text-2); text-align:left;
@@ -340,14 +340,14 @@ img,svg{display:block;}
 .auth-error span{font-size:11.5px; color:var(--text-2);}
 
 /* --- account chrome --- */
-.user-chip{display:flex; align-items:center; gap:8px; padding:5px 10px 5px 6px; border-radius:99px;
+.user-chip{display:flex; align-items:center; gap:8px; padding:5px 10px 5px 6px; border-radius:var(--r-sm);
   border:1px solid var(--border-strong); background:var(--surface-2); font-size:12.5px; font-weight:600;
   cursor:pointer; transition:background .15s ease, border-color .15s ease;}
 .user-chip:hover{background:var(--hover); border-color:var(--border-accent);}
 .user-chip img{width:24px; height:24px; border-radius:50%; object-fit:cover;}
 .acct-grid{display:grid; grid-template-columns:230px 1fr; gap:26px; align-items:start; padding-bottom:100px;}
 .acct-nav{display:flex; flex-direction:column; gap:3px; position:sticky; top:88px;}
-.acct-nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:9px;
+.acct-nav a{display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--r-sm);
   font-size:13px; font-weight:600; color:var(--text-2); transition:.15s;}
 .acct-nav a .icon{width:15px; height:15px;}
 .acct-nav a:hover{background:var(--surface-2); color:var(--text);}
@@ -371,7 +371,7 @@ select.inp{cursor:pointer;}
 .pref-row .pt{font-size:13px; font-weight:600; margin-bottom:2px;}
 .pref-row .pd{font-size:11.5px; color:var(--text-3); max-width:440px;}
 .steam-id-copy{cursor:pointer; border:none; background:var(--surface-3); color:var(--text-2);
-  border-radius:6px; padding:3px 7px; font-size:10.5px; font-weight:700; transition:.15s;}
+  border-radius:var(--r-sm); padding:3px 7px; font-size:10.5px; font-weight:700; transition:.15s;}
 .steam-id-copy:hover{background:var(--hover); color:var(--text);}
 
 /* --- billing --- */
@@ -381,7 +381,7 @@ select.inp{cursor:pointer;}
 .bill-stat .val{font-size:15px; font-weight:700;}
 .pay-card{display:flex; align-items:center; gap:14px; padding:15px 16px; border-radius:var(--r-md);
   background:var(--surface-2); border:1px solid var(--border);}
-.pay-brand{width:44px; height:30px; border-radius:6px; background:linear-gradient(145deg,#2b3350,#141826);
+.pay-brand{width:44px; height:30px; border-radius:var(--r-sm); background:linear-gradient(145deg,#2b3350,#141826);
   border:1px solid var(--border-strong); display:flex; align-items:center; justify-content:center;
   font-size:9.5px; font-weight:800; letter-spacing:.04em; color:#c9d3f0;}
 .danger-zone{border-color:rgba(179,38,30,.3); background:linear-gradient(180deg, rgba(179,38,30,.05), var(--surface) 50%);}
@@ -404,7 +404,7 @@ select.inp{cursor:pointer;}
 .dash-tabs{display:flex; gap:4px; padding:4px; background:var(--surface-2); border:1px solid var(--border);
   border-radius:var(--r-md); overflow-x:auto; scrollbar-width:none;}
 .dash-tabs::-webkit-scrollbar{display:none;}
-.dash-tab{display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:8px; border:none;
+.dash-tab{display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:var(--r-sm); border:none;
   background:transparent; color:var(--text-2); font-size:12.5px; font-weight:600; white-space:nowrap;
   transition:background .15s ease, color .15s ease;}
 .dash-tab .icon{width:14px; height:14px;}
@@ -551,7 +551,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 *{scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;}
 ::-webkit-scrollbar{width:10px; height:10px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:6px;
+::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:var(--r-sm);
   border:2px solid transparent; background-clip:content-box;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text-3); background-clip:content-box;}
 ::-webkit-scrollbar-thumb:active{background:var(--orange); background-clip:content-box;}
@@ -567,7 +567,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
   padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap;}
 .gene-target .slot-tag{flex-shrink:0;}
 .gene-target .gene-blocks{display:flex; gap:3px; margin-right:auto;}
-.gene-target .gene{width:17px; height:17px; font-size:10px; border-radius:3px;
+.gene-target .gene{width:17px; height:17px; font-size:10px; border-radius:var(--r-sm);
   display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
   font-weight:700;}
 @media (max-width:600px){
@@ -595,7 +595,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .vend-row.alert{grid-template-columns:auto 1fr; gap:8px;}
 .vend-item{color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .vend-x{color:var(--text-3); margin-left:5px;}
-.vend-bp{font-size:9px; color:var(--orange); border:1px solid var(--orange); border-radius:3px;
+.vend-bp{font-size:9px; color:var(--orange); border:1px solid var(--orange); border-radius:var(--r-sm);
   padding:0 3px; margin-left:5px; vertical-align:middle;}
 .vend-grid{color:var(--text-3); font-size:11px; text-align:right;}
 .vend-cost{color:var(--success); font-size:11px; white-space:nowrap; text-align:right;}
@@ -849,7 +849,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 /* --- pairing --- */
 .pair-step-row{display:flex; align-items:center; gap:14px; padding:16px 20px; border-bottom:1px solid var(--border);}
 .pair-step-row:last-child{border-bottom:none;}
-.pair-num{width:26px; height:26px; border-radius:8px; flex-shrink:0; display:flex; align-items:center;
+.pair-num{width:26px; height:26px; border-radius:var(--r-sm); flex-shrink:0; display:flex; align-items:center;
   justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:700;
   background:var(--orange-soft); color:var(--orange); border:1px solid var(--border-accent);}
 .pair-body{flex:1; min-width:0;}
@@ -869,7 +869,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dropdown-panel{position:absolute; top:calc(100% + 8px); right:0; min-width:240px; background:var(--surface-2); border:1px solid var(--border-strong); border-radius:var(--r-md); box-shadow:var(--shadow-md); padding:6px; z-index:150; display:none;}
 .dropdown-panel.left{right:auto; left:0;}
 .dropdown-panel.open{display:block;}
-.dropdown-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:12.8px; color:var(--text-2); cursor:pointer; transition:.12s;}
+.dropdown-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--r-sm); font-size:12.8px; color:var(--text-2); cursor:pointer; transition:.12s;}
 .dropdown-item:hover{background:var(--hover); color:var(--text);}
 .dropdown-item .icon{width:15px; height:15px; color:var(--text-3); flex-shrink:0;}
 .dropdown-item .meta{margin-left:auto; font-size:11px; color:var(--text-3);}
@@ -878,7 +878,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dropdown-item.danger{color:#ef6a62;}
 .dropdown-sep{height:1px; background:var(--border); margin:6px 4px;}
 .dropdown-label{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; padding:8px 10px 4px;}
-.dropdown-check{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:8px; font-size:12.5px; color:var(--text-2); cursor:pointer;}
+.dropdown-check{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--r-sm); font-size:12.5px; color:var(--text-2); cursor:pointer;}
 .dropdown-check:hover{background:var(--hover);}
 .dropdown-check input{accent-color:var(--orange); width:14px; height:14px;}
 
@@ -903,13 +903,13 @@ body:not(.is-demo) .demo-only{display:none !important;}
 
 /* ============== NAV ============== */
 .nav{position:sticky; top:0; z-index:100; padding:14px 0; transition:background .25s ease, border-color .25s ease, backdrop-filter .25s ease;}
-.nav-inner{display:flex; align-items:center; justify-content:space-between; gap:24px; padding:10px 18px; border-radius:14px; border:1px solid transparent; transition:.25s;}
+.nav-inner{display:flex; align-items:center; justify-content:space-between; gap:24px; padding:10px 18px; border-radius:var(--r-md); border:1px solid transparent; transition:.25s;}
 .nav.scrolled .nav-inner{background:rgba(13,13,13,0.72); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-color:var(--border); box-shadow:var(--shadow-sm);}
 /* The brand is a home link everywhere it appears. Negative margins let it carry a
    44px touch target without pushing the surrounding layout around. */
 .brand{
   display:inline-flex; align-items:center; gap:10px; font-weight:800; font-size:16px;
-  letter-spacing:-.01em; color:inherit; text-decoration:none; border-radius:10px;
+  letter-spacing:-.01em; color:inherit; text-decoration:none; border-radius:var(--r-md);
   padding:7px 9px; margin:-7px -9px; min-height:44px; -webkit-tap-highlight-color:transparent;
   transition:background .16s ease;
 }
@@ -928,7 +928,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .brand:active .brand-mark{transform:translateY(0);}
 .brand-mark svg{width:17px; height:17px; fill:#140D0A; stroke:none;}
 .nav-links{display:flex; align-items:center; gap:2px;}
-.nav-links a{padding:9px 14px; font-size:13px; font-weight:600; color:var(--text-2); border-radius:8px; transition:.15s;}
+.nav-links a{padding:9px 14px; font-size:13px; font-weight:600; color:var(--text-2); border-radius:var(--r-sm); transition:.15s;}
 .nav-links a:hover{color:var(--text); background:var(--surface-2);}
 .nav-actions{display:flex; align-items:center; gap:10px;}
 
@@ -958,14 +958,14 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .feature-copy .desc{color:var(--text-2); font-size:15.5px; margin-bottom:24px; max-width:460px;}
 .feature-list{display:flex; flex-direction:column; gap:12px; margin-bottom:30px;}
 .feature-list li{display:flex; gap:10px; align-items:flex-start; font-size:13.8px; color:var(--text);}
-.feature-list .tick{width:18px; height:18px; border-radius:5px; background:var(--orange-soft); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
+.feature-list .tick{width:18px; height:18px; border-radius:var(--r-sm); background:var(--orange-soft); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
 .feature-list .tick .icon{width:11px; height:11px; stroke-width:3;}
 .feature-mock{position:relative; z-index:1;}
 
 /* misc mockup atoms */
 .window-dots{display:flex; gap:6px;}
 .window-dots span{width:9px; height:9px; border-radius:50%; background:var(--surface-3); border:1px solid var(--border-strong);}
-.avatar{width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0;}
+.avatar{width:34px; height:34px; border-radius:var(--r-sm); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#fff; flex-shrink:0;}
 .map-grid{position:relative; border-radius:var(--r-md); overflow:hidden; background:
   radial-gradient(ellipse 120% 90% at 30% 20%, rgba(217,119,69,.10), transparent 55%),
   radial-gradient(ellipse 100% 80% at 80% 80%, rgba(179,38,30,.12), transparent 55%),
@@ -1004,7 +1004,7 @@ body.billing #billing-view{display:block;}
 .sidebar-brand{
   display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:10px;
   font-weight:800; font-size:15px; color:inherit; text-decoration:none;
-  border-radius:10px; -webkit-tap-highlight-color:transparent;
+  border-radius:var(--r-md); -webkit-tap-highlight-color:transparent;
   transition:background .16s ease;
 }
 .sidebar-brand:hover{background:var(--surface-2);}
@@ -1012,11 +1012,11 @@ body.billing #billing-view{display:block;}
 .sidebar-brand .brand-mark{transition:transform .18s cubic-bezier(.16,.8,.3,1);}
 .sidebar-brand:hover .brand-mark{transform:translateY(-1px) rotate(-3deg);}
 .side-section-lbl{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-3); font-weight:700; padding:16px 10px 6px;}
-.side-link{display:flex; align-items:center; gap:11px; padding:9px 10px; border-radius:9px; color:var(--text-2); font-size:13px; font-weight:600; transition:.15s; position:relative;}
+.side-link{display:flex; align-items:center; gap:11px; padding:9px 10px; border-radius:var(--r-sm); color:var(--text-2); font-size:13px; font-weight:600; transition:.15s; position:relative;}
 .side-link .icon{width:16px; height:16px;}
 .side-link:hover{background:var(--surface-2); color:var(--text);}
 .side-link.active{background:var(--orange-soft); color:var(--orange);}
-.side-link .count{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); padding:1px 6px; border-radius:99px; color:var(--text-2);}
+.side-link .count{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); padding:1px 6px; border-radius:var(--r-sm); color:var(--text-2);}
 .side-foot{margin-top:auto; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:10px;}
 .conn-status{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-2); padding:8px 10px;}
 .conn-status .dot{width:7px; height:7px; border-radius:50%; background:var(--success); box-shadow:0 0 0 3px rgba(74,222,128,.18);}
@@ -1026,14 +1026,14 @@ body.billing #billing-view{display:block;}
 .crumb{font-size:13px; color:var(--text-2); display:flex; align-items:center; gap:8px;}
 .crumb b{color:var(--text); font-weight:700;}
 .top-search{flex:1; max-width:420px; display:flex; align-items:center; gap:10px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); color:var(--text-3); font-size:12.5px;}
-.top-search kbd{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); border:1px solid var(--border-strong); padding:2px 6px; border-radius:5px; color:var(--text-2);}
+.top-search kbd{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); border:1px solid var(--border-strong); padding:2px 6px; border-radius:var(--r-sm); color:var(--text-2);}
 .top-actions{display:flex; align-items:center; gap:10px; margin-left:auto;}
 .selector{display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); font-size:12.5px; font-weight:600; cursor:pointer; transition:.15s;}
 .selector:hover{border-color:var(--border-accent);}
 .icon-btn{position:relative; width:38px; height:38px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-2); transition:.15s;}
 .icon-btn:hover{color:var(--text); border-color:var(--border-accent);}
 .icon-btn .dot-badge{position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:50%; background:var(--orange); border:1.5px solid var(--bg-1);}
-.user-chip{display:flex; align-items:center; gap:9px; padding:5px 10px 5px 5px; border-radius:99px; background:var(--surface-2); border:1px solid var(--border); cursor:pointer;}
+.user-chip{display:flex; align-items:center; gap:9px; padding:5px 10px 5px 5px; border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--border); cursor:pointer;}
 
 .dash-content{padding:26px 28px 80px; max-width:1720px;}
 .dash-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:14px;}
@@ -1046,7 +1046,7 @@ body.billing #billing-view{display:block;}
 .trend.up{color:var(--success);} .trend.down{color:var(--crimson);}
 
 .alert-banner{display:flex; align-items:center; gap:16px; padding:16px 20px; border-radius:var(--r-lg); background:linear-gradient(90deg, rgba(179,38,30,.22), rgba(179,38,30,.06)); border:1px solid rgba(179,38,30,.4); margin-bottom:20px; position:relative; overflow:hidden;}
-.alert-icon{width:40px; height:40px; border-radius:10px; background:var(--crimson); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 0 5px rgba(179,38,30,.15);}
+.alert-icon{width:40px; height:40px; border-radius:var(--r-md); background:var(--crimson); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 0 0 5px rgba(179,38,30,.15);}
 .alert-icon .icon{stroke:#fff; width:20px; height:20px;}
 .alert-body{flex:1; min-width:0;}
 .alert-body .t{font-weight:700; font-size:14px; margin-bottom:2px;}
@@ -1061,14 +1061,14 @@ body.billing #billing-view{display:block;}
 .widget:hover{border-color:var(--border-strong);}
 
 /* chat */
-.chat-bubble{max-width:80%; padding:10px 13px; border-radius:12px; font-size:13px; line-height:1.5;}
+.chat-bubble{max-width:80%; padding:10px 13px; border-radius:var(--r-md); font-size:13px; line-height:1.5;}
 .chat-them{background:var(--surface-2); border:1px solid var(--border); align-self:flex-start; border-bottom-left-radius:4px;}
 .chat-bot{background:var(--orange-soft); border:1px solid var(--border-accent); align-self:flex-start; border-bottom-left-radius:4px; color:#f2c4a8;}
 .chat-me{background:var(--surface-3); align-self:flex-end; border-bottom-right-radius:4px;}
 
 /* phone mock */
 .phone{width:230px; border-radius:34px; border:6px solid #060606; background:#0c0c0c; box-shadow:var(--shadow-lg); overflow:hidden; position:relative;}
-.phone::before{content:""; position:absolute; top:0; left:50%; transform:translateX(-50%); width:70px; height:18px; background:#060606; border-radius:0 0 12px 12px; z-index:2;}
+.phone::before{content:""; position:absolute; top:0; left:50%; transform:translateX(-50%); width:70px; height:18px; background:#060606; border-radius:0 0 var(--r-md) var(--r-md); z-index:2;}
 .phone-screen{padding:44px 16px 24px; min-height:400px; display:flex; flex-direction:column; align-items:center; background:radial-gradient(circle at 50% 0%, #241512, #0c0c0c 60%);}
 
 /* command palette */
@@ -1078,7 +1078,7 @@ body.billing #billing-view{display:block;}
 .cmdk-input{display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--border);}
 .cmdk-input input{flex:1; background:transparent; border:none; outline:none; color:var(--text); font-size:15px; font-family:inherit;}
 .cmdk-list{padding:8px; max-height:340px; overflow-y:auto;}
-.cmdk-item{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; font-size:13.5px; color:var(--text-2);}
+.cmdk-item{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--r-sm); font-size:13.5px; color:var(--text-2);}
 .cmdk-item:hover, .cmdk-item.sel{background:var(--surface-2); color:var(--text);}
 .cmdk-item .icon{color:var(--orange);}
 .cmdk-item .k{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--text-3);}
@@ -1087,15 +1087,15 @@ body.billing #billing-view{display:block;}
 .toast-stack{position:fixed; bottom:22px; right:22px; z-index:300; display:flex; flex-direction:column; gap:10px; align-items:flex-end;}
 .toast{display:flex; gap:12px; align-items:flex-start; padding:14px 16px; width:320px; animation:toastIn .35s cubic-bezier(.16,.8,.3,1);}
 @keyframes toastIn{from{opacity:0; transform:translateY(10px) scale(.97);} to{opacity:1; transform:none;}}
-.toast .ic{width:30px; height:30px; border-radius:8px; background:var(--orange-soft); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.toast .ic{width:30px; height:30px; border-radius:var(--r-sm); background:var(--orange-soft); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
 .toast .tt{font-size:13px; font-weight:700; margin-bottom:2px;}
 .toast .td{font-size:12px; color:var(--text-2);}
 
 /* recycler dnd */
 .rc-drop{min-height:96px; border:1.5px dashed var(--border-strong); border-radius:var(--r-md); display:flex; align-items:center; gap:8px; padding:10px; flex-wrap:wrap; transition:.15s;}
 .rc-drop.over{border-color:var(--orange); background:var(--orange-soft);}
-.rc-chip{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:9px; background:var(--surface-2); border:1px solid var(--border-strong); font-size:12px; font-weight:600; cursor:grab;}
-.rc-chip .sw{width:18px; height:18px; border-radius:5px; flex-shrink:0;}
+.rc-chip{display:flex; align-items:center; gap:8px; padding:8px 10px; border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--border-strong); font-size:12px; font-weight:600; cursor:grab;}
+.rc-chip .sw{width:18px; height:18px; border-radius:var(--r-sm); flex-shrink:0;}
 
 /* gene blocks — a strict 2-col (label | track) grid so every row's genes sit on
    identical column centers, and the genes themselves are a column-flow grid of
@@ -1130,7 +1130,7 @@ body.billing #billing-view{display:block;}
    The genetics mock is drawn as the thing you actually build in game: a wooden box of
    soil with three adjacent slots, so the layout itself tells you where to put each clone. */
 .planter{
-  position:relative; border-radius:14px; padding:9px;
+  position:relative; border-radius:var(--r-md); padding:9px;
   background:
     repeating-linear-gradient(90deg, rgba(0,0,0,.15) 0 1px, transparent 1px 34px),
     linear-gradient(180deg,#8a6238,#63452a 55%,#48301c);
@@ -1139,7 +1139,7 @@ body.billing #billing-view{display:block;}
 }
 .planter-soil{
   display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px;
-  padding:12px 11px; border-radius:9px;
+  padding:12px 11px; border-radius:var(--r-sm);
   background:
     radial-gradient(circle at 18% 26%, rgba(255,255,255,.05), transparent 40%),
     radial-gradient(circle at 76% 70%, rgba(255,255,255,.04), transparent 38%),
@@ -1150,7 +1150,7 @@ body.billing #billing-view{display:block;}
 .plant-slot{
   position:relative; min-width:0;
   display:flex; flex-direction:column; align-items:center; gap:8px;
-  padding:12px 9px 11px; border-radius:9px;
+  padding:12px 9px 11px; border-radius:var(--r-sm);
   background:radial-gradient(ellipse 82% 58% at 50% 34%, rgba(126,92,56,.30), rgba(0,0,0,0) 70%);
   border:1px dashed rgba(255,255,255,.10);
   transition:border-color .18s ease, box-shadow .18s ease;
@@ -1357,7 +1357,6 @@ body.billing #billing-view{display:block;}
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-links">
       <a href="#f01">Team Tracker</a>
-      <a href="#f02">Raid Alarms</a>
       <a href="#" onclick="goPricing();return false;">Pricing</a>
       <a href="#" onclick="goPairing();return false;">Pairing</a>
     </div>
@@ -1376,7 +1375,7 @@ body.billing #billing-view{display:block;}
   <div class="container">
     <div class="hero-grid">
       <div class="hero-copy reveal in-view">
-        <span class="eyebrow">Your tactical companion for an ethical edge over every enemy</span>
+        <span class="eyebrow">Team tracking</span>
         <h1>Own every wipe from<br/>first spawn to <span class="hl">final raid.</span></h1>
         <p class="sub">Rustex fuses your server's Rust+ telemetry into one console: squad positions, raid alarms, markets and base status, updated live, no alt-tabbing required.</p>
         <div class="hero-cta">
@@ -1430,12 +1429,12 @@ body.billing #billing-view{display:block;}
     <div class="feature-copy reveal">
       <span class="num-tag">01</span>
       <span class="eyebrow">Squad awareness</span>
-      <h2>Know where your squad<br/>stands, always.</h2>
-      <p class="desc">Live positions pulled straight from Rust+ team data, rendered on your tac-map the instant they update. No more asking "where are you" in voice chat.</p>
+      <h2>Know where<br/>your squad is.</h2>
+      <p class="desc">Live squad positions from Rust+, with grid references.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live GPS-accurate teammate positions</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Online, offline and dead status at a glance</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid coordinates accurate to the meter</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live teammate positions</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Online, offline and dead status</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid reference for each teammate</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">View Team Tracker<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1453,7 +1452,6 @@ body.billing #billing-view{display:block;}
             <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--crimson);width:26px;height:26px;font-size:10px">RM</span>Ramsey</td><td><span class="badge">Raider</span></td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
           </tbody>
         </table>
-        
       </div>
     </div>
   </div>
@@ -1461,88 +1459,17 @@ body.billing #billing-view{display:block;}
 
 <section class="feature" id="f02">
   <span class="feature-num">02</span>
-  <div class="container feature-grid" style="grid-template-columns:0.78fr 1.22fr;">
-    <div class="feature-copy reveal">
-      <span class="num-tag">03</span>
-      <span class="eyebrow">Raid response</span>
-      <h2>The alarm goes off.<br/>So does your phone.</h2>
-      <p class="desc">Smart Alarm trips, Rustex pushes to every teammate's phone in under a second, and one tap puts your whole squad on a live call, with no Discord fumbling mid-raid.</p>
-      <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant push the moment a Smart Alarm trips</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>One-tap emergency call to the whole squad</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live raid timeline with breach markers</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Real-time teammate availability</li>
-      </ul>
-      <a href="#" class="btn btn-primary" onclick="goDashboard();return false;">Test Raid Alarm<svg class="icon" style="width:15px;height:15px"><use href="#i-siren"/></svg></a>
-    </div>
-    <div class="feature-mock" style="display:grid; grid-template-columns:1fr 230px; gap:20px; align-items:start;">
-      <div class="hud-frame glass" style="padding:16px;">
-        <span class="hb-tr"></span><span class="hb-bl"></span>
-        <div class="alert-banner" style="margin-bottom:16px;">
-          <span class="alert-icon blink"><svg class="icon"><use href="#i-siren"/></svg></span>
-          <div class="alert-body"><div class="t">RAID DETECTED: Main Base</div><div class="d mono">Smart Alarm · North Wall · 00:00:14 ago</div></div>
-          <button class="btn btn-primary btn-sm">Call Squad</button>
-        </div>
-        <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-clock"/></svg>Raid Timeline</div>
-        <div style="display:flex;flex-direction:column;gap:0;">
-          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center;">
-            <span class="mono text-3" style="width:52px;font-size:11px">21:04:02</span>
-            <span class="item-ic sm photo ic-c4" title="Timed Explosive Charge"></span>
-            <span class="pill pill-dead" style="flex-shrink:0"><span class="dot"></span>Breach</span>
-            <span class="text-2" style="font-size:12.5px">Timed Explosive Charge at North Wall (armored)</span>
-          </div>
-          <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
-            <span class="mono text-3" style="width:52px;font-size:11px">21:03:41</span>
-            <span class="pill pill-warn" style="flex-shrink:0"><span class="dot"></span>Alarm</span>
-            <span class="text-2" style="font-size:12.5px">Smart Alarm triggered at North Wall</span>
-          </div>
-          <div style="display:flex;gap:12px;padding:10px 0;">
-            <span class="mono text-3" style="width:52px;font-size:11px">21:01:15</span>
-            <span class="pill pill-offline" style="flex-shrink:0"><span class="dot"></span>Spotted</span>
-            <span class="text-2" style="font-size:12.5px">Duskrunner spotted near grid F9</span>
-          </div>
-        </div>
-        <div class="card-title" style="margin:16px 0 10px;"><svg class="icon"><use href="#i-users"/></svg>Team Availability</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="pill pill-online"><span class="dot"></span>Kaelthorn</span>
-          <span class="pill pill-online"><span class="dot"></span>Vexen</span>
-          <span class="pill pill-warn"><span class="dot"></span>Otterloop · away</span>
-          <span class="pill pill-offline"><span class="dot"></span>Novasol</span>
-        </div>
-      </div>
-      <div class="phone hud-frame">
-        <span class="hb-tr"></span><span class="hb-bl"></span>
-        <div class="phone-screen">
-          <span class="mono text-3" style="font-size:10px;margin-bottom:26px;">9:41</span>
-          <span class="eyebrow" style="justify-content:center;margin-bottom:6px;">Incoming</span>
-          <div class="avatar" style="width:64px;height:64px;font-size:20px;border-radius:18px;background:var(--orange);margin-bottom:12px;">KL</div>
-          <div style="font-weight:700;font-size:16px;">Kaelthorn</div>
-          <div class="text-2" style="font-size:12px;margin-bottom:6px;" id="callTimer">calling…</div>
-          <div class="pill pill-dead" style="margin-bottom:28px;"><span class="dot"></span>Raid in progress</div>
-          <div id="callActions" style="display:flex;gap:22px;">
-            <button class="icon-btn" style="background:var(--crimson);color:#fff;border:none;width:50px;height:50px;" onclick="answerCall()"><svg class="icon"><use href="#i-phone"/></svg></button>
-            <button class="icon-btn" style="background:var(--surface-3);width:50px;height:50px;" onclick="declineCall()"><svg class="icon"><use href="#i-x"/></svg></button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ SECTION 04 — VENDING SEARCH ============ -->
-<section class="feature" id="f03">
-  <span class="feature-num">03</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">04</span>
       <span class="eyebrow">Marketplace</span>
-      <h2>Every vending machine<br/>on the map, searchable.</h2>
-      <p class="desc">Stop running the loop manually. Search any item and see every machine selling it, ranked by price and distance from you.</p>
+      <h2>Every vending machine,<br/>searchable.</h2>
+      <p class="desc">Search any item and see every machine selling it, cheapest first.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Search by item across every known machine</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live price comparison, best deal first</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid + walking distance from your position</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Stock levels updated in real time</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Search by item across every machine</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Cheapest listing first</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid reference for every shop</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Stock level on every listing</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Search Vending<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1576,18 +1503,18 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 05 — SHOP ALERTS ============ -->
-<section class="feature" id="f04">
-  <span class="feature-num">04</span>
+<section class="feature" id="f03">
+  <span class="feature-num">03</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">05</span>
       <span class="eyebrow">Market watch</span>
       <h2>Never miss a deal<br/>at the shops.</h2>
-      <p class="desc">A live feed of every shop that opens or vanishes near you, so you catch the good sell orders and notice when a base goes quiet.</p>
+      <p class="desc">New shops and new listings as they appear.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant alerts for new player shops</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Removed and expired shop notices</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full activity feed of vending changes</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>New shops as they appear</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Shops that have gone</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>New listings in shops you already saw</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Enable Shop Alerts<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1621,19 +1548,17 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 06 — DECAY TIMERS ============ -->
-<section class="feature" id="f05">
-  <span class="feature-num">05</span>
+<section class="feature" id="f04">
+  <span class="feature-num">04</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">06</span>
       <span class="eyebrow">Base upkeep</span>
-      <h2>Track every base's timer,<br/>before it hits zero.</h2>
-      <p class="desc">Every base you tag gets its own decay countdown, tier-aware and pinned to the map, so nothing you built quietly falls over.</p>
+      <h2>Know when<br/>upkeep runs out.</h2>
+      <p class="desc">Decay time by building tier and current hitpoints.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Auto-tracks twig through armored tiers</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live countdown per structure</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Map pins for every tracked base</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Batch monitoring across wipes</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Twig through armoured tiers</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Time left from current hitpoints</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Track Decay<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1670,19 +1595,19 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 07 — GENETICS CALCULATOR ============ -->
-<section class="feature" id="f06">
-  <span class="feature-num">06</span>
+<section class="feature" id="f05">
+  <span class="feature-num">05</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">07</span>
       <span class="eyebrow">Plant genetics</span>
       <h2>Breed the perfect<br/>clone, every time.</h2>
-      <p class="desc">Real crossbreeding math, not a slider. Green genes (Growth, Yield and Hardiness) weigh 0.6, red genes (Water and Empty) weigh 1.0 and only flip a slot when a donor's combined weight strictly beats the center's own. Click any gene below, or run a simulated cross.</p>
+      <p class="desc">Real crossbreed weighting, not a slider. Click any gene to change it.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Genome visualization for any clone</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Real weight-based crossbreed simulation</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Target genetics with live match %</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Two donor slots, same as an in-game planter</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Genome view for any clone</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Real weight-based crossbreeding</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Target genome with live match</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Two donor slots, as in a planter</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Genetics Lab<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1691,7 +1616,7 @@ body.billing #billing-view{display:block;}
       <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genome Comparison</div><span class="pill pill-orange" id="geneMatchPill"><span class="dot"></span>0% to target</span></div>
 
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
-        <div class="item-ic photo ic-planter" style="width:52px;height:52px;border-radius:12px;border:1px solid var(--border-strong);flex-shrink:0;" title="Large Planter Box"></div>
+        <div class="item-ic photo ic-planter" style="width:52px;height:52px;border-radius:var(--r-md);border:1px solid var(--border-strong);flex-shrink:0;" title="Large Planter Box"></div>
         <div>
           <div style="font-weight:700;font-size:13px;">Hemp · Large Planter Box</div>
           <div class="text-3" style="font-size:11px;">Target genome for most crops: <b class="mono" style="color:var(--text-2)">GGGYYY</b> (3 Growth, 3 Yield)</div>
@@ -1749,19 +1674,16 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 08 — SMART DEVICES ============ -->
-<section class="feature" id="f07">
-  <span class="feature-num">07</span>
+<section class="feature" id="f06">
+  <span class="feature-num">06</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">08</span>
       <span class="eyebrow">Base control</span>
       <h2>Your base,<br/>one switch away.</h2>
-      <p class="desc">Every Smart Switch, turret and garage door paired to your base, controllable from your dashboard, plus upkeep and resources at a glance.</p>
+      <p class="desc">Smart switches and paired devices, from the dashboard.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggle turrets, switches and garage doors</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Control lighting scenes remotely</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monitor Tool Cupboard upkeep live</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Track resource inventory in real time</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggle paired smart switches</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Control Devices<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1787,19 +1709,18 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 09 — RECYCLER CALCULATOR ============ -->
-<section class="feature" id="f08">
-  <span class="feature-num">08</span>
+<section class="feature" id="f07">
+  <span class="feature-num">07</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">09</span>
       <span class="eyebrow">Yield planning</span>
       <h2>Know the breakdown<br/>before you recycle.</h2>
-      <p class="desc">Drag components into the recycler and watch the exact resource output totals, with a live Monument vs Safe Zone yield toggle.</p>
+      <p class="desc">Exact recycler output, monument or safe zone.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Drag-and-drop component input</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant resource output totals</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monument vs Safe Zone yield toggle</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full breakdown chains for every item</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Every component in the game</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Exact output totals</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monument and safe zone rates</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Calculate Yields<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1828,18 +1749,17 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 10 — IN-GAME CHAT ASSISTANT ============ -->
-<section class="feature" id="f09">
-  <span class="feature-num">09</span>
+<section class="feature" id="f08">
+  <span class="feature-num">08</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">10</span>
       <span class="eyebrow">Chat assistant</span>
-      <h2>A bot that actually<br/>knows the wipe.</h2>
-      <p class="desc">Your full team chat, right in the dashboard.</p>
+      <h2>Team chat<br/>in the dashboard.</h2>
+      <p class="desc">Your team chat, without alt-tabbing.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full team chat inside your dashboard</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live bot responses, richly formatted</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant event notifications</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Read and send team chat</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Event announcements posted to chat</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Chat Assistant<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
@@ -1862,18 +1782,18 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 11 — RESOURCE HEATMAP ============ -->
-<section class="feature" id="f10">
-  <span class="feature-num">10</span>
+<section class="feature" id="f09">
+  <span class="feature-num">09</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">11</span>
       <span class="eyebrow">Map intelligence</span>
-      <h2>See the whole map's<br/>loot before you rotate.</h2>
-      <p class="desc">The events this server has shown you, on the server's own map.</p>
+      <h2>See where<br/>the action is.</h2>
+      <p class="desc">This server's events, on its own map.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Sulfur, metal & stone node density</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Player spawn point overlay</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Built on the real map image</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Explosions, crates and cargo runs</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monuments at real coordinates</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>The server's own map image</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggleable layers</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Heatmap<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
@@ -5050,6 +4970,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 18:49 UTC</div>
+<div class="build-stamp">build 2026-07-29 19:04 UTC</div>
 </body>
 </html>
