@@ -511,8 +511,11 @@ body:not(.is-demo) .demo-banner{display:none;}
   border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface-2);
   color:var(--text-3); cursor:pointer; white-space:nowrap;}
 .rc-mode.active{background:var(--orange); color:#140D0A; border-color:var(--orange);}
-.rc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:7px 14px;}
-.rc-row{display:grid; grid-template-columns:1fr 68px; align-items:center; gap:8px;}
+.rc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:2px 22px;}
+.rc-row{padding:5px 0; border-bottom:1px solid var(--border);}
+.rc-row{display:grid; grid-template-columns:1fr auto 66px; align-items:center; gap:10px;}
+.rc-yield{font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);
+  white-space:nowrap; text-align:right;}
 .rc-label{font-size:12px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .rc-qty{max-width:none; width:100%; padding:6px 8px; font-size:12px;}
 .rc-out{margin-top:16px; padding:14px; border-radius:var(--r-md); background:var(--surface-2);
@@ -521,7 +524,11 @@ body:not(.is-demo) .demo-banner{display:none;}
 .rc-amt{font-size:19px; font-weight:800; color:var(--orange); min-width:62px;}
 .rc-name{font-size:12.5px; color:var(--text-2);}
 .rc-note{font-size:11px;}
-@media (max-width:760px){ .rc-grid{grid-template-columns:1fr;} }
+@media (max-width:1200px){ .rc-grid{grid-template-columns:1fr;} }
+@media (max-width:520px){
+  .rc-row{grid-template-columns:1fr 62px; row-gap:1px;}
+  .rc-yield{grid-column:1; text-align:left;}
+}
 
 /* Team chat */
 .chat-send{display:flex; gap:8px; margin-top:10px;}
@@ -559,7 +566,7 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* The live strip carries a server name that can be long; it has to shrink rather than
    force the row wider than the column it sits in. */
 .live-state{min-width:0;}
-.live-state span,.live-state{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.live-state{white-space:normal; overflow:visible; overflow-wrap:anywhere; line-height:1.45;}
 @media (max-width:760px){
   .live-state{font-size:11px; padding:8px 11px;}
   .decay-row{grid-template-columns:1fr; gap:5px;}
@@ -586,11 +593,11 @@ body:not(.is-demo) .demo-banner{display:none;}
 
 /* Live status strip. Says where the numbers came from and when, so a stale panel is
    distinguishable from a fresh one at a glance. */
-.live-state{display:flex; align-items:center; gap:9px; padding:9px 14px; border-radius:var(--r-md);
+.live-state{display:flex; align-items:flex-start; gap:9px; padding:9px 14px; border-radius:var(--r-md);
   font-size:12px; font-weight:600; border:1px solid var(--border); background:var(--surface-2);
   color:var(--text-2);}
-.live-state::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor;
-  flex-shrink:0;}
+.live-state::before{content:""; width:7px; height:7px; border-radius:50%;
+  background:currentColor; flex-shrink:0; margin-top:5px;}
 .live-state.loading{color:var(--text-3);}
 .live-state.ok{color:var(--success); border-color:rgba(95,168,92,.3); background:var(--success-soft);}
 .live-state.err{color:var(--warning); border-color:rgba(200,146,46,.3); background:var(--warning-soft);}
@@ -2027,6 +2034,10 @@ body.billing #billing-view{display:block;}
             <div class="rc-note text-3" id="rcNote"></div>
           </div>
           <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="clearRecycler()">Clear</button>
+          <p class="text-3" style="font-size:10.5px;line-height:1.5;margin:10px 0 0;">
+            Yields from Man1ak&rsquo;s recycler chart. Where the chart gives a range the total stays a
+            range rather than guessing a single figure.
+          </p>
         </div>
       </div>
 
@@ -4096,15 +4107,35 @@ function buildRecycler(){
   const grid = document.getElementById('rcGrid');
   if(!grid || grid.dataset.built) return;
   grid.dataset.built = '1';
+  // Each row doubles as the reference table: the yield for the selected recycler is shown
+  // beside the input, so you can read what something gives without entering a quantity.
   grid.innerHTML = RECYCLE.map(r =>
-    '<label class="rc-row"><span class="rc-label">' + escapeHtml(r.name) + '</span>'
+    '<label class="rc-row">'
+    + '<span class="rc-label">' + escapeHtml(r.name) + '</span>'
+    + '<span class="rc-yield" data-yield="' + escapeHtml(r.name) + '"></span>'
     + '<input class="inp rc-qty" type="number" min="0" inputmode="numeric" placeholder="0" '
-    + 'oninput="setRecycleQty(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', this.value)"></label>'
+    + 'oninput="setRecycleQty(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', this.value)">'
+    + '</label>'
   ).join('');
   renderRecycler();
 }
 
+const YIELD_SHORT = { scrap:'scrap', hqm:'HQM', frag:'frags', cloth:'cloth', rope:'rope', tech:'tech trash' };
+const asRange = v => Array.isArray(v) ? (v[0] === v[1] ? v[0] : v[0] + '-' + v[1]) : v;
+
+/** "12 scrap · 15 frags" for one component under the current recycler. */
+function yieldSummary(row){
+  return Object.entries(row[recycleMode] || {})
+    .map(([k, v]) => asRange(v) + ' ' + (YIELD_SHORT[k] || k))
+    .join(' · ');
+}
+
 function renderRecycler(){
+  document.querySelectorAll('[data-yield]').forEach(el => {
+    const row = RECYCLE.find(r => r.name === el.dataset.yield);
+    if(row) el.textContent = yieldSummary(row);
+  });
+
   const totals = {};
   const add = (key, v) => {
     const [lo, hi] = Array.isArray(v) ? v : [v, v];
@@ -4365,6 +4396,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:15 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:17 UTC</div>
 </body>
 </html>
