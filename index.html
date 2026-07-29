@@ -574,6 +574,15 @@ body:not(.is-demo) .demo-only{display:none !important;}
   #d-genetics .planter-soil{grid-template-columns:1fr;}
 }
 
+.dl-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:-38px 0 46px;}
+.dl-btn .icon{width:15px; height:15px;}
+.dl-note{font-size:11.5px; color:var(--text-3); max-width:340px; line-height:1.45;}
+@media (max-width:700px){ .dl-row{margin:-30px 0 34px;} .nav-dl{display:none;} }
+
+/* Desktop app: the window is the dashboard, so the site's marketing chrome is hidden. */
+body.is-app #siteNav, body.is-app .site-footer, body.is-app .hero{display:none !important;}
+body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
+
 /* Vending search and shop alerts */
 .vend-bar{display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; margin-bottom:12px;
   border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--border);}
@@ -1233,6 +1242,7 @@ body.billing #billing-view{display:block;}
 <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
 <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 004 0"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V17"/></symbol>
 <symbol id="rc-pipe" viewBox="0 0 24 24"><path d="M5 16.5 16 5.5"/><path d="M8 19.5 19 8.5"/><path d="M5 16.5a2.1 2.1 0 003 3"/><path d="M16 5.5a2.1 2.1 0 013 3"/></symbol>
 <symbol id="rc-sign" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="10" rx="1.5"/><path d="M12 14v6"/><path d="M9 9h6M12 6.5 15 9l-3 2.5"/></symbol>
 <symbol id="rc-sheet" viewBox="0 0 24 24"><path d="M3 9.5 12 5l9 4.5"/><path d="M3 13.5 12 9l9 4.5"/><path d="M3 17.5 12 13l9 4.5"/></symbol>
@@ -1381,6 +1391,11 @@ body.billing #billing-view{display:block;}
         <div class="hero-cta">
           <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
           <a href="#f01" class="btn btn-outline">See it in action</a>
+        </div>
+        <div class="dl-row">
+          <a class="btn btn-outline dl-btn" href="https://github.com/csking4444/rustex-app/releases/latest" target="_blank" rel="noopener">
+            <svg class="icon"><use href="#i-download"/></svg>Download for Windows</a>
+          <span class="dl-note">Runs the dashboard on your own machine. The browser version needs no install.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -2621,6 +2636,12 @@ body.billing #billing-view{display:block;}
 // /api/auth/callback verifies the response server-to-server with Steam before
 // issuing a signed HttpOnly cookie. The browser never decides who it is — it
 // asks /api/auth/me. Everything below is presentation on top of that.
+
+/**
+ * True inside the desktop app. Declared here rather than beside the transport below because
+ * boot() and Session.refresh() both read it, and a const read ahead of its declaration throws.
+ */
+const IS_DESKTOP = typeof window !== 'undefined' && !!window.rustexNative?.isDesktop;
 //
 // Payments are NOT wired. There is no provider, so we never invent a
 // subscription, an invoice or a saved card. Demo mode is opt-in and labelled.
@@ -2659,6 +2680,9 @@ const Session = {
     syncAuthUI();
   },
   async refresh(){
+    // The desktop build talks to the game server directly and has no hosted session to ask
+    // about. No user is invented for it — it simply runs unauthenticated and local.
+    if(IS_DESKTOP){ this.user = null; this.plan = null; syncAuthUI(); return null; }
     try {
       const r = await fetch('/api/auth/me', { credentials:'same-origin', cache:'no-store' });
       if(r.ok){ const j = await r.json(); this.user = j.user; this.plan = j.plan || null; }
@@ -2673,8 +2697,9 @@ const Session = {
     syncAuthUI();
   },
   get signedIn(){ return !!this.user; },
-  // Access is granted by a real subscription, or by explicitly entering demo mode.
-  get entitled(){ return !!this.plan || this.demo; },
+  // Access is granted by a real subscription, or by explicitly entering demo mode. The
+  // desktop build gates on nothing: it runs on your machine against your own pairing.
+  get entitled(){ return !!this.plan || this.demo || IS_DESKTOP; },
   get state(){ return this.entitled ? 'entitled' : this.signedIn ? 'in' : 'out'; },
   get displayName(){
     return (this.prefs.displayName || '').trim()
@@ -3046,7 +3071,9 @@ async function logOut(){
   }
 
   const h = location.hash;
-  const want = h.replace('#','');
+  // The desktop app is the dashboard. There is no marketing page to land on, so unless a
+  // pairing link asked for something else it opens straight into it.
+  const want = (IS_DESKTOP && !h) ? 'dash' : h.replace('#','');
   if(want === 'dash' || want === 'dashboard'){
     if(Session.entitled) document.body.classList.add('dash');
     else if(Session.signedIn) document.body.classList.add('pricing');
@@ -3066,6 +3093,9 @@ async function logOut(){
   if(document.body.classList.contains('billing')) renderBilling();
   if(document.body.classList.contains('pairing')) renderPairedServers();
 })();
+
+// Marketing chrome belongs to the website, not to the app window.
+if(IS_DESKTOP) document.body.classList.add('is-app');
 
 // ---- sticky nav ----
 const nav = document.getElementById('siteNav');
@@ -4055,7 +4085,17 @@ function rpQueue(run){
   return next;
 }
 
+/**
+ * One transport, two backends. In the desktop app the request goes over IPC to the main
+ * process, which owns the socket; on the web it goes to the hosted function. Both answer in
+ * the same shape, so nothing above this line needs to know which one it is talking to.
+ */
 async function rpFetch(payload, fallback){
+  if(IS_DESKTOP){
+    const r = await window.rustexNative.rustPlus(payload);
+    if(!r || !r.ok) throw new Error(r?.message || fallback);
+    return r.response;
+  }
   const r = await fetch('/api/rustplus/request', {
     method:'POST',
     headers:{ 'Content-Type':'application/json' },
@@ -4970,6 +5010,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 19:11 UTC</div>
+<div class="build-stamp">build 2026-07-29 19:36 UTC</div>
 </body>
 </html>
