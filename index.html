@@ -1357,7 +1357,7 @@ body.billing #billing-view{display:block;}
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-links">
       <a href="#f01">Team Tracker</a>
-      <a href="#f03">Raid Alarms</a>
+      <a href="#f02">Raid Alarms</a>
       <a href="#" onclick="goPricing();return false;">Pricing</a>
       <a href="#" onclick="goPairing();return false;">Pairing</a>
     </div>
@@ -1378,7 +1378,7 @@ body.billing #billing-view{display:block;}
       <div class="hero-copy reveal in-view">
         <span class="eyebrow">Your tactical companion for an ethical edge over every enemy</span>
         <h1>Own every wipe from<br/>first spawn to <span class="hl">final raid.</span></h1>
-        <p class="sub">Rustex fuses your server's Rust+ telemetry into one console: squad positions, threats, raid alarms, markets and base status, updated live, no alt-tabbing required.</p>
+        <p class="sub">Rustex fuses your server's Rust+ telemetry into one console: squad positions, raid alarms, markets and base status, updated live, no alt-tabbing required.</p>
         <div class="hero-cta">
           <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
           <a href="#f01" class="btn btn-outline">See it in action</a>
@@ -1436,14 +1436,13 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live GPS-accurate teammate positions</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Online, offline and dead status at a glance</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid coordinates accurate to the meter</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Roles synced with your TC permissions</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">View Team Tracker<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Squad Overview</div><span class="pill pill-online"><span class="dot"></span>4 online</span></div>
-      <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;">
+      <div>
         <table class="table">
           <thead><tr><th>Member</th><th>Role</th><th>Grid</th><th>Status</th></tr></thead>
           <tbody>
@@ -1454,60 +1453,14 @@ body.billing #billing-view{display:block;}
             <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--crimson);width:26px;height:26px;font-size:10px">RM</span>Ramsey</td><td><span class="badge">Raider</span></td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
           </tbody>
         </table>
-        <div class="map-grid" style="min-height:260px;">
-          <div class="map-pin" style="background:var(--success);top:38%;left:44%;"></div>
-          <div class="map-pin" style="background:var(--success);top:42%;left:50%;"></div>
-          <div class="map-pin" style="background:var(--success);top:30%;left:60%;"></div>
-          <div class="map-pin" style="background:var(--text-3);top:60%;left:70%;"></div>
-          <div class="map-pin" style="background:var(--crimson);top:75%;left:22%;"></div>
-          <span class="mono text-3" style="position:absolute;bottom:10px;right:12px;font-size:10px">TAC-MAP · LIVE</span>
-        </div>
+        
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ SECTION 02 — THREAT INTELLIGENCE ============ -->
 <section class="feature" id="f02">
   <span class="feature-num">02</span>
-  <div class="container feature-grid">
-    <div class="feature-copy reveal">
-      <span class="num-tag">02</span>
-      <span class="eyebrow">Threat intelligence</span>
-      <h2>Know all<br/>your threats.</h2>
-      <p class="desc">A running dossier on every player who's put a bullet in you, ranked, scored and cross-referenced across wipes.</p>
-      <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Enemy leaderboard ranked by threat score</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Nemesis tracking that persists across wipes</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full kill and death combat history</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Encounter timeline with location + weapon</li>
-      </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Threat Intel<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
-    </div>
-    <div class="feature-mock hud-frame glass" style="padding:16px;">
-      <span class="hb-tr"></span><span class="hb-bl"></span>
-      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Leaderboard</div><span class="badge" style="color:var(--crimson);border-color:rgba(179,38,30,.3);background:var(--crimson-soft)">1 Nemesis</span></div>
-      <table class="table">
-        <thead><tr><th>#</th><th>Player</th><th>Weapon</th><th>KD</th><th>Threat</th><th>Last seen</th></tr></thead>
-        <tbody>
-          <tr><td class="mono text-3">01</td><td style="font-weight:700;color:var(--crimson)">Grimhollow ⚑</td><td><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span></td><td class="mono">4.8</td><td style="width:120px"><div class="progress crimson"><span style="width:94%"></span></div></td><td class="text-2">6m ago</td></tr>
-          <tr><td class="mono text-3">02</td><td>Duskrunner</td><td><span class="item-ic sm photo ic-rocket" title="Rocket Launcher"></span></td><td class="mono">3.1</td><td style="width:120px"><div class="progress"><span style="width:70%"></span></div></td><td class="text-2">28m ago</td></tr>
-          <tr><td class="mono text-3">03</td><td>Ashvale</td><td><span class="item-ic sm photo ic-bolt" title="Bolt Action Rifle"></span></td><td class="mono">2.4</td><td style="width:120px"><div class="progress"><span style="width:52%"></span></div></td><td class="text-2">1h ago</td></tr>
-          <tr><td class="mono text-3">04</td><td>Coldwick</td><td><span class="item-ic sm photo ic-thompson" title="Thompson"></span></td><td class="mono">1.9</td><td style="width:120px"><div class="progress success"><span style="width:38%"></span></div></td><td class="text-2">3h ago</td></tr>
-        </tbody>
-      </table>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px;">
-        <div class="panel-2" style="padding:12px;"><div class="stat"><span class="num mono" style="font-size:19px">142</span><span class="lbl">Kills</span></div></div>
-        <div class="panel-2" style="padding:12px;"><div class="stat"><span class="num mono" style="font-size:19px">37</span><span class="lbl">Deaths</span></div></div>
-        <div class="panel-2" style="padding:12px;"><div class="stat"><span class="num mono" style="font-size:19px;color:var(--orange)">3.83</span><span class="lbl">Squad KD</span></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ SECTION 03 — LIVE RAID ALARM & PHONE CALLING ============ -->
-<section class="feature" id="f03">
-  <span class="feature-num">03</span>
   <div class="container feature-grid" style="grid-template-columns:0.78fr 1.22fr;">
     <div class="feature-copy reveal">
       <span class="num-tag">03</span>
@@ -1577,8 +1530,8 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 04 — VENDING SEARCH ============ -->
-<section class="feature" id="f04">
-  <span class="feature-num">04</span>
+<section class="feature" id="f03">
+  <span class="feature-num">03</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">04</span>
@@ -1623,13 +1576,13 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 05 — SHOP ALERTS ============ -->
-<section class="feature" id="f05">
-  <span class="feature-num">05</span>
+<section class="feature" id="f04">
+  <span class="feature-num">04</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">05</span>
       <span class="eyebrow">Market watch</span>
-      <h2>Never miss a deal<br/>or a threat at the shops.</h2>
+      <h2>Never miss a deal<br/>at the shops.</h2>
       <p class="desc">A live feed of every shop that opens or vanishes near you, so you catch the good sell orders and notice when a base goes quiet.</p>
       <ul class="feature-list">
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant alerts for new player shops</li>
@@ -1668,8 +1621,8 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 06 — DECAY TIMERS ============ -->
-<section class="feature" id="f06">
-  <span class="feature-num">06</span>
+<section class="feature" id="f05">
+  <span class="feature-num">05</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">06</span>
@@ -1717,8 +1670,8 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 07 — GENETICS CALCULATOR ============ -->
-<section class="feature" id="f07">
-  <span class="feature-num">07</span>
+<section class="feature" id="f06">
+  <span class="feature-num">06</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">07</span>
@@ -1796,8 +1749,8 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 08 — SMART DEVICES ============ -->
-<section class="feature" id="f08">
-  <span class="feature-num">08</span>
+<section class="feature" id="f07">
+  <span class="feature-num">07</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">08</span>
@@ -1834,8 +1787,8 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 09 — RECYCLER CALCULATOR ============ -->
-<section class="feature" id="f09">
-  <span class="feature-num">09</span>
+<section class="feature" id="f08">
+  <span class="feature-num">08</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">09</span>
@@ -1875,17 +1828,16 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 10 — IN-GAME CHAT ASSISTANT ============ -->
-<section class="feature" id="f10">
-  <span class="feature-num">10</span>
+<section class="feature" id="f09">
+  <span class="feature-num">09</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">10</span>
       <span class="eyebrow">Chat assistant</span>
       <h2>A bot that actually<br/>knows the wipe.</h2>
-      <p class="desc">Your full team chat, right in the dashboard, with chat commands and a bot that answers instantly with real server data.</p>
+      <p class="desc">Your full team chat, right in the dashboard.</p>
       <ul class="feature-list">
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full team chat inside your dashboard</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Slash commands for pop, events, pairing</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Live bot responses, richly formatted</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Instant event notifications</li>
       </ul>
@@ -1910,14 +1862,14 @@ body.billing #billing-view{display:block;}
 </section>
 
 <!-- ============ SECTION 11 — RESOURCE HEATMAP ============ -->
-<section class="feature" id="f11">
-  <span class="feature-num">11</span>
+<section class="feature" id="f10">
+  <span class="feature-num">10</span>
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">11</span>
       <span class="eyebrow">Map intelligence</span>
       <h2>See the whole map's<br/>loot before you rotate.</h2>
-      <p class="desc">Every explosion, crate, cargo run and shop this server has shown you, built up over the wipe on the server's own map so you can see where the action actually is.</p>
+      <p class="desc">The events this server has shown you, on the server's own map.</p>
       <ul class="feature-list">
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Sulfur, metal & stone node density</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Player spawn point overlay</li>
@@ -1931,12 +1883,7 @@ body.billing #billing-view{display:block;}
       <div class="card-head">
         <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
-              <button type="button" class="pill heat-key" data-layer="raid" aria-pressed="true"><span class="dot" style="background:rgb(229,90,60)"></span>Raids</button>
-              <button type="button" class="pill heat-key" data-layer="crate" aria-pressed="true"><span class="dot" style="background:rgb(245,158,11)"></span>Crates</button>
-              <button type="button" class="pill heat-key" data-layer="cargo" aria-pressed="true"><span class="dot" style="background:rgb(96,165,250)"></span>Cargo</button>
-              <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
-              <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
-              <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
+              
         </div>
       </div>
       <div class="heat-wrap" data-heat>
@@ -5103,6 +5050,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 05:55 UTC</div>
+<div class="build-stamp">build 2026-07-29 18:49 UTC</div>
 </body>
 </html>
