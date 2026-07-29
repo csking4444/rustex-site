@@ -557,34 +557,22 @@ body:not(.is-demo) .demo-only{display:none !important;}
 ::-webkit-scrollbar-thumb:active{background:var(--orange); background-clip:content-box;}
 ::-webkit-scrollbar-corner{background:transparent;}
 
-/* Breeding calculator */
-.gene-steps{margin:0 0 11px; padding-left:17px; font-size:11px; color:var(--text-3); line-height:1.5;}
-.gene-steps li{margin-bottom:3px;}
-.gene-steps b{color:var(--text-2);}
+/* Genetics lab */
+.gene-help{font-size:11px; color:var(--text-3); line-height:1.45; margin-bottom:9px;}
 .gene-err{font-size:11px; color:var(--warning); margin-bottom:8px;}
-.gene-plants{display:flex; flex-direction:column; gap:3px;}
-.gene-row{display:flex; align-items:center; gap:9px; padding:3px 6px; border-radius:var(--r-sm);}
+.gene-row{display:grid; grid-template-columns:auto 1fr auto 20px; align-items:center; gap:9px;
+  padding:4px 6px; border-radius:var(--r-sm);}
 .gene-row:hover{background:var(--surface-2);}
 .gene-blocks{display:flex; gap:3px;}
 .gene.sm{width:17px; height:17px; font-size:10px; font-weight:700; border-radius:3px;
   display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);}
-.gene-x{margin-left:auto; border:0; background:transparent; color:var(--text-3); cursor:pointer;
-  font-size:14px; line-height:1; padding:0 2px;}
+.gene-verdict{font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;}
+.gene-verdict.keep{color:var(--success);}
+.gene-verdict.compost{color:var(--text-3);}
+.gene-num{font-size:10.5px; color:var(--text-3);}
+.gene-x{border:0; background:transparent; color:var(--text-3); cursor:pointer; font-size:14px;
+  line-height:1; padding:0;}
 .gene-x:hover{color:var(--orange);}
-.gene-out{margin-top:12px; padding:11px; border-radius:var(--r-md); background:var(--surface-2);
-  border:1px solid var(--border-strong);}
-.gene-out-head{font-size:10px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-3);
-  margin-bottom:8px;}
-.gene-result{display:flex; align-items:center; gap:3px; margin-bottom:9px; flex-wrap:wrap;}
-.gene-chance{margin-left:8px; font-size:11px; color:var(--text-3); font-family:var(--font-mono);}
-.gene-odds{display:flex; flex-direction:column; gap:3px;}
-.gene-slot{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
-.gene-slot-n{width:12px; font-size:10px; color:var(--text-3); font-family:var(--font-mono);}
-.gene-odd{display:flex; align-items:center; gap:3px;}
-.gene-odd b{font-size:10px; color:var(--text-3); font-family:var(--font-mono); font-weight:600;
-  margin-right:5px;}
-.gene-advice{margin-top:10px; padding-top:9px; border-top:1px solid var(--border);
-  font-size:11px; color:var(--text-2); line-height:1.5;}
 .gene-key{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; padding-top:9px;
   border-top:1px solid var(--border); font-size:10.5px; color:var(--text-3);}
 .gene-key b{font-family:var(--font-mono);}
@@ -1952,8 +1940,6 @@ body.billing #billing-view{display:block;}
               <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
               <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
               <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
-              <button type="button" class="pill heat-key" data-layer="team" aria-pressed="true"><span class="dot" style="background:rgb(255,138,61)"></span>Team</button>
-              <button type="button" class="pill heat-key" data-layer="live" aria-pressed="true"><span class="dot" style="background:rgb(255,255,255)"></span>Live now</button>
         </div>
       </div>
       <div class="heat-wrap" data-heat>
@@ -1998,6 +1984,7 @@ body.billing #billing-view{display:block;}
     <div class="side-section-lbl">Overview</div>
     <a class="side-link active" data-dsec="overview" data-target="" href="#" onclick="showDashSection('overview');return false;"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
     <a class="side-link" data-dsec="overview" data-target="d-team" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
+    <a class="side-link" data-dsec="overview" data-target="d-alarm" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</a>
         <div class="side-section-lbl">Tools</div>
 <a class="side-link" data-dsec="tools" data-target="d-decay" href="#" onclick="showDashSection('tools','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
     <a class="side-link" data-dsec="tools" data-target="d-devices" href="#" onclick="showDashSection('tools','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
@@ -2113,6 +2100,15 @@ body.billing #billing-view{display:block;}
 
         </div>
 
+        <div class="widget card w-12" id="d-alarm">
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
+            <div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>
+          </div>
+        </div>
+        </div>
+
+      <div class="dash-section" id="dsec-market">
         <div class="widget card w-6" id="d-vending">
           <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div class="vend-bar">
@@ -2211,8 +2207,6 @@ body.billing #billing-view{display:block;}
               <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
               <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
               <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
-              <button type="button" class="pill heat-key" data-layer="team" aria-pressed="true"><span class="dot" style="background:rgb(255,138,61)"></span>Team</button>
-              <button type="button" class="pill heat-key" data-layer="live" aria-pressed="true"><span class="dot" style="background:rgb(255,255,255)"></span>Live now</button>
             </div>
           </div>
           <div class="heat-wrap" data-heat>
@@ -2228,31 +2222,16 @@ body.billing #billing-view{display:block;}
         </div>
 
         <div class="widget card w-6" id="d-genetics">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Breeding Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-
-          <ol class="gene-steps">
-            <li>Put these clones in <b>one planter</b> together. Only plants sharing a planter cross.</li>
-            <li>Let them ripen, then harvest. The seeds you get carry the crossed genes.</li>
-            <li>Clone the best result and run it again until every slot is G or Y.</li>
-          </ol>
-
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
+          <div class="gene-help">Type a clone's six genes and add it. Keep the best, compost the rest.</div>
           <div class="vend-bar">
-            <input id="geneInput" type="text" maxlength="6" placeholder="Genes, e.g. GGYYHW" autocomplete="off"
+            <input id="geneInput" type="text" maxlength="6" placeholder="GGYYGG" autocomplete="off"
                    spellcheck="false" oninput="this.value=this.value.toUpperCase()"
                    onkeydown="if(event.key==='Enter')addGene()">
             <button class="btn btn-primary btn-sm" onclick="addGene()">Add</button>
-            <button class="btn btn-ghost btn-sm" onclick="clearGenes()">Clear</button>
           </div>
           <div id="geneErr" class="gene-err" hidden></div>
-          <div id="geneList" class="gene-plants"></div>
-
-          <div id="geneOut" class="gene-out" hidden>
-            <div class="gene-out-head">Most likely offspring</div>
-            <div id="geneResult" class="gene-result"></div>
-            <div id="geneOdds" class="gene-odds"></div>
-            <div id="geneAdvice" class="gene-advice"></div>
-          </div>
-
+          <div id="geneList" class="vend-list"></div>
           <div class="gene-key">
             <span><b style="color:#4ADE80">G</b> Growth</span><span><b style="color:#FBBF24">Y</b> Yield</span>
             <span><b style="color:#a78bfa">H</b> Hardiness</span><span><b style="color:#e5e7eb">W</b> Water</span>
@@ -3412,11 +3391,9 @@ function renderRc(){
 // real here. What it does expose is where things happen — explosions, crates, and the cargo
 // and heli routes — which is the more useful map anyway.
 const HEAT_NODE_COLOR = { raid:'229,90,60', crate:'245,158,11', cargo:'96,165,250',
-                          heli:'229,60,60', shop:'74,222,128', monument:'150,152,160',
-                          team:'255,138,61', live:'255,255,255' };
+                          heli:'229,60,60', shop:'74,222,128', monument:'150,152,160' };
 const HEAT_NODE_LABEL = { raid:'Explosions', crate:'Locked crates', cargo:'Cargo ship',
-                          heli:'Patrol helicopter', shop:'Vending machines', monument:'Monument',
-                          team:'Teammate', live:'Live now' };
+                          heli:'Patrol helicopter', shop:'Vending machines', monument:'Monument' };
 const HEAT_GRID = 16;              // map is divided A0..P15, same refs the tooltips quote
 const HEAT_AUTHOR_W = 640;         // blob radii are authored against a 640px canvas
 const HEAT_MAX_SCALE = 6;
@@ -3430,8 +3407,6 @@ const HEAT_BUCKETS = 48;           // map is bucketed this finely before being d
 const HEAT_NODES = [];
 let heatCounts = {};               // "kind:col:row" -> times seen
 let heatMonuments = [];
-/** Where things are right now. Replaced on every refresh, unlike the cumulative counts. */
-let heatLive = [];
 let heatKey = null;
 
 /** Per server and per wipe: a new wipe is a new map, so old positions mean nothing. */
@@ -3499,46 +3474,6 @@ function rebuildHeatNodes(){
   for(const mon of heatMonuments)
     HEAT_NODES.push({ type:'monument', x:mon.x, y:mon.y, r:8, label:mon.label, count:0,
                       density:0, amount:0 });
-  // Live positions sit on top of the accumulated heat, drawn small and tight so a current
-  // sighting reads as a point rather than as a region of history.
-  for(const lm of heatLive)
-    HEAT_NODES.push({ type:lm.type, x:lm.x, y:lm.y, r:7, label:lm.label, live:true,
-                      count:0, density:0, amount:0 });
-}
-
-/**
- * Current positions of everything the server is reporting this refresh, plus the team roster.
- * Kept separate from the cumulative counts so leaving the page open does not smear a moving
- * cargo ship into a stripe across the map.
- */
-function recordLivePositions(markers, mapSize){
-  const size = mapSize || 4000;
-  const at = m => ({
-    x: Math.max(0, Math.min(1, Number(m.x) / size)),
-    y: Math.max(0, Math.min(1, 1 - Number(m.y) / size)),
-  });
-  heatLive = [];
-  for(const m of (markers || [])){
-    const kind = HEAT_MARKER_KIND[m.type] || HEAT_MARKER_KIND[String(m.type)];
-    if(!kind || kind === 'shop') continue;      // shops are static furniture, already a layer
-    heatLive.push({ type:'live', label:HEAT_NODE_LABEL[kind] || kind, ...at(m) });
-  }
-  rebuildHeatNodes();
-  heatInstances.forEach(fn => fn());
-}
-
-/** Teammates, from the roster refresh rather than the marker list. */
-function recordTeamPositions(members, mapSize){
-  const size = mapSize || 4000;
-  const team = (members || []).filter(m => m.isOnline).map(m => ({
-    type:'team',
-    label:(m.name || 'Teammate') + (m.isAlive ? '' : ' (dead)'),
-    x: Math.max(0, Math.min(1, Number(m.x) / size)),
-    y: Math.max(0, Math.min(1, 1 - Number(m.y) / size)),
-  }));
-  heatLive = heatLive.filter(l => l.type !== 'team').concat(team);
-  rebuildHeatNodes();
-  heatInstances.forEach(fn => fn());
 }
 
 const heatGridRef = (x,y) =>
@@ -3930,7 +3865,7 @@ function showDashSection(id, focusWidget){
   // Vending data is only worth fetching when the panel that shows it is open.
   if(id === 'market' && document.getElementById('vendResults')) refreshVending();
   // The heatmap lives in tools; fetch the server's real map the first time it is opened.
-  if(id === 'tools' && document.getElementById('heatCanvas2')){ loadServerMap(); loadActivity(); }
+  if(id === 'tools' && document.getElementById('heatCanvas2')) loadServerMap();
   if(id === 'tools' && document.getElementById('geneList')) renderGenes();
   if(focusWidget){
     const el = document.getElementById(focusWidget);
@@ -4078,7 +4013,6 @@ async function refreshLiveData(){
     loadTeamChat();
     rustPlus(Session.servers[0], 'getMapMarkers')
       .then(mk => runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members, info?.info?.mapSize))
-      .then(() => recordTeamPositions(team?.teamInfo?.members, info?.info?.mapSize))
       .catch(()=>{});
 
     if(banner){
@@ -4524,12 +4458,8 @@ const activityLabel = m => ACTIVITY_TYPES[m.type] || ACTIVITY_TYPES[Number(m.typ
 async function loadActivity(){
   const log = document.getElementById('activityLog');
   const server = Session.servers[0];
-  // The feed panel is optional — this same refresh feeds the map, so it must run whether or
-  // not anything is currently displaying the list.
-  if(!server){
-    if(log) log.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>';
-    return;
-  }
+  if(!log) return;
+  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>'; return; }
 
   try {
     const [markers, info] = await Promise.all([
@@ -4540,12 +4470,11 @@ async function loadActivity(){
     // Same refresh feeds the heatmap, so watching the map costs no extra requests.
     if(!heatKey) loadHeat(heatStoreKey(server, info));
     recordHeatEvents(markers?.mapMarkers?.markers, mapSize);
-    recordLivePositions(markers?.mapMarkers?.markers, mapSize);
     // Players are the bulk of the list and are already on the team panel; the interesting
     // events are everything else.
     const list = (markers?.mapMarkers?.markers || []).filter(activityLabel);
 
-    if(log) log.innerHTML = list.length
+    log.innerHTML = list.length
       ? list.slice(0, 18).map(m => {
           const where = toGrid(Number(m.x)||0, Number(m.y)||0, mapSize) || 'off grid';
           const what = activityLabel(m);
@@ -4554,7 +4483,7 @@ async function loadActivity(){
         }).join('')
       : '<div class="text-3" style="font-size:11.5px;">Nothing on the map right now.</div>';
   } catch(err){
-    if(log) log.innerHTML = '<div class="text-3" style="font-size:11.5px;">' + escapeHtml(err.message) + '</div>';
+    log.innerHTML = '<div class="text-3" style="font-size:11.5px;">' + escapeHtml(err.message) + '</div>';
   }
 }
 
@@ -4709,108 +4638,67 @@ function diffShops(){
 }
 
 /**
- * Gene breeding calculator.
- *
- * Rust crosses every plant sharing a planter, one slot at a time. Each plant enters its gene
- * for that slot into a weighted draw: W and X count 1.0 while G, Y and H count only 0.6. That
- * is why bad genes take over — one W outweighs one G — and it is the whole reason breeding
- * needs planning rather than hope.
+ * Genetics lab. Rust clones carry six genes; G and Y are what you want, H is filler, and W
+ * and X actively work against the plant. The useful question is only ever "keep this one or
+ * compost it", so that is what this answers rather than drawing a planter.
  */
-const GENE_WEIGHTS = { G:0.6, Y:0.6, H:0.6, W:1.0, X:1.0 };
-const GENE_SLOTS = 6;
-const GENE_MAX_PLANTS = 6;        // a large planter box holds six
-const genePlants = [];
+const GENE_GOOD = new Set(['G', 'Y']);
+const GENE_OK = new Set(['H']);
+const geneList = [];
 
-/** Odds for one slot, strongest first. */
-function geneSlotOdds(plants, slot){
-  const tally = {};
-  let total = 0;
-  for(const plant of plants){
-    const g = plant[slot];
-    const w = GENE_WEIGHTS[g] || 0;
-    tally[g] = (tally[g] || 0) + w;
-    total += w;
+function geneScore(genes){
+  let good = 0, bad = 0;
+  for(const g of genes){
+    if(GENE_GOOD.has(g)) good++;
+    else if(!GENE_OK.has(g)) bad++;
   }
-  if(!total) return [];
-  return Object.entries(tally)
-    .map(([gene, w]) => ({ gene, p: w / total }))
-    .sort((a, b) => b.p - a.p || a.gene.localeCompare(b.gene));
-}
-
-function geneForecast(plants){
-  const out = [];
-  for(let i = 0; i < GENE_SLOTS; i++) out.push(geneSlotOdds(plants, i));
-  return out;
-}
-
-function geneError(msg){
-  const err = document.getElementById('geneErr');
-  if(err){ err.textContent = msg; err.hidden = !msg; }
+  return { good, bad };
 }
 
 function addGene(){
   const input = document.getElementById('geneInput');
+  const err = document.getElementById('geneErr');
   const raw = (input?.value || '').trim().toUpperCase();
-  if(raw.length !== GENE_SLOTS) return geneError('Six genes are needed, one per slot.');
-  if(!/^[GYHWX]{6}$/.test(raw)) return geneError('Only G, Y, H, W and X are genes.');
-  if(genePlants.length >= GENE_MAX_PLANTS)
-    return geneError('A planter holds ' + GENE_MAX_PLANTS + ' plants. Remove one first.');
-  geneError('');
-  genePlants.push(raw);
-  if(input){ input.value = ''; input.focus(); }
+  const show = msg => { if(err){ err.textContent = msg; err.hidden = !msg; } };
+
+  if(raw.length !== 6) return show('Six genes are needed, one per slot.');
+  if(!/^[GYHWX]{6}$/.test(raw)) return show('Only G, Y, H, W and X are genes.');
+  show('');
+  if(geneList.length >= 12) geneList.shift();
+  geneList.push(raw);
+  if(input) input.value = '';
   renderGenes();
 }
 
-function removeGene(i){ genePlants.splice(i, 1); geneError(''); renderGenes(); }
-function clearGenes(){ genePlants.length = 0; geneError(''); renderGenes(); }
-
-const geneBlock = g =>
-  '<span class="gene sm" style="background:' + GENE_COLORS[g] + ';color:' + GENE_INK[g]
-  + '" title="' + GENE_LABELS[g] + '">' + g + '</span>';
+function removeGene(i){ geneList.splice(i, 1); renderGenes(); }
+function clearGenes(){ geneList.length = 0; renderGenes(); }
 
 function renderGenes(){
   const box = document.getElementById('geneList');
-  const out = document.getElementById('geneOut');
   if(!box) return;
-
-  box.innerHTML = genePlants.length
-    ? genePlants.map((genes, i) =>
-        '<div class="gene-row">'
-        + '<span class="gene-blocks">' + [...genes].map(geneBlock).join('') + '</span>'
-        + '<button type="button" class="gene-x" onclick="removeGene(' + i + ')" aria-label="Remove plant">&times;</button>'
-        + '</div>').join('')
-    : '<div class="text-3" style="font-size:11.5px;">Add the clones you plan to put in the planter.</div>';
-
-  if(out) out.hidden = genePlants.length < 2;
-  if(genePlants.length < 2){
-    if(genePlants.length === 1) geneError('Add a second plant to see what they cross into.');
+  if(!geneList.length){
+    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">No clones added yet.</div>';
     return;
   }
+  // Best first, so the one to plant is at the top.
+  const rows = geneList
+    .map((genes, i) => ({ genes, i, ...geneScore(genes) }))
+    .sort((a, b) => (b.good - b.bad) - (a.good - a.bad));
+  const best = rows[0];
 
-  const slots = geneForecast(genePlants);
-  const best = slots.map(slot => slot[0]);
-
-  document.getElementById('geneResult').innerHTML =
-    best.map(b => geneBlock(b.gene)).join('')
-    + '<span class="gene-chance">' + Math.round(best.reduce((a, b) => a * b.p, 1) * 100)
-    + '% chance of exactly this</span>';
-
-  document.getElementById('geneOdds').innerHTML = slots.map((slot, i) =>
-    '<div class="gene-slot"><span class="gene-slot-n">' + (i + 1) + '</span>'
-    + slot.map(o => '<span class="gene-odd">' + geneBlock(o.gene)
-        + '<b>' + Math.round(o.p * 100) + '%</b></span>').join('')
-    + '</div>').join('');
-
-  // Say what to do next, rather than leaving the odds to be interpreted.
-  const weak = slots.map((slot, i) => ({ i, top: slot[0] }))
-                    .filter(x => x.top.gene === 'W' || x.top.gene === 'X');
-  document.getElementById('geneAdvice').textContent = weak.length
-    ? 'Slot' + (weak.length > 1 ? 's ' : ' ') + weak.map(w => w.i + 1).join(', ')
-      + ' will most likely come out ' + [...new Set(weak.map(w => w.top.gene))].join(' or ')
-      + '. Add a plant with G or Y in that slot, or drop one carrying the bad gene: W and X '
-      + 'pull nearly twice as hard as G, Y and H, so they win ties easily.'
-    : 'Every slot favours a good gene. Harvest these together, then clone the best seed and '
-      + 'run it again to lock the result in.';
+  box.innerHTML = rows.map(r => {
+    const keep = r === best || (r.good >= 4 && r.bad <= 1);
+    const blocks = [...r.genes].map(g =>
+      '<span class="gene sm" style="background:' + GENE_COLORS[g] + ';color:' + GENE_INK[g] + '"'
+      + ' title="' + GENE_LABELS[g] + '">' + g + '</span>').join('');
+    return '<div class="gene-row">'
+      + '<span class="gene-blocks">' + blocks + '</span>'
+      + '<span class="gene-verdict ' + (keep ? 'keep' : 'compost') + '">'
+      +   (keep ? (r === best ? 'Best' : 'Keep') : 'Compost') + '</span>'
+      + '<span class="mono gene-num">' + r.good + 'G/Y</span>'
+      + '<button type="button" class="gene-x" onclick="removeGene(' + r.i + ')" aria-label="Remove">&times;</button>'
+      + '</div>';
+  }).join('');
 }
 
 const RECYCLE = [
@@ -5175,6 +5063,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 05:45 UTC</div>
+<div class="build-stamp">build 2026-07-29 05:29 UTC</div>
 </body>
 </html>
