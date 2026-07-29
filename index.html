@@ -557,25 +557,22 @@ body:not(.is-demo) .demo-only{display:none !important;}
 ::-webkit-scrollbar-thumb:active{background:var(--orange); background-clip:content-box;}
 ::-webkit-scrollbar-corner{background:transparent;}
 
-/* Genetics lab */
-.gene-help{font-size:11px; color:var(--text-3); line-height:1.45; margin-bottom:9px;}
-.gene-err{font-size:11px; color:var(--warning); margin-bottom:8px;}
-.gene-row{display:grid; grid-template-columns:auto 1fr auto 20px; align-items:center; gap:9px;
-  padding:4px 6px; border-radius:var(--r-sm);}
-.gene-row:hover{background:var(--surface-2);}
-.gene-blocks{display:flex; gap:3px;}
-.gene.sm{width:17px; height:17px; font-size:10px; font-weight:700; border-radius:3px;
-  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);}
-.gene-verdict{font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;}
-.gene-verdict.keep{color:var(--success);}
-.gene-verdict.compost{color:var(--text-3);}
-.gene-num{font-size:10.5px; color:var(--text-3);}
-.gene-x{border:0; background:transparent; color:var(--text-3); cursor:pointer; font-size:14px;
-  line-height:1; padding:0;}
-.gene-x:hover{color:var(--orange);}
-.gene-key{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; padding-top:9px;
-  border-top:1px solid var(--border); font-size:10.5px; color:var(--text-3);}
-.gene-key b{font-family:var(--font-mono);}
+/* Genetics lab, dashboard copy of the planter */
+#d-genetics .planter-soil{padding:10px 9px; gap:7px;}
+#d-genetics .plant-slot{padding:10px 7px 9px; gap:7px;}
+#d-genetics .plant-sprite{width:34px; height:34px;}
+#d-genetics .plant-slot.is-center .plant-sprite{width:38px; height:38px;}
+#d-genetics .planter-caption{margin-top:9px; font-size:10.5px; line-height:1.45;}
+.gene-target{display:flex; align-items:center; gap:10px; margin:11px 0 9px;
+  padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap;}
+.gene-target .slot-tag{flex-shrink:0;}
+.gene-target .gene-blocks{display:flex; gap:3px; margin-right:auto;}
+.gene-target .gene{width:17px; height:17px; font-size:10px; border-radius:3px;
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+  font-weight:700;}
+@media (max-width:600px){
+  #d-genetics .planter-soil{grid-template-columns:1fr;}
+}
 
 /* Vending search and shop alerts */
 .vend-bar{display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; margin-bottom:12px;
@@ -2222,21 +2219,39 @@ body.billing #billing-view{display:block;}
         </div>
 
         <div class="widget card w-6" id="d-genetics">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="gene-help">Type a clone's six genes and add it. Keep the best, compost the rest.</div>
-          <div class="vend-bar">
-            <input id="geneInput" type="text" maxlength="6" placeholder="GGYYGG" autocomplete="off"
-                   spellcheck="false" oninput="this.value=this.value.toUpperCase()"
-                   onkeydown="if(event.key==='Enter')addGene()">
-            <button class="btn btn-primary btn-sm" onclick="addGene()">Add</button>
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="pill pill-orange" id="dashGeneMatchPill"><span class="dot"></span>0% to target</span></div>
+          <div class="planter">
+            <div class="planter-soil" role="group" aria-label="Planter box seen from above: Donor A, Center plant, Donor B">
+              <div class="plant-slot" data-flow="right">
+                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
+                <div class="slot-body">
+                  <span class="slot-tag">Donor A</span>
+                  <div class="gene-blocks" id="dashDonorAGeneRow"></div>
+                </div>
+              </div>
+              <div class="plant-slot is-center">
+                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
+                <div class="slot-body">
+                  <span class="slot-tag">Center &middot; your clone</span>
+                  <div class="gene-blocks" id="dashCenterGeneRow"></div>
+                </div>
+              </div>
+              <div class="plant-slot" data-flow="left">
+                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
+                <div class="slot-body">
+                  <span class="slot-tag">Donor B</span>
+                  <div class="gene-blocks" id="dashDonorBGeneRow"></div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="geneErr" class="gene-err" hidden></div>
-          <div id="geneList" class="vend-list"></div>
-          <div class="gene-key">
-            <span><b style="color:#4ADE80">G</b> Growth</span><span><b style="color:#FBBF24">Y</b> Yield</span>
-            <span><b style="color:#a78bfa">H</b> Hardiness</span><span><b style="color:#e5e7eb">W</b> Water</span>
-            <span><b style="color:#9ca3af">X</b> Empty</span>
+          <p class="planter-caption"><svg class="icon"><use href="#i-flask"/></svg>Tap any gene to change it. Plant your two best clones either side of the one you want to improve.</p>
+          <div class="gene-target">
+            <span class="slot-tag">Target</span>
+            <div class="gene-blocks" id="dashTargetGeneRow"></div>
+            <button class="btn btn-primary btn-sm" onclick="simulateCrossbreed()">Crossbreed</button>
           </div>
+          <div class="progress"><span id="dashGeneBar" style="width:0%"></span></div>
         </div>
 
         <div class="widget card w-6" id="d-chat">
@@ -3277,6 +3292,29 @@ let centerGenes = ['G','Y','H','W','X','G'];
 let donorAGenes = ['G','G','G','Y','Y','Y'];
 let donorBGenes = ['G','G','Y','Y','Y','G'];
 
+/** Both the landing page and the dashboard show the same planter, so each row id maps to
+ *  whichever genome it edits and the two stay in step. */
+const GENE_TWIN = {
+  centerGeneRow:'dashCenterGeneRow', dashCenterGeneRow:'centerGeneRow',
+  neighborAGeneRow:'dashDonorAGeneRow', dashDonorAGeneRow:'neighborAGeneRow',
+  neighborBGeneRow:'dashDonorBGeneRow', dashDonorBGeneRow:'neighborBGeneRow' };
+const GENE_ROW_SOURCE = {
+  centerGeneRow:'c', neighborAGeneRow:'a', neighborBGeneRow:'b',
+  dashCenterGeneRow:'c', dashDonorAGeneRow:'a', dashDonorBGeneRow:'b' };
+
+/** Redraws every planter on the page from the current genomes. */
+function renderAllGeneRows(){
+  renderGeneRow('centerGeneRow', centerGenes, true);
+  renderGeneRow('neighborAGeneRow', donorAGenes, true);
+  renderGeneRow('neighborBGeneRow', donorBGenes, true);
+  renderGeneRow('dashCenterGeneRow', centerGenes, true);
+  renderGeneRow('dashDonorAGeneRow', donorAGenes, true);
+  renderGeneRow('dashDonorBGeneRow', donorBGenes, true);
+  renderGeneRow('targetGeneRow', GENE_TARGET, false);
+  renderGeneRow('dashTargetGeneRow', GENE_TARGET, false);
+  recomputeGeneMatch();
+}
+
 function renderGeneRow(elId, genes, clickable){
   const el = document.getElementById(elId);
   if(!el) return;
@@ -3291,13 +3329,16 @@ function renderGeneRow(elId, genes, clickable){
     // attached to the same node, so keyboard users don't lose their slot.
     const cycle = span=>{
       const i = +span.dataset.i;
-      const arr = elId==='centerGeneRow' ? centerGenes : elId==='neighborAGeneRow' ? donorAGenes : donorBGenes;
+      const arr = GENE_ROW_SOURCE[elId] === 'a' ? donorAGenes
+                : GENE_ROW_SOURCE[elId] === 'b' ? donorBGenes : centerGenes;
       const g = arr[i] = GENE_TYPES[(GENE_TYPES.indexOf(arr[i]) + 1) % GENE_TYPES.length];
       span.style.background = GENE_COLORS[g];
       span.style.color = GENE_INK[g];
       span.textContent = g;
       span.title = `Slot ${i+1} — ${GENE_LABELS[g]}`;
       span.setAttribute('aria-label', `Slot ${i+1}, ${GENE_LABELS[g]}. Activate to cycle.`);
+      // The same genome may be on screen twice; repaint the other copy so they never disagree.
+      GENE_TWIN[elId] && renderGeneRow(GENE_TWIN[elId], arr, true);
       recomputeGeneMatch();
     };
     el.querySelectorAll('.gene').forEach(span=>{
@@ -3313,9 +3354,13 @@ function recomputeGeneMatch(){
   let matches = 0;
   centerGenes.forEach((g,i)=>{ if(g === GENE_TARGET[i]) matches++; });
   const pct = Math.round((matches / centerGenes.length) * 100);
-  const bar = document.getElementById('geneBar'); if(bar) bar.style.width = pct + '%';
-  const pill = document.getElementById('geneMatchPill');
-  if(pill) pill.innerHTML = '<span class="dot"></span>' + pct + '% to target';
+  for(const id of ['geneBar', 'dashGeneBar']){
+    const bar = document.getElementById(id); if(bar) bar.style.width = pct + '%';
+  }
+  for(const id of ['geneMatchPill', 'dashGeneMatchPill']){
+    const pill = document.getElementById(id);
+    if(pill) pill.innerHTML = '<span class="dot"></span>' + pct + '% to target';
+  }
 }
 
 function simulateCrossbreed(){
@@ -3333,16 +3378,11 @@ function simulateCrossbreed(){
     const centerWeight = GENE_WEIGHT(centerGene);
     return (bestType && bestType !== centerGene && bestWeight > centerWeight) ? bestType : centerGene;
   });
-  renderGeneRow('centerGeneRow', centerGenes, true);
-  recomputeGeneMatch();
+  renderAllGeneRows();
   fireCustomToast('Crossbreed simulated', 'Center genome is now ' + centerGenes.join('') + '.', 'i-flask');
 }
 
-renderGeneRow('centerGeneRow', centerGenes, true);
-renderGeneRow('neighborAGeneRow', donorAGenes, true);
-renderGeneRow('neighborBGeneRow', donorBGenes, true);
-renderGeneRow('targetGeneRow', GENE_TARGET, false);
-recomputeGeneMatch();
+renderAllGeneRows();
 
 // ---- recycler drag & drop ----
 const RC_YIELDS = {
@@ -5063,6 +5103,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 05:29 UTC</div>
+<div class="build-stamp">build 2026-07-29 05:55 UTC</div>
 </body>
 </html>
