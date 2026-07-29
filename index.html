@@ -557,6 +557,26 @@ body:not(.is-demo) .demo-only{display:none !important;}
 ::-webkit-scrollbar-thumb:active{background:var(--orange); background-clip:content-box;}
 ::-webkit-scrollbar-corner{background:transparent;}
 
+/* Genetics lab */
+.gene-help{font-size:11px; color:var(--text-3); line-height:1.45; margin-bottom:9px;}
+.gene-err{font-size:11px; color:var(--warning); margin-bottom:8px;}
+.gene-row{display:grid; grid-template-columns:auto 1fr auto 20px; align-items:center; gap:9px;
+  padding:4px 6px; border-radius:var(--r-sm);}
+.gene-row:hover{background:var(--surface-2);}
+.gene-blocks{display:flex; gap:3px;}
+.gene.sm{width:17px; height:17px; font-size:10px; font-weight:700; border-radius:3px;
+  display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);}
+.gene-verdict{font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;}
+.gene-verdict.keep{color:var(--success);}
+.gene-verdict.compost{color:var(--text-3);}
+.gene-num{font-size:10.5px; color:var(--text-3);}
+.gene-x{border:0; background:transparent; color:var(--text-3); cursor:pointer; font-size:14px;
+  line-height:1; padding:0;}
+.gene-x:hover{color:var(--orange);}
+.gene-key{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; padding-top:9px;
+  border-top:1px solid var(--border); font-size:10.5px; color:var(--text-3);}
+.gene-key b{font-family:var(--font-mono);}
+
 /* Vending search and shop alerts */
 .vend-bar{display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; margin-bottom:12px;
   border-radius:var(--r-sm); background:var(--surface-2); border:1px solid var(--border);}
@@ -1914,10 +1934,12 @@ body.billing #billing-view{display:block;}
       <div class="card-head">
         <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
-          <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
-          <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
-          <button type="button" class="pill pill-offline heat-key" data-layer="stone" aria-pressed="true"><span class="dot"></span>Stone</button>
-          <button type="button" class="pill pill-online heat-key" data-layer="spawn" aria-pressed="true"><span class="dot"></span>Spawns</button>
+              <button type="button" class="pill heat-key" data-layer="raid" aria-pressed="true"><span class="dot" style="background:rgb(229,90,60)"></span>Raids</button>
+              <button type="button" class="pill heat-key" data-layer="crate" aria-pressed="true"><span class="dot" style="background:rgb(245,158,11)"></span>Crates</button>
+              <button type="button" class="pill heat-key" data-layer="cargo" aria-pressed="true"><span class="dot" style="background:rgb(96,165,250)"></span>Cargo</button>
+              <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
+              <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
+              <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
         </div>
       </div>
       <div class="heat-wrap" data-heat>
@@ -2179,10 +2201,12 @@ body.billing #billing-view{display:block;}
           <div class="card-head">
             <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
-              <button type="button" class="pill pill-warn heat-key" data-layer="sulfur" aria-pressed="true"><span class="dot"></span>Sulfur</button>
-              <button type="button" class="pill pill-slate heat-key" data-layer="metal" aria-pressed="true"><span class="dot"></span>Metal</button>
-              <button type="button" class="pill pill-offline heat-key" data-layer="stone" aria-pressed="true"><span class="dot"></span>Stone</button>
-              <button type="button" class="pill pill-online heat-key" data-layer="spawn" aria-pressed="true"><span class="dot"></span>Spawns</button>
+              <button type="button" class="pill heat-key" data-layer="raid" aria-pressed="true"><span class="dot" style="background:rgb(229,90,60)"></span>Raids</button>
+              <button type="button" class="pill heat-key" data-layer="crate" aria-pressed="true"><span class="dot" style="background:rgb(245,158,11)"></span>Crates</button>
+              <button type="button" class="pill heat-key" data-layer="cargo" aria-pressed="true"><span class="dot" style="background:rgb(96,165,250)"></span>Cargo</button>
+              <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
+              <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
+              <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
             </div>
           </div>
           <div class="heat-wrap" data-heat>
@@ -2199,21 +2223,20 @@ body.billing #billing-view{display:block;}
 
         <div class="widget card w-6" id="d-genetics">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="planter planter-mini" style="margin-bottom:10px;">
-            <div class="planter-soil">
-              <div class="plant-slot is-center">
-                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
-                <div class="slot-body">
-                  <span class="slot-tag">Center · Hemp</span>
-                  <div class="gene-blocks">
-                    <span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#4ADE80;color:#06281a;cursor:default" title="Growth">G</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#FBBF24;color:#2f2000;cursor:default" title="Yield">Y</span><span class="gene" style="background:#e5e7eb;color:#1f2937;cursor:default" title="Water (avoid)">W</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="gene-help">Type a clone's six genes and add it. Keep the best, compost the rest.</div>
+          <div class="vend-bar">
+            <input id="geneInput" type="text" maxlength="6" placeholder="GGYYGG" autocomplete="off"
+                   spellcheck="false" oninput="this.value=this.value.toUpperCase()"
+                   onkeydown="if(event.key==='Enter')addGene()">
+            <button class="btn btn-primary btn-sm" onclick="addGene()">Add</button>
           </div>
-          <div class="progress"><span style="width:67%"></span></div>
-          <div class="text-3 mono" style="font-size:10.5px;margin-top:6px;">67% to target GGGYYY</div>
+          <div id="geneErr" class="gene-err" hidden></div>
+          <div id="geneList" class="vend-list"></div>
+          <div class="gene-key">
+            <span><b style="color:#4ADE80">G</b> Growth</span><span><b style="color:#FBBF24">Y</b> Yield</span>
+            <span><b style="color:#a78bfa">H</b> Hardiness</span><span><b style="color:#e5e7eb">W</b> Water</span>
+            <span><b style="color:#9ca3af">X</b> Empty</span>
+          </div>
         </div>
 
         <div class="widget card w-6" id="d-chat">
@@ -3843,6 +3866,7 @@ function showDashSection(id, focusWidget){
   if(id === 'market' && document.getElementById('vendResults')) refreshVending();
   // The heatmap lives in tools; fetch the server's real map the first time it is opened.
   if(id === 'tools' && document.getElementById('heatCanvas2')) loadServerMap();
+  if(id === 'tools' && document.getElementById('geneList')) renderGenes();
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -4248,6 +4272,9 @@ const announced = new Set();
 /** Announcements raised but not yet confirmed sent. Kept separate from `announced` so a
  *  send that fails is retried rather than being marked done and lost. */
 const announceQueue = [];
+/** Online and alive state at the previous refresh, per teammate, so an announcement can be
+ *  raised on the transition instead of every time the same state is seen again. */
+const teamState = new Map();
 const ANNOUNCE_PER_REFRESH = 3;   // pace the chat, but carry the rest forward
 const ANNOUNCE_QUEUE_MAX = 30;
 
@@ -4280,14 +4307,27 @@ async function runAnnouncements(markers, members, mapSize){
     if(opts.crate && type === 'Crate')            once(key, '[Rustex] Locked Crate' + at(m));
   }
 
+  // Announce the change, not the state. Keying "is online" on spawnTime meant it fired again
+  // every time someone respawned, so dying and coming back read as "is online" rather than as
+  // a death. Comparing against the previous refresh gives the actual transition.
   for(const m of (members || [])){
-    if(opts.death && !m.isAlive){
+    const id = String(m.steamId);
+    const online = !!m.isOnline;
+    const alive = !!m.isAlive;
+    const prev = teamState.get(id);
+    teamState.set(id, { online, alive });
+    // First time we see someone there is nothing to compare against, and announcing here
+    // would fire for the whole team at once on connect.
+    if(!prev) continue;
+
+    const who = '[Rustex] ' + (m.name || 'A teammate');
+    if(opts.death && prev.alive && !alive){
       const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-      once('dead:' + m.steamId + ':' + (m.deathTime || 0),
-           '[Rustex] ' + (m.name || 'A teammate') + ' died' + (where ? ' at ' + where : ''));
+      once('dead:' + id + ':' + (m.deathTime || Date.now()),
+           who + ' died' + (where ? ' at ' + where : ''));
     }
-    if(opts.online && m.isOnline)
-      once('on:' + m.steamId + ':' + (m.spawnTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' is online');
+    if(opts.online && !prev.online && online)
+      once('on:' + id + ':' + (m.spawnTime || Date.now()), who + ' is online');
   }
 
   // Send a few per refresh so the chat is not flooded, but anything left over stays queued
@@ -4406,14 +4446,14 @@ function pokeChat(){
 document.addEventListener('visibilitychange', () => { if(!document.hidden) pokeChat(); });
 
 /** Map markers are the closest thing Rust+ offers to an event feed without a live socket. */
-// The protobuf is decoded with enums as strings, so these arrive as names, not numbers.
-// Numeric keys are kept as a fallback in case a server sends the raw value.
-const MARKER_TYPES = {
-  Player:'Player', Explosion:'Explosion', VendingMachine:'Vending machine', CH47:'CH47',
-  CargoShip:'Cargo ship', Crate:'Locked crate', GenericRadius:'Radius',
-  PatrolHelicopter:'Patrol helicopter',
-  1:'Player', 2:'Explosion', 3:'Vending machine', 4:'CH47', 5:'Cargo ship',
-  6:'Locked crate', 7:'Radius', 8:'Patrol helicopter' };
+// In-game events only. Vending machines and player pins are not events — they are standing
+// map furniture, and shops have their own panel. Radius markers carry no meaning on their own.
+const ACTIVITY_TYPES = {
+  Explosion:'Explosion', CargoShip:'Cargo ship', CH47:'CH47 helicopter',
+  Crate:'Locked crate', PatrolHelicopter:'Patrol helicopter',
+  2:'Explosion', 5:'Cargo ship', 4:'CH47 helicopter', 6:'Locked crate', 8:'Patrol helicopter' };
+
+const activityLabel = m => ACTIVITY_TYPES[m.type] || ACTIVITY_TYPES[Number(m.type)] || null;
 
 async function loadActivity(){
   const log = document.getElementById('activityLog');
@@ -4432,13 +4472,12 @@ async function loadActivity(){
     recordHeatEvents(markers?.mapMarkers?.markers, mapSize);
     // Players are the bulk of the list and are already on the team panel; the interesting
     // events are everything else.
-    const list = (markers?.mapMarkers?.markers || [])
-      .filter(m => String(m.type) !== 'Player' && Number(m.type) !== 1);
+    const list = (markers?.mapMarkers?.markers || []).filter(activityLabel);
 
     log.innerHTML = list.length
       ? list.slice(0, 18).map(m => {
           const where = toGrid(Number(m.x)||0, Number(m.y)||0, mapSize) || 'off grid';
-          const what = MARKER_TYPES[m.type] || MARKER_TYPES[Number(m.type)] || String(m.type);
+          const what = activityLabel(m);
           return '<div class="act-line"><span class="act-grid mono">' + escapeHtml(where) + '</span>'
             + '<span class="act-what">' + escapeHtml(what) + '</span></div>';
         }).join('')
@@ -4596,6 +4635,70 @@ function diffShops(){
   else
     box.innerHTML = '<div class="text-3" style="font-size:11.5px;">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. No changes since the last read.</div>';
+}
+
+/**
+ * Genetics lab. Rust clones carry six genes; G and Y are what you want, H is filler, and W
+ * and X actively work against the plant. The useful question is only ever "keep this one or
+ * compost it", so that is what this answers rather than drawing a planter.
+ */
+const GENE_GOOD = new Set(['G', 'Y']);
+const GENE_OK = new Set(['H']);
+const geneList = [];
+
+function geneScore(genes){
+  let good = 0, bad = 0;
+  for(const g of genes){
+    if(GENE_GOOD.has(g)) good++;
+    else if(!GENE_OK.has(g)) bad++;
+  }
+  return { good, bad };
+}
+
+function addGene(){
+  const input = document.getElementById('geneInput');
+  const err = document.getElementById('geneErr');
+  const raw = (input?.value || '').trim().toUpperCase();
+  const show = msg => { if(err){ err.textContent = msg; err.hidden = !msg; } };
+
+  if(raw.length !== 6) return show('Six genes are needed, one per slot.');
+  if(!/^[GYHWX]{6}$/.test(raw)) return show('Only G, Y, H, W and X are genes.');
+  show('');
+  if(geneList.length >= 12) geneList.shift();
+  geneList.push(raw);
+  if(input) input.value = '';
+  renderGenes();
+}
+
+function removeGene(i){ geneList.splice(i, 1); renderGenes(); }
+function clearGenes(){ geneList.length = 0; renderGenes(); }
+
+function renderGenes(){
+  const box = document.getElementById('geneList');
+  if(!box) return;
+  if(!geneList.length){
+    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">No clones added yet.</div>';
+    return;
+  }
+  // Best first, so the one to plant is at the top.
+  const rows = geneList
+    .map((genes, i) => ({ genes, i, ...geneScore(genes) }))
+    .sort((a, b) => (b.good - b.bad) - (a.good - a.bad));
+  const best = rows[0];
+
+  box.innerHTML = rows.map(r => {
+    const keep = r === best || (r.good >= 4 && r.bad <= 1);
+    const blocks = [...r.genes].map(g =>
+      '<span class="gene sm" style="background:' + GENE_COLORS[g] + ';color:' + GENE_INK[g] + '"'
+      + ' title="' + GENE_LABELS[g] + '">' + g + '</span>').join('');
+    return '<div class="gene-row">'
+      + '<span class="gene-blocks">' + blocks + '</span>'
+      + '<span class="gene-verdict ' + (keep ? 'keep' : 'compost') + '">'
+      +   (keep ? (r === best ? 'Best' : 'Keep') : 'Compost') + '</span>'
+      + '<span class="mono gene-num">' + r.good + 'G/Y</span>'
+      + '<button type="button" class="gene-x" onclick="removeGene(' + r.i + ')" aria-label="Remove">&times;</button>'
+      + '</div>';
+  }).join('');
 }
 
 const RECYCLE = [
@@ -4960,6 +5063,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 05:18 UTC</div>
+<div class="build-stamp">build 2026-07-29 05:29 UTC</div>
 </body>
 </html>
