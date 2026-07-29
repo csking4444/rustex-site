@@ -3789,6 +3789,21 @@ let chatSeq = 0;      // ids for optimistic lines
 const CHAT_FAST_MS = 2000;    // poll gap while messages are actually moving
 const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
+/**
+ * Swaps only the state class. Assigning className wholesale here used to drop w-12, which
+ * is what makes this strip span the full 12 column row — without it the strip collapsed to
+ * a single column and the server name was cut off after a few characters.
+ */
+function setLiveState(el, state, text){
+  el.classList.remove('loading', 'ok', 'err');
+  el.classList.add('live-state', 'w-12', state);
+  if(text !== undefined){
+    el.textContent = text;
+    // A long server name still ellipses on a phone, so keep the whole string reachable.
+    el.title = text;
+  }
+}
+
 async function refreshLiveData(){
   const server = Session.servers[0];
   const banner = document.getElementById('liveState');
@@ -3802,8 +3817,8 @@ async function refreshLiveData(){
 
   if(banner){
     banner.hidden = false;
-    banner.className = 'live-state loading';
-    banner.textContent = 'Loading live data from ' + (server.name || server.addr) + '…';
+    setLiveState(banner, 'loading',
+      'Loading live data from ' + (server.name || server.addr) + '…');
   }
 
   try {
@@ -3839,13 +3854,12 @@ async function refreshLiveData(){
 
     if(banner){
       const ok = !!(info || team);
-      banner.className = 'live-state ' + (ok ? 'ok' : 'err');
-      banner.textContent = ok
+      setLiveState(banner, ok ? 'ok' : 'err', ok
         ? 'Live from ' + (info?.info?.name || server.name) + ' · updated ' + new Date().toLocaleTimeString()
-        : 'Could not reach ' + (server.name || server.addr) + '. Showing the last values received.';
+        : 'Could not reach ' + (server.name || server.addr) + '. Showing the last values received.');
     }
   } catch (err) {
-    if(banner){ banner.className = 'live-state err'; banner.textContent = err.message; }
+    if(banner){ setLiveState(banner, 'err', err.message); }
   }
 }
 
@@ -4620,6 +4634,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:55 UTC</div>
+<div class="build-stamp">build 2026-07-29 04:02 UTC</div>
 </body>
 </html>
