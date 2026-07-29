@@ -553,6 +553,8 @@ body:not(.is-demo) .demo-banner{display:none;}
 .chat-who{color:var(--orange); font-weight:700; flex-shrink:0; max-width:110px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .chat-msg{color:var(--text-2); min-width:0; overflow-wrap:anywhere;}
+.chat-note{margin-top:7px; padding-top:6px; border-top:1px solid var(--border);
+  color:var(--text-3); font-size:11px; line-height:1.4;}
 
 /* Live events */
 .act-line{display:flex; align-items:center; gap:9px; padding:8px 0;
@@ -1982,7 +1984,7 @@ body.billing #billing-view{display:block;}
       <div class="dash-section active" id="dsec-overview">
         <div class="live-state w-12" id="liveState" hidden></div>
         <div class="stat-row w-12">
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span><span class="trend up"><svg class="icon" style="width:11px;height:11px"><use href="#i-trend-up"/></svg>+12</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="pop">187</span><span class="text-3" style="font-size:14px"><span data-live="maxPop"> of 200</span></span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="pop">187</span><span class="text-3" style="font-size:14px"><span data-live="maxPop"> of 200</span></span></div></div>
           <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="wipeAge">3</span><span class="text-3" style="font-size:14px"> days</span></div></div>
           <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Queue</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)"><span data-live="queue">0</span></div></div>
           <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="squadOnline">4</span><span class="text-3" style="font-size:14px"><span data-live="squadTotal"> of 5</span></span></div></div>
@@ -3746,10 +3748,17 @@ function saveServers(){
  * blanking the panel, so a momentary timeout does not make the dashboard look broken — and
  * nothing here invents a number when the server did not send one.
  */
+// Declared here, not beside the chat code below, because boot() calls refreshLiveData()
+// before that point in the script is reached — a `let` down there is still in its temporal
+// dead zone at that moment and every read of it throws.
+let chatCache = [];   // last good chat buffer, so a failed refresh does not blank the panel
+let chatTimer = null;
+
 async function refreshLiveData(){
   const server = Session.servers[0];
   const banner = document.getElementById('liveState');
-  if(!server){ if(banner) banner.hidden = true; return; }
+  if(!server){ if(banner) banner.hidden = true; stopChatPolling(); return; }
+  startChatPolling();
 
   const setText = (sel, value) => {
     const el = document.querySelector(sel);
@@ -3873,20 +3882,62 @@ function escapeHtml(value){
 }
 
 /** One Rust+ read. The server does the socket work; this just asks. */
-async function rustPlus(server, action){
+/**
+ * Every Rust+ call opens its own socket to the game server, and Rust+ rate limits per player
+ * token. Firing several at once — the overview refresh, the activity feed and the chat all
+ * poll — trips that limit or gets the extra sockets dropped, which is why reads used to
+ * succeed on one refresh and fail on the next. So calls are queued and spaced instead of
+ * racing, and a transient failure is retried once before it is reported.
+ */
+const RP_GAP_MS = 240;
+let rpChain = Promise.resolve();
+let rpLast = 0;
+
+/**
+ * Failures worth one more attempt: nothing was refused, the trip just did not complete.
+ * Matched against the wording the API actually returns, not the Rust+ error codes — the
+ * server maps those to sentences before the client ever sees them.
+ */
+function rpTransient(message){
+  return /too many requests|rate.?limit|did not answer|closed the connection|could not reach|failed to fetch|network|timed? ?out/i
+    .test(message || '');
+}
+
+function rpQueue(run){
+  const next = rpChain.then(async () => {
+    const wait = RP_GAP_MS - (Date.now() - rpLast);
+    if(wait > 0) await new Promise(r => setTimeout(r, wait));
+    try {
+      return await run();
+    } catch(err){
+      if(!rpTransient(err.message)) throw err;
+      await new Promise(r => setTimeout(r, 600));
+      return await run();
+    } finally { rpLast = Date.now(); }
+  });
+  // Keep the chain alive: one rejection must not stop every later call from running.
+  rpChain = next.catch(()=>{});
+  return next;
+}
+
+async function rpFetch(payload, fallback){
   const r = await fetch('/api/rustplus/request', {
     method:'POST',
     headers:{ 'Content-Type':'application/json' },
     credentials:'same-origin',
-    body: JSON.stringify({
-      host: server.ip, port: Number(server.port),
-      playerId: server.playerId, playerToken: Number(server.playerToken),
-      action
-    })
+    body: JSON.stringify(payload)
   });
   const body = await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(body.message || 'That request failed.');
+  if(!r.ok) throw new Error(body.message || fallback);
   return body.response;
+}
+
+function rustPlus(server, action){
+  return rpQueue(() => rpFetch({
+    host: server.ip, port: Number(server.port),
+    playerId: server.playerId, playerToken: Number(server.playerToken),
+    action
+  }, 'That request failed.'));
 }
 
 /**
@@ -3954,16 +4005,12 @@ async function sendTeamMessage(text){
   if(!server) throw new Error('No server connected.');
   return rustPlusSend(server, text);
 }
-async function rustPlusSend(server, text){
-  const r = await fetch('/api/rustplus/request', {
-    method:'POST', headers:{'Content-Type':'application/json'}, credentials:'same-origin',
-    body: JSON.stringify({
-      host: server.ip, port: Number(server.port), playerId: server.playerId,
-      playerToken: Number(server.playerToken), action:'sendTeamMessage', message: text })
-  });
-  const body = await r.json().catch(()=>({}));
-  if(!r.ok) throw new Error(body.message || 'Could not send that message.');
-  return body.response;
+/** Goes through the same queue as the reads, so a send cannot collide with a poll. */
+function rustPlusSend(server, text){
+  return rpQueue(() => rpFetch({
+    host: server.ip, port: Number(server.port), playerId: server.playerId,
+    playerToken: Number(server.playerToken), action:'sendTeamMessage', message: text
+  }, 'Could not send that message.'));
 }
 
 async function sendChatFromBox(btn){
@@ -4033,20 +4080,56 @@ async function loadTeamChat(btn){
   try {
     const res = await rustPlus(server, 'getTeamChat');
     const msgs = res?.teamChat?.messages || [];
-    log.innerHTML = msgs.length
-      ? msgs.slice(-30).map(m =>
-          '<div class="chat-line"><span class="chat-who">' + escapeHtml(m.name || 'Unknown') + '</span>'
-          + '<span class="chat-msg">' + escapeHtml(m.message || '') + '</span></div>').join('')
-      : '<div class="text-3" style="font-size:11.5px;">No messages in the recent buffer.</div>';
-    log.scrollTop = log.scrollHeight;
+    // Hold the last good buffer. A refresh that comes back empty because the request failed
+    // upstream must not look the same as a genuinely quiet chat.
+    if(msgs.length) chatCache = msgs;
+    renderChatLog(log, chatCache, '');
   } catch(err){
-    log.innerHTML = '<div class="text-3" style="font-size:11.5px;">' + escapeHtml(err.message) + '</div>';
+    // Keep whatever is on screen. Wiping the log on a transient failure is why chat looked
+    // like it worked sometimes and showed nothing others.
+    renderChatLog(log, chatCache, err.message);
   } finally { done(); }
 }
 
+function renderChatLog(log, msgs, note){
+  const body = msgs.length
+    ? msgs.slice(-30).map(m =>
+        '<div class="chat-line"><span class="chat-who">' + escapeHtml(m.name || 'Unknown') + '</span>'
+        + '<span class="chat-msg">' + escapeHtml(m.message || '') + '</span></div>').join('')
+    : '<div class="text-3" style="font-size:11.5px;">No messages in the recent buffer.</div>';
+  const warn = note
+    ? '<div class="chat-note">' + escapeHtml(note) + '</div>'
+    : '';
+  log.innerHTML = body + warn;
+  log.scrollTop = log.scrollHeight;
+}
+
+/**
+ * Chat is only worth reading if it keeps up on its own. Polls while the tab is visible and
+ * the panel is on screen, and stops when it is not, so a backgrounded tab is not burning
+ * requests against the same rate limit the queue exists to respect.
+ */
+function startChatPolling(){
+  stopChatPolling();
+  chatTimer = setInterval(() => {
+    if(document.hidden) return;
+    if(!Session.servers[0]) return;
+    const log = document.getElementById('chatLog');
+    if(!log || !log.offsetParent) return;      // panel not visible; nothing to update
+    loadTeamChat();
+  }, 15000);
+}
+function stopChatPolling(){ if(chatTimer){ clearInterval(chatTimer); chatTimer = null; } }
+
 /** Map markers are the closest thing Rust+ offers to an event feed without a live socket. */
-const MARKER_TYPES = { 1:'Player', 2:'Explosion', 3:'Vending machine', 4:'CH47', 5:'Cargo ship',
-                       6:'Crate', 7:'Radius', 8:'Patrol helicopter' };
+// The protobuf is decoded with enums as strings, so these arrive as names, not numbers.
+// Numeric keys are kept as a fallback in case a server sends the raw value.
+const MARKER_TYPES = {
+  Player:'Player', Explosion:'Explosion', VendingMachine:'Vending machine', CH47:'CH47',
+  CargoShip:'Cargo ship', Crate:'Locked crate', GenericRadius:'Radius',
+  PatrolHelicopter:'Patrol helicopter',
+  1:'Player', 2:'Explosion', 3:'Vending machine', 4:'CH47', 5:'Cargo ship',
+  6:'Locked crate', 7:'Radius', 8:'Patrol helicopter' };
 
 async function loadActivity(){
   const log = document.getElementById('activityLog');
@@ -4062,13 +4145,15 @@ async function loadActivity(){
     const mapSize = info?.info?.mapSize || 4000;
     // Players are the bulk of the list and are already on the team panel; the interesting
     // events are everything else.
-    const list = (markers?.mapMarkers?.markers || []).filter(m => Number(m.type) !== 1);
+    const list = (markers?.mapMarkers?.markers || [])
+      .filter(m => String(m.type) !== 'Player' && Number(m.type) !== 1);
 
     log.innerHTML = list.length
       ? list.slice(0, 18).map(m => {
           const where = toGrid(Number(m.x)||0, Number(m.y)||0, mapSize) || 'off grid';
+          const what = MARKER_TYPES[m.type] || MARKER_TYPES[Number(m.type)] || String(m.type);
           return '<div class="act-line"><span class="act-grid mono">' + escapeHtml(where) + '</span>'
-            + '<span class="act-what">' + escapeHtml(MARKER_TYPES[Number(m.type)] || ('Type ' + m.type)) + '</span></div>';
+            + '<span class="act-what">' + escapeHtml(what) + '</span></div>';
         }).join('')
       : '<div class="text-3" style="font-size:11.5px;">Nothing on the map right now.</div>';
   } catch(err){
@@ -4431,6 +4516,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:30 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:42 UTC</div>
 </body>
 </html>
