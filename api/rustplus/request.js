@@ -1,5 +1,6 @@
 import { readSession } from '../_lib.js';
-import { rustPlusRequest, RustPlusError, READ_ACTIONS, WRITE_ACTIONS, MAX_MESSAGE_LENGTH } from './_client.js';
+import { rustPlusRequest, RustPlusError, READ_ACTIONS, WRITE_ACTIONS, ENTITY_ACTIONS,
+         MAX_MESSAGE_LENGTH } from './_client.js';
 
 /**
  * Live Rust+ data, fetched on demand.
@@ -23,14 +24,24 @@ export default async function handler(req, res) {
   try { session = readSession(req); } catch { /* treated as signed out */ }
   if (!session) return res.status(401).json({ error: 'not_signed_in', message: 'Sign in to load live data.' });
 
-  const { host, port, playerId, playerToken, action, message } = req.body ?? {};
+  const { host, port, playerId, playerToken, action, message, entityId, value } = req.body ?? {};
 
   if (!host || typeof host !== 'string')
     return res.status(400).json({ error: 'bad_request', message: 'A server address is required.' });
   if (!READ_ACTIONS.has(action) && !WRITE_ACTIONS.has(action))
     return res.status(400).json({ error: 'bad_request', message: `Unknown action '${action}'.` });
   // Writes post into the player's team chat, so the text is checked before we open a socket.
-  if (WRITE_ACTIONS.has(action)) {
+  // Entity calls name one paired device. Validate the id here too, so a bad one is refused
+  // before a socket is opened rather than after.
+  if (ENTITY_ACTIONS.has(action)) {
+    const id = Number(entityId);
+    if (!Number.isInteger(id) || id <= 0)
+      return res.status(400).json({ error: 'bad_request', message: 'A device id is required.' });
+  }
+  if (action === 'setEntityValue' && typeof value !== 'boolean')
+    return res.status(400).json({ error: 'bad_request', message: 'A device value must be true or false.' });
+
+  if (action === 'sendTeamMessage') {
     const text = String(message ?? '').trim();
     if (!text)
       return res.status(400).json({ error: 'bad_request', message: 'A message is required.' });
@@ -52,6 +63,8 @@ export default async function handler(req, res) {
       playerToken: Number(playerToken),
       action,
       message,
+      entityId,
+      value,
     });
     return res.status(200).json({ ok: true, action, response });
   } catch (err) {

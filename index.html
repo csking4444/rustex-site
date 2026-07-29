@@ -579,6 +579,25 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dl-note{font-size:11.5px; color:var(--text-3); max-width:340px; line-height:1.45;}
 @media (max-width:700px){ .dl-row{margin:-30px 0 34px;} .nav-dl{display:none;} }
 
+/* Smart devices */
+.dev-help{font-size:11px; color:var(--text-3); line-height:1.45; margin-bottom:9px;}
+.dev-list{display:flex; flex-direction:column; gap:3px; max-height:230px; overflow-y:auto;}
+.dev-row{display:grid; grid-template-columns:1fr auto auto 20px; align-items:center; gap:10px;
+  padding:5px 6px; border-radius:var(--r-sm);}
+.dev-row:hover{background:var(--surface-2);}
+.dev-name{font-size:12px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; display:flex; align-items:baseline; gap:7px;}
+.dev-meta{font-size:10px; color:var(--text-3); flex-shrink:0;}
+.dev-state{font-size:10px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;
+  max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.dev-state.on{color:var(--success);}
+.dev-state.off{color:var(--text-3);}
+.dev-state.unknown{color:var(--text-3);}
+.dev-state.err{color:var(--warning); text-transform:none; letter-spacing:0;}
+#d-devices .vend-bar{gap:6px;}
+#d-devices .vend-bar input{min-width:0;}
+#devId{max-width:92px;}
+
 /* Desktop app: the window is the dashboard, so the site's marketing chrome is hidden. */
 body.is-app #siteNav, body.is-app .site-footer, body.is-app .hero{display:none !important;}
 body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
@@ -2063,17 +2082,16 @@ body.billing #billing-view{display:block;}
         </div>
 
         <div class="widget card w-6" id="d-devices">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;flex-direction:column;gap:9px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><button class="btn btn-ghost btn-sm" onclick="refreshDevices(this)">Refresh</button></div>
+          <p class="dev-help">Pair a Smart Switch in the Rust+ app, then add its ID here. The ID is shown on the device in game.</p>
+          <div class="vend-bar">
+            <input id="devId" type="text" inputmode="numeric" placeholder="Device ID" autocomplete="off">
+            <input id="devName" type="text" placeholder="Name (optional)" autocomplete="off"
+                   onkeydown="if(event.key==='Enter')addDevice()">
+            <button class="btn btn-primary btn-sm" onclick="addDevice()">Add</button>
           </div>
-          <div class="progress" style="margin-top:12px"><span style="width:64%"></span></div>
-          <div style="display:flex;gap:12px;margin-top:8px;">
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-wood" title="Wood"></span>8.2k</span>
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-stones" title="Stones"></span>12.4k</span>
-            <span class="mono text-3" style="font-size:10px;display:flex;align-items:center;gap:4px;"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
-          </div>
+          <div id="devErr" class="gene-err" hidden></div>
+          <div id="devList" class="dev-list"></div>
         </div>
 
         <div class="widget card w-12" id="d-heatmap">
@@ -3804,6 +3822,7 @@ function showDashSection(id, focusWidget){
   // The heatmap lives in tools; fetch the server's real map the first time it is opened.
   if(id === 'tools' && document.getElementById('heatCanvas2')) loadServerMap();
   if(id === 'tools' && document.getElementById('geneList')) renderGenes();
+  if(id === 'tools' && document.getElementById('devList')){ loadDevices(); renderDevices(); refreshDevices(); }
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -4105,6 +4124,17 @@ async function rpFetch(payload, fallback){
   const body = await r.json().catch(()=>({}));
   if(!r.ok) throw new Error(body.message || fallback);
   return body.response;
+}
+
+/** Entity calls carry a device id, and setEntityValue carries the new state. */
+function rustPlusEntity(server, action, entityId, value){
+  const payload = {
+    host: server.ip, port: Number(server.port),
+    playerId: server.playerId, playerToken: Number(server.playerToken),
+    action, entityId: Number(entityId),
+  };
+  if(action === 'setEntityValue') payload.value = !!value;
+  return rpQueue(() => rpFetch(payload, 'That device did not answer.'));
 }
 
 function rustPlus(server, action){
@@ -4648,6 +4678,140 @@ function renderGenes(){
   }).join('');
 }
 
+/**
+ * Smart devices.
+ *
+ * Rust+ addresses each paired entity by an id shown on the device in game. There is no call
+ * that lists them: new pairings arrive as FCM pushes, which needs a listener held open, so
+ * they are added by id here and remembered per server.
+ */
+const DEVICE_TYPES = { 1:'Switch', 2:'Alarm', 3:'Storage monitor',
+                       Switch:'Switch', Alarm:'Alarm', StorageMonitor:'Storage monitor' };
+let devices = [];
+let devTimer = null;
+
+function devKey(){
+  const server = Session.servers[0];
+  return server ? 'rustex.devices.' + server.id : null;
+}
+
+function loadDevices(){
+  const key = devKey();
+  if(!key){ devices = []; return; }
+  try { devices = JSON.parse(localStorage.getItem(key) || '[]') || []; }
+  catch(err){ if(!(err instanceof SyntaxError)) throw err; devices = []; }
+}
+
+function saveDevices(){
+  const key = devKey();
+  if(!key) return;
+  try { localStorage.setItem(key, JSON.stringify(devices)); } catch {}
+}
+
+function devError(msg){
+  const el = document.getElementById('devErr');
+  if(el){ el.textContent = msg; el.hidden = !msg; }
+}
+
+function addDevice(){
+  const idEl = document.getElementById('devId');
+  const nameEl = document.getElementById('devName');
+  const raw = (idEl?.value || '').trim();
+  const id = Number(raw);
+  if(!Session.servers[0]) return devError('Connect a server first.');
+  if(!/^\d+$/.test(raw) || !Number.isInteger(id) || id <= 0)
+    return devError('A device ID is a whole number, shown on the device in game.');
+  if(devices.some(d => d.id === id)) return devError('That device is already on the list.');
+  devError('');
+  devices.push({ id, name: (nameEl?.value || '').trim() || ('Device ' + id), on: null, type: null });
+  saveDevices();
+  if(idEl) idEl.value = '';
+  if(nameEl) nameEl.value = '';
+  renderDevices();
+  refreshDevice(id);
+}
+
+function removeDevice(id){
+  devices = devices.filter(d => d.id !== id);
+  saveDevices();
+  renderDevices();
+}
+
+function renderDevices(){
+  const box = document.getElementById('devList');
+  if(!box) return;
+  if(!Session.servers[0]){
+    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to control your devices.</div>';
+    return;
+  }
+  if(!devices.length){
+    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">No devices added yet.</div>';
+    return;
+  }
+  box.innerHTML = devices.map(d => {
+    const known = d.on === true || d.on === false;
+    const state = d.err ? 'err' : known ? (d.on ? 'on' : 'off') : 'unknown';
+    const label = d.err ? d.err : known ? (d.on ? 'On' : 'Off') : 'Not read yet';
+    return '<div class="dev-row">'
+      + '<span class="dev-name">' + escapeHtml(d.name)
+      +   '<span class="dev-meta mono">#' + d.id + (d.type ? ' · ' + escapeHtml(d.type) : '') + '</span></span>'
+      + '<span class="dev-state ' + state + '" title="' + escapeHtml(label) + '">' + escapeHtml(label) + '</span>'
+      + '<label class="switch" title="Toggle">'
+      +   '<input type="checkbox"' + (d.on ? ' checked' : '') + (known ? '' : ' disabled')
+      +     ' onchange="toggleDevice(' + d.id + ', this.checked)"><span class="track"></span></label>'
+      + '<button type="button" class="gene-x" onclick="removeDevice(' + d.id + ')" aria-label="Remove device">&times;</button>'
+      + '</div>';
+  }).join('');
+}
+
+/** Reads one device's current state. */
+async function refreshDevice(id){
+  const server = Session.servers[0];
+  const dev = devices.find(d => d.id === id);
+  if(!server || !dev) return;
+  try {
+    const res = await rustPlusEntity(server, 'getEntityInfo', id);
+    const info = res?.entityInfo;
+    dev.on = !!info?.payload?.value;
+    dev.type = DEVICE_TYPES[info?.type] || DEVICE_TYPES[Number(info?.type)] || null;
+    dev.err = null;
+  } catch(err){
+    dev.err = err.message;
+  }
+  saveDevices();
+  renderDevices();
+}
+
+async function refreshDevices(btn){
+  if(!Session.servers[0]){ renderDevices(); return; }
+  const done = btn ? busyButton(btn, 'Reading…') : () => {};
+  try { for(const d of [...devices]) await refreshDevice(d.id); }
+  finally { done(); }
+}
+
+/**
+ * Flips a switch. The checkbox is put back if the server refuses, so the control never shows
+ * a state the base is not actually in.
+ */
+async function toggleDevice(id, on){
+  const server = Session.servers[0];
+  const dev = devices.find(d => d.id === id);
+  if(!server || !dev) return;
+  const previous = dev.on;
+  dev.on = on;
+  renderDevices();
+  try {
+    await rustPlusEntity(server, 'setEntityValue', id, on);
+    dev.err = null;
+    saveDevices();
+  } catch(err){
+    dev.on = previous;
+    dev.err = err.message;
+    renderDevices();
+    fireCustomToast('Could not switch that', err.message, 'i-lock');
+  }
+}
+
 const RECYCLE = [
   { name:'Metal Pipe',          mon:{scrap:6,  hqm:[1,2]},              safe:{scrap:4,  hqm:1} },
   { name:'Road Signs',          mon:{scrap:6,  hqm:[1,2]},              safe:{scrap:4,  hqm:1} },
@@ -5010,6 +5174,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 19:36 UTC</div>
+<div class="build-stamp">build 2026-07-29 19:43 UTC</div>
 </body>
 </html>

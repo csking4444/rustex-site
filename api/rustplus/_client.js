@@ -12,12 +12,16 @@ const AppMessage = root.lookupType('rustplus.AppMessage');
  *  cannot reach a mutating call like setEntityValue through this path. */
 export const READ_ACTIONS = new Set([
   'getInfo', 'getTime', 'getMap', 'getTeamInfo', 'getTeamChat', 'getMapMarkers',
+  'getEntityInfo',
 ]);
+
+/** Actions that address one paired device rather than the server as a whole. */
+export const ENTITY_ACTIONS = new Set(['getEntityInfo', 'setEntityValue']);
 
 /** Actions that change something in the game. Kept separate from the reads so a write can
  *  never be reached by a caller that only meant to fetch data, and so adding a read later
  *  cannot accidentally grant write access. */
-export const WRITE_ACTIONS = new Set(['sendTeamMessage']);
+export const WRITE_ACTIONS = new Set(['sendTeamMessage', 'setEntityValue']);
 
 /** Rust+ rejects anything longer, and a very long line is unreadable in the game's chat box. */
 export const MAX_MESSAGE_LENGTH = 250;
@@ -89,7 +93,8 @@ export class RustPlusError extends Error {
  * that needs a socket held open, which a serverless function cannot do — so this covers the
  * request/response half of the protocol only.
  */
-export async function rustPlusRequest({ host, port, playerId, playerToken, action, message, timeoutMs = 8000 }) {
+export async function rustPlusRequest({ host, port, playerId, playerToken, action, message,
+                                        entityId, value, timeoutMs = 8000 }) {
   const isWrite = WRITE_ACTIONS.has(action);
   if (!READ_ACTIONS.has(action) && !isWrite)
     throw new RustPlusError(`Unsupported action '${action}'.`, 400);
@@ -99,20 +104,34 @@ export async function rustPlusRequest({ host, port, playerId, playerToken, actio
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new RustPlusError('Invalid port.', 400);
 
   const seq = (Date.now() % 2_000_000) + 1;
-  // Reads take an empty message; sendTeamMessage carries the text.
+
+  // Entity calls address one paired device, and the id rides on the request itself rather
+  // than in the body. Without it the server answers about nothing.
+  const needsEntity = ENTITY_ACTIONS.has(action);
+  const entity = Number(entityId);
+  if (needsEntity && (!Number.isInteger(entity) || entity <= 0))
+    throw new RustPlusError('A device id is required.', 400);
+
+  // Reads take an empty message; the writes carry what they change.
   let body = {};
-  if (isWrite) {
+  if (action === 'sendTeamMessage') {
     const text = String(message ?? '').trim();
     if (!text) throw new RustPlusError('A message is required.', 400);
     if (text.length > MAX_MESSAGE_LENGTH)
       throw new RustPlusError(`Messages are limited to ${MAX_MESSAGE_LENGTH} characters.`, 400);
     body = { message: text };
+  } else if (action === 'setEntityValue') {
+    // Only ever a boolean. Anything else would be the caller guessing at the protocol.
+    if (typeof value !== 'boolean')
+      throw new RustPlusError('A device value must be true or false.', 400);
+    body = { value };
   }
 
   const payload = AppRequest.encode(AppRequest.create({
     seq,
     playerId: String(playerId),
     playerToken: Number(playerToken),
+    ...(needsEntity ? { entityId: entity } : {}),
     [action]: body,
   })).finish();
 
@@ -165,6 +184,7 @@ function mapError(code) {
     case 'invalid_token':      return 'The player token is wrong or has expired. Pair again to get a fresh one.';
     case 'access_denied':      return 'This server refused the request. The pairing may have been revoked.';
     case 'player_not_found':   return 'That player is not on this server.';
+    case 'wrong_type':         return 'That device cannot be switched. Only smart switches accept on and off.';
     case 'rate_limit':         return 'Too many requests to that server. Wait a moment and retry.';
     default:                   return `The server rejected the request (${code}).`;
   }
