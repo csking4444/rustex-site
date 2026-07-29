@@ -419,6 +419,9 @@ select.inp{cursor:pointer;}
 .demo-banner .icon{width:15px; height:15px; color:var(--warning); flex-shrink:0;}
 .demo-banner b{color:var(--text);}
 body:not(.is-demo) .demo-banner{display:none;}
+/* Sample content that only makes sense under the demo banner. Hiding the banner for real
+   users while leaving the content it labels on screen presents invented data as real. */
+body:not(.is-demo) .demo-only{display:none !important;}
 
 /* --- dashboard layout & responsive ---------------------------------------
    The dashboard sections are their own 12-column grid, so the older
@@ -1998,7 +2001,7 @@ body.billing #billing-view{display:block;}
 
       <div class="demo-banner"><svg class="icon"><use href="#i-flask"/></svg><span><b>Demo mode.</b> Everything on this page is sample data, not live Rust+ telemetry.</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="exitDemo()">Exit demo</button></div>
 
-      <div class="alert-banner">
+      <div class="alert-banner demo-only">
         <span class="alert-icon blink"><svg class="icon"><use href="#i-siren"/></svg></span>
         <div class="alert-body"><div class="t">RAID DETECTED: Main Base, North Wall</div><div class="d mono">Smart Alarm tripped 00:14 ago · 2 breach events logged</div></div>
         <button class="btn btn-primary btn-sm">Call Squad</button>
@@ -3807,7 +3810,12 @@ function setLiveState(el, state, text){
 async function refreshLiveData(){
   const server = Session.servers[0];
   const banner = document.getElementById('liveState');
-  if(!server){ if(banner) banner.hidden = true; stopChatPolling(); return; }
+  if(!server){
+    if(banner) banner.hidden = true;
+    stopChatPolling();
+    clearLiveFigures();
+    return;
+  }
   startChatPolling();
 
   const setText = (sel, value) => {
@@ -3903,6 +3911,22 @@ function toGrid(x, y, mapSize){
     counter++;
   }
   return (letters === null || number === null) ? null : letters + number;
+}
+
+/**
+ * With nothing paired there are no real figures to show, and the placeholders baked into the
+ * markup are invented ones — a population, a wipe age, a roster of players who do not exist.
+ * Left alone they read as this account's live data. Demo mode keeps them, since it is labelled
+ * as sample data on screen.
+ */
+function clearLiveFigures(){
+  if(document.body.classList.contains('is-demo')) return;
+  document.querySelectorAll('[data-live]').forEach(el => {
+    el.textContent = el.dataset.live === 'squadTotal' ? '' : '—';
+  });
+  const body = document.getElementById('teamRows');
+  if(body) body.innerHTML =
+    '<div class="text-3" style="font-size:11.5px;padding:4px 0;">Connect a server to see your team.</div>';
 }
 
 /** Replaces the sample roster with the real one. */
@@ -4634,6 +4658,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 04:02 UTC</div>
+<div class="build-stamp">build 2026-07-29 04:12 UTC</div>
 </body>
 </html>
