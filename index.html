@@ -579,6 +579,53 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dl-note{font-size:11.5px; color:var(--text-3); max-width:340px; line-height:1.45;}
 @media (max-width:700px){ .dl-row{margin:-30px 0 34px;} .nav-dl{display:none;} }
 
+/* Download warning dialog */
+.dlm{position:fixed; inset:0; z-index:120; display:flex; align-items:flex-start;
+  justify-content:center; padding:28px 18px; overflow-y:auto;
+  background:rgba(0,0,0,.72); backdrop-filter:blur(3px);}
+.dlm[hidden]{display:none;}
+.dlm-card{position:relative; width:100%; max-width:520px; padding:26px 26px 22px;
+  background:var(--surface); border:1px solid var(--border-strong);
+  border-radius:var(--r-md); box-shadow:var(--shadow-md);}
+.dlm-x{position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:var(--r-sm);
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text-3);
+  font-size:17px; line-height:1; cursor:pointer;}
+.dlm-x:hover{color:var(--text); border-color:var(--border-strong);}
+.dlm-eyebrow{display:block; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--orange); font-weight:700; margin-bottom:9px;}
+.dlm-title{font-size:23px; line-height:1.2; margin:0 0 13px; letter-spacing:-.01em;}
+.dlm-lead{font-size:13px; color:var(--text-2); margin:0 0 11px; line-height:1.5;}
+.dlm-list{margin:0 0 17px; padding-left:17px; font-size:12.5px; color:var(--text-2); line-height:1.55;}
+.dlm-list li{margin-bottom:5px;}
+.dlm-list li::marker{color:var(--orange);}
+/* A drawing of the Windows dialog, not a screenshot: stays sharp at any zoom and adds no weight. */
+.dlm-smart{background:#0b57a4; color:#fff; padding:16px 17px 15px; border-radius:var(--r-sm);
+  margin-bottom:9px;}
+.dlm-smart-h{font-size:16px; font-weight:600; margin-bottom:9px;}
+.dlm-smart-b{font-size:12px; line-height:1.5; margin:0 0 11px; color:rgba(255,255,255,.92);}
+.dlm-more{margin:0 0 12px;}
+.dlm-link{font-size:12px; text-decoration:underline; color:#fff;}
+.dlm-smart-meta{font-size:11.5px; line-height:1.55; margin:0 0 15px; color:rgba(255,255,255,.9);}
+.dlm-smart-btns{display:flex; gap:9px; justify-content:flex-end; flex-wrap:wrap;}
+.dlm-fake-btn{display:inline-flex; align-items:center; gap:6px; padding:6px 15px; font-size:12px;
+  color:#1b1b1b; background:#e6e6e6; border:1px solid #adadad; border-radius:2px;}
+.dlm-num{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
+  border-radius:2px; background:var(--crimson); color:#fff; font-size:9.5px; font-weight:800;
+  font-family:var(--font-mono); margin-left:6px; flex-shrink:0;}
+.dlm-legend{display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:11.5px;
+  color:var(--text-3); margin:0 0 17px;}
+.dlm-legend .dlm-num{margin-left:0;}
+.dlm-note{font-size:12px; color:var(--text-3); line-height:1.55; margin:0 0 11px;}
+.dlm-note a{color:var(--orange); text-decoration:underline;}
+.dlm-actions{display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
+  margin-top:17px; padding-top:16px; border-top:1px solid var(--border);}
+@media (max-width:560px){
+  .dlm{padding:14px 10px;}
+  .dlm-card{padding:22px 17px 18px;}
+  .dlm-title{font-size:20px;}
+  .dlm-actions .btn{flex:1;}
+}
+
 /* Smart devices */
 .dev-help{font-size:11px; color:var(--text-3); line-height:1.45; margin-bottom:9px;}
 .dev-list{display:flex; flex-direction:column; gap:3px; max-height:230px; overflow-y:auto;}
@@ -1359,6 +1406,48 @@ body.billing #billing-view{display:block;}
 <div class="toast-stack" id="toastStack"></div>
 
 <!-- command palette -->
+<div class="dlm" id="dlModal" hidden role="dialog" aria-modal="true" aria-labelledby="dlmTitle">
+  <div class="dlm-card">
+    <button type="button" class="dlm-x" onclick="closeDlWarning()" aria-label="Close">&times;</button>
+    <span class="dlm-eyebrow">Before you download</span>
+    <h2 class="dlm-title" id="dlmTitle">Windows will warn you about this app</h2>
+    <p class="dlm-lead">Rustex is not code-signed yet, so expect two warnings:</p>
+    <ul class="dlm-list">
+      <li>Your browser may flag the installer as an uncommon download.</li>
+      <li>Windows shows a blue &ldquo;Windows protected your PC&rdquo; screen the first time you run it.</li>
+    </ul>
+
+    <div class="dlm-smart" aria-label="What the Windows SmartScreen dialog looks like">
+      <div class="dlm-smart-h">Windows protected your PC</div>
+      <p class="dlm-smart-b">Microsoft Defender SmartScreen prevented an unrecognised app from
+        starting. Running this app might put your PC at risk.</p>
+      <p class="dlm-more"><span class="dlm-link">More info</span><span class="dlm-num">1</span></p>
+      <p class="dlm-smart-meta">App: Rustex-Setup-0.1.0.exe<br/>Publisher: Unknown publisher</p>
+      <div class="dlm-smart-btns">
+        <span class="dlm-fake-btn">Run anyway<span class="dlm-num">2</span></span>
+        <span class="dlm-fake-btn">Don&rsquo;t run</span>
+      </div>
+    </div>
+    <p class="dlm-legend"><span class="dlm-num">1</span> Click &ldquo;More info&rdquo;
+      <span class="dlm-num">2</span> Then &ldquo;Run anyway&rdquo;</p>
+
+    <p class="dlm-note">That screen is about reputation. Windows shows it for any publisher it
+      has not verified yet, and it does not mean Defender found anything in the file.</p>
+    <p class="dlm-note">The fix is a code-signing certificate, which has to be bought and the
+      identity behind it verified. That has not been done yet, so every build until then is
+      unsigned and will show this.</p>
+    <p class="dlm-note">You do not have to take our word for it. Upload the file you downloaded
+      to <a href="https://www.virustotal.com/gui/home/upload" target="_blank" rel="noopener">VirusTotal</a>
+      and let 70+ engines check it, or scan it with your own antivirus.</p>
+
+    <div class="dlm-actions">
+      <button type="button" class="btn btn-ghost" onclick="closeDlWarning()">Cancel</button>
+      <a class="btn btn-primary" id="dlmGo" href="/download/Rustex-Setup-0.1.0.exe" download
+         onclick="confirmDlWarning()"><svg class="icon" style="width:15px;height:15px"><use href="#i-download"/></svg>Download anyway</a>
+    </div>
+  </div>
+</div>
+
 <div class="cmdk-overlay" id="cmdk">
   <div class="glass cmdk">
     <div class="cmdk-input">
@@ -1412,7 +1501,8 @@ body.billing #billing-view{display:block;}
           <a href="#f01" class="btn btn-outline">See it in action</a>
         </div>
         <div class="dl-row" id="dlRow">
-          <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup-0.1.0.exe" download>
+          <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup-0.1.0.exe" download
+             onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
           <span class="dl-note" id="dlNote">v0.1.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
@@ -3111,6 +3201,55 @@ async function logOut(){
   if(document.body.classList.contains('billing')) renderBilling();
   if(document.body.classList.contains('pairing')) renderPairedServers();
 })();
+
+/**
+ * Downloading an unsigned build without warning someone first is how a real product gets
+ * mistaken for malware. The dialog explains the SmartScreen screen before it appears, shows
+ * what it looks like, and only then hands over the file.
+ */
+let dlReturnFocus = null;
+
+function openDlWarning(event){
+  const modal = document.getElementById('dlModal');
+  const btn = document.getElementById('dlBtn');
+  if(!modal || !btn) return true;            // no dialog: let the plain link work
+  if(event) event.preventDefault();
+
+  // Whatever the button points at is what the dialog hands over, so a published release
+  // still wins without this needing to know about it.
+  const go = document.getElementById('dlmGo');
+  if(go){
+    go.href = btn.getAttribute('href');
+    if(btn.hasAttribute('download')) go.setAttribute('download', '');
+    else go.removeAttribute('download');
+    if(btn.target) go.target = btn.target;
+  }
+  dlReturnFocus = document.activeElement;
+  modal.hidden = false;
+  document.body.style.overflow = 'hidden';
+  if(go) go.focus();
+  return false;
+}
+
+function closeDlWarning(){
+  const modal = document.getElementById('dlModal');
+  if(!modal || modal.hidden) return;
+  modal.hidden = true;
+  document.body.style.overflow = '';
+  if(dlReturnFocus && dlReturnFocus.focus) dlReturnFocus.focus();
+  dlReturnFocus = null;
+}
+
+/** The link does the downloading; this only gets out of its way. */
+function confirmDlWarning(){ setTimeout(closeDlWarning, 60); }
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeDlWarning();
+});
+document.addEventListener('click', e => {
+  const modal = document.getElementById('dlModal');
+  if(modal && !modal.hidden && e.target === modal) closeDlWarning();
+});
 
 /**
  * The installer is served from this site, so the button works with no GitHub repo behind it.
@@ -5222,6 +5361,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 23:18 UTC</div>
+<div class="build-stamp">build 2026-07-29 23:28 UTC</div>
 </body>
 </html>
