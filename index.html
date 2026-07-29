@@ -559,6 +559,11 @@ body:not(.is-demo) .demo-banner{display:none;}
 .chat-msg{color:var(--text-2); min-width:0; overflow-wrap:anywhere;}
 .chat-note{margin-top:7px; padding-top:6px; border-top:1px solid var(--border);
   color:var(--text-3); font-size:11px; line-height:1.4;}
+/* Sent, not yet echoed back by the server. */
+.chat-sending{opacity:.55;}
+.chat-failed .chat-msg{color:var(--warning); text-decoration:line-through;}
+.chat-failed .chat-who{color:var(--warning);}
+.chat-failed::after{content:"not sent"; font-size:10px; color:var(--warning); align-self:center;}
 
 /* Live events */
 .act-line{display:flex; align-items:center; gap:9px; padding:8px 0;
@@ -3778,6 +3783,11 @@ function saveServers(){
 // dead zone at that moment and every read of it throws.
 let chatCache = [];   // last good chat buffer, so a failed refresh does not blank the panel
 let chatTimer = null;
+let chatPending = []; // messages shown before the send round trip finishes
+let chatDelay = 0;    // current poll gap; shrinks while the chat is busy, grows when quiet
+let chatSeq = 0;      // ids for optimistic lines
+const CHAT_FAST_MS = 2000;    // poll gap while messages are actually moving
+const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
 async function refreshLiveData(){
   const server = Session.servers[0];
@@ -4038,17 +4048,30 @@ function rustPlusSend(server, text){
   }, 'Could not send that message.'));
 }
 
+/**
+ * Shows the message the moment you press send rather than after the round trip. The send
+ * still has to reach the game server, but waiting on it before drawing anything is what
+ * made typing feel unresponsive. The line sits in a pending state until the server echoes
+ * it back, and is marked as failed if it never does.
+ */
 async function sendChatFromBox(btn){
   const box = document.getElementById('chatSend');
   const text = (box?.value || '').trim();
   if(!text) return;
-  const done = busyButton(btn, 'Sending…');
+
+  const entry = { id: ++chatSeq, message: text, failed: false };
+  chatPending.push(entry);
+  if(box) box.value = '';     // clear immediately; nothing is queued behind this
+  paintChat();
+
   try {
     await sendTeamMessage(text);
-    box.value = '';
-    await loadTeamChat();
-  } catch(err){ fireCustomToast('Not sent', err.message, 'i-lock'); }
-  finally { done(); }
+    pokeChat();               // pull the real copy back without waiting for the next tick
+  } catch(err){
+    entry.failed = true;
+    paintChat();
+    fireCustomToast('Not sent', err.message, 'i-lock');
+  }
 }
 
 // Fired events are remembered so the same cargo is not announced on every refresh.
@@ -4107,8 +4130,18 @@ async function loadTeamChat(btn){
     const msgs = res?.teamChat?.messages || [];
     // Hold the last good buffer. A refresh that comes back empty because the request failed
     // upstream must not look the same as a genuinely quiet chat.
+    const changed = msgs.length !== chatCache.length
+      || chatSignature(msgs) !== chatSignature(chatCache);
     if(msgs.length) chatCache = msgs;
+    // Anything we posted optimistically that has now come back from the server is no longer
+    // pending — drop it so the line is not shown twice.
+    if(chatPending.length){
+      const landed = new Set(msgs.slice(-12).map(m => String(m.message || '')));
+      chatPending = chatPending.filter(p => p.failed || !landed.has(p.message));
+    }
     renderChatLog(log, chatCache, '');
+    // Keep checking quickly while people are talking; ease off once it goes quiet.
+    chatDelay = changed ? CHAT_FAST_MS : Math.min(CHAT_SLOW_MS, (chatDelay || CHAT_FAST_MS) * 1.6);
   } catch(err){
     // Keep whatever is on screen. Wiping the log on a transient failure is why chat looked
     // like it worked sometimes and showed nothing others.
@@ -4116,17 +4149,35 @@ async function loadTeamChat(btn){
   } finally { done(); }
 }
 
+/** Cheap fingerprint of a buffer, to tell a genuinely new message from a repeat poll. */
+function chatSignature(msgs){
+  const last = msgs[msgs.length - 1];
+  return msgs.length + '|' + (last ? (last.name || '') + ':' + (last.message || '') : '');
+}
+
+function chatLine(name, text, cls){
+  return '<div class="chat-line' + (cls ? ' ' + cls : '') + '">'
+    + '<span class="chat-who">' + escapeHtml(name || 'Unknown') + '</span>'
+    + '<span class="chat-msg">' + escapeHtml(text || '') + '</span></div>';
+}
+
 function renderChatLog(log, msgs, note){
-  const body = msgs.length
-    ? msgs.slice(-30).map(m =>
-        '<div class="chat-line"><span class="chat-who">' + escapeHtml(m.name || 'Unknown') + '</span>'
-        + '<span class="chat-msg">' + escapeHtml(m.message || '') + '</span></div>').join('')
+  const sent = msgs.slice(-30).map(m => chatLine(m.name, m.message)).join('');
+  // Optimistic lines sit at the bottom until the server echoes them back.
+  const waiting = chatPending.map(p =>
+    chatLine('You', p.message, p.failed ? 'chat-failed' : 'chat-sending')).join('');
+  const body = (sent || waiting)
+    ? sent + waiting
     : '<div class="text-3" style="font-size:11.5px;">No messages in the recent buffer.</div>';
-  const warn = note
-    ? '<div class="chat-note">' + escapeHtml(note) + '</div>'
-    : '';
+  const warn = note ? '<div class="chat-note">' + escapeHtml(note) + '</div>' : '';
   log.innerHTML = body + warn;
   log.scrollTop = log.scrollHeight;
+}
+
+/** Repaints from what is already in memory. No request, so it is immediate. */
+function paintChat(){
+  const log = document.getElementById('chatLog');
+  if(log) renderChatLog(log, chatCache, '');
 }
 
 /**
@@ -4136,15 +4187,31 @@ function renderChatLog(log, msgs, note){
  */
 function startChatPolling(){
   stopChatPolling();
-  chatTimer = setInterval(() => {
-    if(document.hidden) return;
-    if(!Session.servers[0]) return;
+  chatDelay = CHAT_FAST_MS;
+  const tick = async () => {
+    const idle = document.hidden || !Session.servers[0];
     const log = document.getElementById('chatLog');
-    if(!log || !log.offsetParent) return;      // panel not visible; nothing to update
-    loadTeamChat();
-  }, 15000);
+    // A backgrounded tab or a hidden panel must not keep spending requests against the
+    // same rate limit the queue exists to respect.
+    if(!idle && log && log.offsetParent){
+      try { await loadTeamChat(); } catch {}
+    }
+    chatTimer = setTimeout(tick, idle ? CHAT_SLOW_MS : (chatDelay || CHAT_FAST_MS));
+  };
+  chatTimer = setTimeout(tick, CHAT_FAST_MS);
 }
-function stopChatPolling(){ if(chatTimer){ clearInterval(chatTimer); chatTimer = null; } }
+function stopChatPolling(){ if(chatTimer){ clearTimeout(chatTimer); chatTimer = null; } }
+
+/** Drops the current wait and checks now — used right after sending. */
+function pokeChat(){
+  if(!chatTimer) return;
+  clearTimeout(chatTimer);
+  chatDelay = CHAT_FAST_MS;
+  chatTimer = setTimeout(() => { loadTeamChat().catch(()=>{}); startChatPolling(); }, 0);
+}
+
+// Coming back to the tab should show the current chat, not whatever was there when you left.
+document.addEventListener('visibilitychange', () => { if(!document.hidden) pokeChat(); });
 
 /** Map markers are the closest thing Rust+ offers to an event feed without a live socket. */
 // The protobuf is decoded with enums as strings, so these arrive as names, not numbers.
@@ -4553,6 +4620,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:51 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:55 UTC</div>
 </body>
 </html>
