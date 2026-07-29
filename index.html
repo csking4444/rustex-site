@@ -513,11 +513,20 @@ body:not(.is-demo) .demo-banner{display:none;}
 .rc-mode.active{background:var(--orange); color:#140D0A; border-color:var(--orange);}
 .rc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:2px 22px;}
 .rc-row{padding:5px 0; border-bottom:1px solid var(--border);}
-.rc-row{display:grid; grid-template-columns:1fr auto 66px; align-items:center; gap:10px;}
+.rc-row{display:grid; grid-template-columns:1fr auto 86px; align-items:center; gap:10px;}
 .rc-yield{font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);
   white-space:nowrap; text-align:right;}
 .rc-label{font-size:12px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.rc-qty{max-width:none; width:100%; padding:6px 8px; font-size:12px;}
+.rc-step{display:flex; align-items:stretch; border:1px solid var(--border);
+  border-radius:var(--r-sm); overflow:hidden; background:var(--surface-2);}
+.rc-btn{width:24px; border:0; background:transparent; color:var(--text-3); cursor:pointer;
+  font-size:14px; font-weight:700; line-height:1; padding:0;
+  transition:background .12s ease, color .12s ease;}
+.rc-btn:hover{background:var(--orange); color:#140D0A;}
+.rc-btn:active{background:var(--orange); filter:brightness(.9);}
+.rc-qty{width:34px; border:0; background:transparent; color:var(--text); text-align:center;
+  font-family:var(--font-mono); font-size:12px; padding:5px 0; outline:none; min-width:0;}
+.rc-qty::placeholder{color:var(--text-3);}
 .rc-out{margin-top:16px; padding:14px; border-radius:var(--r-md); background:var(--surface-2);
   border:1px solid var(--border-strong); display:flex; flex-direction:column; gap:8px;}
 .rc-total{display:flex; align-items:baseline; gap:9px;}
@@ -526,7 +535,7 @@ body:not(.is-demo) .demo-banner{display:none;}
 .rc-note{font-size:11px;}
 @media (max-width:1200px){ .rc-grid{grid-template-columns:1fr;} }
 @media (max-width:520px){
-  .rc-row{grid-template-columns:1fr 62px; row-gap:1px;}
+  .rc-row{grid-template-columns:1fr 86px; row-gap:1px;}
   .rc-yield{grid-column:1; text-align:left;}
 }
 
@@ -566,7 +575,7 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* The live strip carries a server name that can be long; it has to shrink rather than
    force the row wider than the column it sits in. */
 .live-state{min-width:0;}
-.live-state{white-space:normal; overflow:visible; overflow-wrap:anywhere; line-height:1.45;}
+.live-state{white-space:normal; overflow:visible; overflow-wrap:normal; line-height:1.35;}
 @media (max-width:760px){
   .live-state{font-size:11px; padding:8px 11px;}
   .decay-row{grid-template-columns:1fr; gap:5px;}
@@ -593,11 +602,11 @@ body:not(.is-demo) .demo-banner{display:none;}
 
 /* Live status strip. Says where the numbers came from and when, so a stale panel is
    distinguishable from a fresh one at a glance. */
-.live-state{display:flex; align-items:flex-start; gap:9px; padding:9px 14px; border-radius:var(--r-md);
+.live-state{display:flex; flex-direction:row; align-items:center; gap:9px; flex-wrap:nowrap; padding:9px 14px; border-radius:var(--r-md);
   font-size:12px; font-weight:600; border:1px solid var(--border); background:var(--surface-2);
   color:var(--text-2);}
 .live-state::before{content:""; width:7px; height:7px; border-radius:50%;
-  background:currentColor; flex-shrink:0; margin-top:5px;}
+  background:currentColor; flex-shrink:0;}
 .live-state.loading{color:var(--text-3);}
 .live-state.ok{color:var(--success); border-color:rgba(95,168,92,.3); background:var(--success-soft);}
 .live-state.err{color:var(--warning); border-color:rgba(200,146,46,.3); background:var(--warning-soft);}
@@ -3781,7 +3790,7 @@ async function refreshLiveData(){
     loadActivity();
     loadTeamChat();
     rustPlus(Session.servers[0], 'getMapMarkers')
-      .then(mk => runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members))
+      .then(mk => runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members, info?.info?.mapSize))
       .catch(()=>{});
 
     if(banner){
@@ -3974,24 +3983,34 @@ async function sendChatFromBox(btn){
 const announced = new Set();
 
 /** Compares this refresh against the last one and announces only what is newly true. */
-async function runAnnouncements(markers, members){
+async function runAnnouncements(markers, members, mapSize){
   const opts = Session.announce || loadAnnounce();
   if(!Session.servers.length) return;
   const lines = [];
 
   const once = (key, line) => { if(!announced.has(key)){ announced.add(key); lines.push(line); } };
 
+  // Grid reference makes an announcement actionable: "Cargo Ship at J12" tells the squad
+  // where to go, "Cargo Ship inbound" does not.
+  const at = m => {
+    const g = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+    return g ? ' at ' + g : '';
+  };
+
   for(const m of (markers || [])){
     const type = m.type;
     const key = type + ':' + m.id;
-    if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship inbound');
-    if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter on the map');
-    if(opts.crate && type === 'Crate')            once(key, '[Rustex] Locked Crate is up');
+    if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship' + at(m));
+    if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter' + at(m));
+    if(opts.crate && type === 'Crate')            once(key, '[Rustex] Locked Crate' + at(m));
   }
 
   for(const m of (members || [])){
-    if(opts.death && !m.isAlive)
-      once('dead:' + m.steamId + ':' + (m.deathTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' died');
+    if(opts.death && !m.isAlive){
+      const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+      once('dead:' + m.steamId + ':' + (m.deathTime || 0),
+           '[Rustex] ' + (m.name || 'A teammate') + ' died' + (where ? ' at ' + where : ''));
+    }
     if(opts.online && m.isOnline)
       once('on:' + m.steamId + ':' + (m.spawnTime || 0), '[Rustex] ' + (m.name || 'A teammate') + ' is online');
   }
@@ -4094,6 +4113,15 @@ function setRecycleMode(mode){
     b.classList.toggle('active', b.dataset.rmode === mode));
   renderRecycler();
 }
+/** Nudges a component's quantity by one, keeping the input and totals in step. */
+function stepRecycle(name, delta){
+  const next = Math.max(0, (recycleQty[name] || 0) + delta);
+  const input = [...document.querySelectorAll('.rc-qty')]
+    .find(i => i.getAttribute('oninput')?.includes(JSON.stringify(name).slice(1, -1)));
+  if(input) input.value = next || '';
+  setRecycleQty(name, next);
+}
+
 function setRecycleQty(name, value){
   const n = Math.max(0, Math.min(10000, Number(value) || 0));
   if(n) recycleQty[name] = n; else delete recycleQty[name];
@@ -4117,9 +4145,12 @@ function buildRecycler(){
     '<label class="rc-row">'
     + '<span class="rc-label">' + escapeHtml(r.name) + '</span>'
     + '<span class="rc-yield" data-yield="' + escapeHtml(r.name) + '"></span>'
-    + '<input class="inp rc-qty" type="number" min="0" inputmode="numeric" placeholder="0" '
-    + 'oninput="setRecycleQty(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', this.value)">'
-    + '</label>'
+    + '<span class="rc-step">'
+    +   '<button type="button" class="rc-btn" onclick="stepRecycle(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', -1)" aria-label="one fewer">&minus;</button>'
+    +   '<input class="rc-qty" type="text" inputmode="numeric" placeholder="0" '
+    +     'oninput="setRecycleQty(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', this.value)">'
+    +   '<button type="button" class="rc-btn" onclick="stepRecycle(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', 1)" aria-label="one more">+</button>'
+    + '</span></label>'
   ).join('');
   renderRecycler();
 }
@@ -4400,6 +4431,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:23 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:30 UTC</div>
 </body>
 </html>
