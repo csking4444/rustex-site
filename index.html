@@ -3069,6 +3069,10 @@ async function logOut(){
   else if(want === 'billing' && Session.signedIn) document.body.classList.add('billing');
   syncAuthUI();
 
+  // Refreshing while on the dashboard takes this path rather than goDashboard(), so without
+  // this the page came back showing the built-in sample figures and never fetched anything.
+  if(document.body.classList.contains('dash')) refreshLiveData();
+
   if(document.body.classList.contains('pricing')) renderPricing();
   if(document.body.classList.contains('settings')){ loadSettingsForm(); renderSettings(); }
   if(document.body.classList.contains('billing')) renderBilling();
@@ -4396,6 +4400,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 03:17 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:23 UTC</div>
 </body>
 </html>
