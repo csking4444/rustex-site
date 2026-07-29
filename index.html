@@ -505,6 +505,24 @@ body:not(.is-demo) .demo-banner{display:none;}
 /* Decay calculator */
 .decay-calc{display:flex; flex-direction:column; gap:11px;}
 
+/* Recycler */
+.rc-modes{display:flex; gap:6px; margin-bottom:14px;}
+.rc-mode{flex:1; padding:9px 10px; font-size:11.5px; font-weight:700; letter-spacing:.03em;
+  border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface-2);
+  color:var(--text-3); cursor:pointer; white-space:nowrap;}
+.rc-mode.active{background:var(--orange); color:#140D0A; border-color:var(--orange);}
+.rc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:7px 14px;}
+.rc-row{display:grid; grid-template-columns:1fr 68px; align-items:center; gap:8px;}
+.rc-label{font-size:12px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.rc-qty{max-width:none; width:100%; padding:6px 8px; font-size:12px;}
+.rc-out{margin-top:16px; padding:14px; border-radius:var(--r-md); background:var(--surface-2);
+  border:1px solid var(--border-strong); display:flex; flex-direction:column; gap:8px;}
+.rc-total{display:flex; align-items:baseline; gap:9px;}
+.rc-amt{font-size:19px; font-weight:800; color:var(--orange); min-width:62px;}
+.rc-name{font-size:12.5px; color:var(--text-2);}
+.rc-note{font-size:11px;}
+@media (max-width:760px){ .rc-grid{grid-template-columns:1fr;} }
+
 /* Team chat */
 .chat-send{display:flex; gap:8px; margin-top:10px;}
 .chat-send .inp{flex:1; min-width:0; max-width:none;}
@@ -1851,7 +1869,6 @@ body.billing #billing-view{display:block;}
     <div class="side-section-lbl">Overview</div>
     <a class="side-link active" data-dsec="overview" data-target="" href="#" onclick="showDashSection('overview');return false;"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
     <a class="side-link" data-dsec="overview" data-target="d-team" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
-    <a class="side-link" data-dsec="overview" data-target="d-threat" href="#" onclick="showDashSection('overview','d-threat');return false;"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intel</a>
     <a class="side-link" data-dsec="overview" data-target="d-alarm" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</a>
         <div class="side-section-lbl">Tools</div>
 <a class="side-link" data-dsec="tools" data-target="d-decay" href="#" onclick="showDashSection('tools','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
@@ -1954,7 +1971,7 @@ body.billing #billing-view{display:block;}
           <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Queue</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)"><span data-live="queue">0</span></div></div>
           <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="squadOnline">4</span><span class="text-3" style="font-size:14px"><span data-live="squadTotal"> of 5</span></span></div></div>
         </div>
-        <div class="widget card w-6" id="d-team">
+        <div class="widget card w-12" id="d-team">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div><div id="teamRows">
           <table class="table">
             <tbody>
@@ -1966,16 +1983,6 @@ body.billing #billing-view{display:block;}
           </table>
         </div>
 
-        </div><div class="widget card w-6" id="d-threat">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-crosshair"/></svg>Threat Intelligence</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <table class="table">
-            <thead><tr><th>Player</th><th></th><th>KD</th><th>Threat</th><th>Last seen</th></tr></thead>
-            <tbody>
-              <tr><td style="font-weight:700;color:var(--crimson)">Grimhollow ⚑</td><td><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span></td><td class="mono">4.8</td><td style="width:140px"><div class="progress crimson"><span style="width:94%"></span></div></td><td class="text-2">6m ago</td></tr>
-              <tr><td>Duskrunner</td><td><span class="item-ic sm photo ic-rocket" title="Rocket Launcher"></span></td><td class="mono">3.1</td><td style="width:140px"><div class="progress"><span style="width:70%"></span></div></td><td class="text-2">28m ago</td></tr>
-              <tr><td>Ashvale</td><td><span class="item-ic sm photo ic-bolt" title="Bolt Action Rifle"></span></td><td class="mono">2.4</td><td style="width:140px"><div class="progress"><span style="width:52%"></span></div></td><td class="text-2">1h ago</td></tr>
-            </tbody>
-          </table>
         </div>
 
         <div class="widget card w-12" id="d-alarm">
@@ -2008,16 +2015,18 @@ body.billing #billing-view{display:block;}
 
         <div class="widget card w-12" id="d-recycler">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-recycle"/></svg>Recycler Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
-            <div class="rc-chip"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>Assault Rifle</div>
-            <div class="rc-chip"><span class="item-ic sm photo ic-garagedoor" title="Garage Door"></span>Garage Door</div>
+          <div class="rc-modes">
+            <button class="rc-mode active" data-rmode="mon"  onclick="setRecycleMode('mon')">Monument · 60%</button>
+            <button class="rc-mode" data-rmode="safe" onclick="setRecycleMode('safe')">Safezone · 40%</button>
           </div>
-          <div style="display:flex;gap:18px;flex-wrap:wrap;" class="mono text-2" style="font-size:12.5px;">
-            <span>Scrap <b style="color:var(--text)">35</b></span>
-            <span>Metal Frags <b style="color:var(--text)">290</b></span>
-            <span>Springs <b style="color:var(--text)">2</b></span>
-            <span>Gears <b style="color:var(--text)">2</b></span>
+
+          <div class="rc-grid" id="rcGrid"></div>
+
+          <div class="rc-out">
+            <div id="rcTotals"><div class="text-3" style="font-size:11.5px;">Enter how many of each component you have.</div></div>
+            <div class="rc-note text-3" id="rcNote"></div>
           </div>
+          <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="clearRecycler()">Clear</button>
         </div>
       </div>
 
@@ -3643,6 +3652,7 @@ function showDashSection(id, focusWidget){
   // canvases sized while hidden measure 0, so re-fit anything that just appeared
   window.dispatchEvent(new Event('resize'));
   if(id === 'tools' && document.getElementById('decayMat')) renderDecay();
+  if(id === 'market' && document.getElementById('rcGrid')) buildRecycler();
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -4032,6 +4042,106 @@ async function loadActivity(){
   }
 }
 
+// ---- recycler ---------------------------------------------------------------
+// Yields transcribed from Man1ak's recycler chart. Monument recyclers run at 60%
+// efficiency, safezone at 40%, and the chart gives both columns explicitly rather
+// than one being derived from the other, so both are stored.
+// Ranges in the chart (for example "1-2") are kept as [min,max] and shown as a range.
+const RECYCLE = [
+  { name:'Metal Pipe',          mon:{scrap:6,  hqm:[1,2]},              safe:{scrap:4,  hqm:1} },
+  { name:'Road Signs',          mon:{scrap:6,  hqm:[1,2]},              safe:{scrap:4,  hqm:1} },
+  { name:'Sheet Metal',         mon:{scrap:[9,10], hqm:[1,2], frag:120},safe:{scrap:[6,7], hqm:[0,1], frag:80} },
+  { name:'Metal Spring',        mon:{scrap:12, hqm:[1,2]},              safe:{scrap:8,  hqm:[0,1]} },
+  { name:'Gears',               mon:{scrap:12, frag:15},                safe:{scrap:8,  frag:10} },
+  { name:'Electric Fuse',       mon:{scrap:24},                         safe:{scrap:16} },
+  { name:'Metal Blade',         mon:{scrap:[2,3], frag:18},             safe:{scrap:[1,2], frag:12} },
+  { name:'Propane Tank',        mon:{scrap:1,  frag:60},                safe:{scrap:1,  frag:40} },
+  { name:'Sewing Kit',          mon:{cloth:12, rope:[1,2]},             safe:{cloth:8,  rope:[1,2]} },
+  { name:'Rope',                mon:{cloth:18},                         safe:{cloth:12} },
+  { name:'Tarp',                mon:{cloth:60},                         safe:{cloth:40} },
+  { name:'Rifle Body',          mon:{scrap:18, hqm:[1,2], frag:90},     safe:{scrap:12, hqm:[1,2], frag:60} },
+  { name:'Semi Automatic Body', mon:{scrap:18, hqm:[1,2]},              safe:{scrap:12, hqm:[1,2]} },
+  { name:'SMG Body',            mon:{scrap:30, hqm:[1,2]},              safe:{scrap:20, hqm:[1,2]} },
+  { name:'Tech Trash',          mon:{scrap:24, hqm:[1,2]},              safe:{scrap:16, hqm:[0,1]} },
+  { name:'CCTV Camera',         mon:{tech:2,  hqm:[1,2]},               safe:{tech:1,  hqm:[1,2]} },
+  { name:'Targeting Computer',  mon:{tech:3,  hqm:[1,2], frag:60},      safe:{tech:2,  hqm:1, frag:40} },
+];
+const YIELD_LABEL = { scrap:'Scrap', hqm:'High Quality Metal', frag:'Metal Fragments',
+                      cloth:'Cloth', rope:'Rope', tech:'Tech Trash' };
+
+// Quantity per component, keyed by name.
+const recycleQty = {};
+let recycleMode = 'mon';
+
+function setRecycleMode(mode){
+  recycleMode = mode;
+  document.querySelectorAll('[data-rmode]').forEach(b =>
+    b.classList.toggle('active', b.dataset.rmode === mode));
+  renderRecycler();
+}
+function setRecycleQty(name, value){
+  const n = Math.max(0, Math.min(10000, Number(value) || 0));
+  if(n) recycleQty[name] = n; else delete recycleQty[name];
+  renderRecycler();
+}
+function clearRecycler(){
+  for(const k of Object.keys(recycleQty)) delete recycleQty[k];
+  document.querySelectorAll('.rc-qty').forEach(i => i.value = '');
+  renderRecycler();
+}
+
+/** Sums the yield of everything entered. Ranges accumulate as ranges. */
+/** Renders one quantity input per component, straight from the table. */
+function buildRecycler(){
+  const grid = document.getElementById('rcGrid');
+  if(!grid || grid.dataset.built) return;
+  grid.dataset.built = '1';
+  grid.innerHTML = RECYCLE.map(r =>
+    '<label class="rc-row"><span class="rc-label">' + escapeHtml(r.name) + '</span>'
+    + '<input class="inp rc-qty" type="number" min="0" inputmode="numeric" placeholder="0" '
+    + 'oninput="setRecycleQty(' + JSON.stringify(r.name).replace(/"/g, '&quot;') + ', this.value)"></label>'
+  ).join('');
+  renderRecycler();
+}
+
+function renderRecycler(){
+  const totals = {};
+  const add = (key, v) => {
+    const [lo, hi] = Array.isArray(v) ? v : [v, v];
+    totals[key] ??= [0, 0];
+    totals[key][0] += lo; totals[key][1] += hi;
+  };
+
+  let items = 0;
+  for(const row of RECYCLE){
+    const qty = recycleQty[row.name];
+    if(!qty) continue;
+    items += qty;
+    for(const [key, v] of Object.entries(row[recycleMode] || {})){
+      const [lo, hi] = Array.isArray(v) ? v : [v, v];
+      add(key, [lo * qty, hi * qty]);
+    }
+  }
+
+  const out = document.getElementById('rcTotals');
+  if(!out) return;
+  const keys = Object.keys(totals).filter(k => totals[k][1] > 0);
+  out.innerHTML = keys.length
+    ? keys.map(k => {
+        const [lo, hi] = totals[k];
+        const amount = lo === hi ? String(lo) : lo + ' to ' + hi;
+        return '<div class="rc-total"><span class="rc-amt mono">' + amount + '</span>'
+             + '<span class="rc-name">' + escapeHtml(YIELD_LABEL[k] || k) + '</span></div>';
+      }).join('')
+    : '<div class="text-3" style="font-size:11.5px;">Enter how many of each component you have.</div>';
+
+  const secs = items * (recycleMode === 'mon' ? 5 : 8);
+  const note = document.getElementById('rcNote');
+  if(note) note.textContent = items
+    ? items + (items === 1 ? ' item' : ' items') + ', about ' + formatDuration(Math.round(secs / 60) || 1) + ' to process'
+    : '';
+}
+
 // ---- decay calculator -------------------------------------------------------
 // Full-health decay durations with no Tool Cupboard upkeep, and the max HP of one
 // wall of each tier. Decay is linear across the duration, so a wall at half health
@@ -4255,6 +4365,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-28 17:25 UTC</div>
+<div class="build-stamp">build 2026-07-29 03:15 UTC</div>
 </body>
 </html>
