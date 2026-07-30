@@ -635,6 +635,14 @@ body.is-app{padding-top:34px;}
 .applogin-status{font-size:var(--fs-xs); color:var(--orange); margin:12px 0 0;
   font-family:var(--font-mono);}
 
+/* The app has its own title bar, and the sidebar did not know about it: 100vh starting 34px
+   down overhangs the window by exactly that much, which is the dead space at the bottom and
+   the shove at the top. It also carried a second Rustex logo directly under the one in the
+   title bar, so that one goes — the app already says its own name. */
+body.is-app .sidebar{height:calc(100vh - 34px); top:34px;}
+body.is-app .sidebar-brand{display:none;}
+body.is-app .dash-shell{min-height:calc(100vh - 34px);}
+
 /* The app build marks the brand inert: it is not a link there, so it must not look or
    behave like one. */
 [data-inert]{pointer-events:none; cursor:default;}
@@ -5251,6 +5259,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 05:18 UTC</div>
+<div class="build-stamp">build 2026-07-30 05:28 UTC</div>
 </body>
 </html>
