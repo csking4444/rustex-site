@@ -1536,11 +1536,11 @@ body.billing #billing-view{display:block;}
     <button class="btn btn-primary applogin-btn" onclick="appSkipLogin()">
       <svg class="icon icon-16"><use href="#i-arrow-right"/></svg>Get started</button>
 
-    <p class="applogin-note">Rustex runs on this machine. It talks to your server directly
-      using your own Rust+ pairing, and nothing about that pairing leaves this computer, so
-      there is no account to sign into.</p>
-    <p class="applogin-note">Signing in on the website is only for managing a subscription.
-      It does not unlock anything here.</p>
+    <p class="applogin-note">Rustex talks to your server directly using your own Rust+
+      pairing, and nothing about that pairing leaves this computer.</p>
+    <p class="applogin-note">Signing in is not wired up yet, so this build is open. Once
+      subscriptions go live you will sign in with Steam here and the app will check your
+      plan on launch.</p>
     <p class="applogin-status" id="appLoginStatus" hidden></p>
   </div>
 </div>
@@ -2673,8 +2673,8 @@ function runSteamAuth(){
     // No hosted session exists for the app, and sending people to a browser only stranded
     // them on the marketing page.
     authPhase('idle');
-    fireCustomToast('No account needed',
-      'Rustex runs on this machine against your own pairing.', 'i-wifi');
+    fireCustomToast('Sign in is not ready yet',
+      'This build is open. Subscription checks arrive with it.', 'i-wifi');
     return;
   }
   authPhase('busy');
@@ -5259,6 +5259,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 05:28 UTC</div>
+<div class="build-stamp">build 2026-07-30 06:01 UTC</div>
 </body>
 </html>
