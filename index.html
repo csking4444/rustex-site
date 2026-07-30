@@ -594,6 +594,47 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dl-note{font-size:12px; color:var(--text-3); max-width:340px; line-height:1.45;}
 @media (max-width:700px){ .dl-row{margin:-30px 0 34px;} .nav-dl{display:none;} }
 
+/* Title bar. The window is frameless, so this is the frame — same tokens as everything else. */
+.titlebar{position:fixed; top:0; left:0; right:0; height:34px; z-index:200;
+  display:flex; align-items:stretch; justify-content:space-between;
+  background:var(--surface); border-bottom:1px solid var(--border);}
+.titlebar[hidden]{display:none;}
+.tb-drag{display:flex; align-items:center; gap:9px; padding-left:13px; flex:1; min-width:0;
+  -webkit-app-region:drag;}
+.tb-mark{width:13px; height:13px; flex-shrink:0; background:var(--orange);
+  clip-path:polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);}
+.tb-name{font-size:var(--fs-sm); font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--text-2);}
+.tb-ver{font-size:var(--fs-2xs); color:var(--text-3);}
+.tb-controls{display:flex; -webkit-app-region:no-drag;}
+.tb-btn{width:44px; border:0; background:transparent; cursor:pointer; color:var(--text-3);
+  display:flex; align-items:center; justify-content:center; transition:background .12s ease;}
+.tb-btn:hover{background:var(--surface-2); color:var(--text);}
+.tb-close:hover{background:var(--crimson); color:#fff;}
+.tb-i-min{width:10px; height:1px; background:currentColor;}
+.tb-i-max{width:9px; height:9px; border:1px solid currentColor;}
+.tb-i-x{width:10px; height:10px; position:relative;}
+.tb-i-x::before, .tb-i-x::after{content:""; position:absolute; top:50%; left:0; width:100%;
+  height:1px; background:currentColor;}
+.tb-i-x::before{transform:rotate(45deg);} .tb-i-x::after{transform:rotate(-45deg);}
+body.is-app{padding-top:34px;}
+
+/* Login. The only screen before the dashboard. */
+.applogin{position:fixed; inset:34px 0 0 0; z-index:150; display:flex; align-items:center;
+  justify-content:center; padding:24px; background:var(--bg);}
+.applogin[hidden]{display:none;}
+.applogin-card{width:100%; max-width:340px; text-align:center;}
+.applogin-mark{display:block; width:46px; height:46px; margin:0 auto 18px; background:var(--orange);
+  clip-path:polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%);}
+.applogin-title{font-size:var(--fs-h2); letter-spacing:.14em; text-transform:uppercase;
+  margin:0 0 7px;}
+.applogin-sub{font-size:var(--fs-md); color:var(--text-3); margin:0 0 26px;}
+.applogin-btn{width:100%; justify-content:center; margin-bottom:10px;}
+.applogin-note{font-size:var(--fs-xs); color:var(--text-3); line-height:1.6; margin:18px 0 0;
+  text-align:left;}
+.applogin-status{font-size:var(--fs-xs); color:var(--orange); margin:12px 0 0;
+  font-family:var(--font-mono);}
+
 /* In-app pairing */
 .pairapp{margin:12px 0 4px; padding:15px 16px; background:var(--surface-2);
   border:1px solid var(--border-strong); border-radius:var(--r-md);}
@@ -1442,6 +1483,38 @@ body.billing #billing-view{display:block;}
 <div class="toast-stack" id="toastStack"></div>
 
 <!-- command palette -->
+<div class="titlebar" id="titlebar" hidden>
+  <div class="tb-drag">
+    <span class="tb-mark" aria-hidden="true"></span>
+    <span class="tb-name">Rustex</span>
+    <span class="tb-ver mono" id="tbVer"></span>
+  </div>
+  <div class="tb-controls">
+    <button type="button" class="tb-btn" onclick="winMin()" aria-label="Minimise"><span class="tb-i-min"></span></button>
+    <button type="button" class="tb-btn" onclick="winMax()" aria-label="Maximise"><span class="tb-i-max" id="tbMaxIcon"></span></button>
+    <button type="button" class="tb-btn tb-close" onclick="winClose()" aria-label="Close"><span class="tb-i-x"></span></button>
+  </div>
+</div>
+
+<div class="applogin" id="appLogin" hidden>
+  <div class="applogin-card">
+    <span class="applogin-mark" aria-hidden="true"></span>
+    <h1 class="applogin-title">Rustex</h1>
+    <p class="applogin-sub">Your Rust server, on your machine.</p>
+
+    <button class="btn btn-primary applogin-btn" onclick="appSignIn(this)">
+      <svg class="icon" style="width:16px;height:16px"><use href="#i-user"/></svg>Sign in with Steam</button>
+
+    <button class="btn btn-outline applogin-btn" onclick="appSkipLogin()">
+      Continue without an account</button>
+
+    <p class="applogin-note">Signing in links this machine to your Steam profile on rustex.
+      The dashboard works either way: it talks to the game server directly using your own
+      Rust+ pairing, and nothing about your pairing leaves this computer.</p>
+    <p class="applogin-status" id="appLoginStatus" hidden></p>
+  </div>
+</div>
+
 <div class="dlm" id="dlModal" hidden role="dialog" aria-modal="true" aria-labelledby="dlmTitle">
   <div class="dlm-card">
     <button type="button" class="dlm-x" onclick="closeDlWarning()" aria-label="Close">&times;</button>
@@ -2924,10 +2997,18 @@ function goBilling(){
 }
 // The dashboard is the gated surface: signed out -> sign in, signed in but unpaid -> pricing.
 function goDashboard(){
-  if(!Session.signedIn){ openSteamAuth('dashboard'); return; }
-  if(!Session.entitled){
-    goPricing();
-    fireCustomToast('Choose a plan to continue', 'The dashboard unlocks the moment a subscription is active.', 'i-lock');
+  // The dashboard ships in the desktop app, not in the browser. On the website every route
+  // that used to open it now offers the download instead, so there is exactly one place the
+  // dashboard lives and the two builds stop overlapping.
+  if(!IS_DESKTOP){
+    const row = document.getElementById('dlRow');
+    if(row && !row.hidden){
+      row.scrollIntoView({ behavior:'smooth', block:'center' });
+      openDlWarning();
+    } else {
+      fireCustomToast('Rustex runs on your machine',
+        'The dashboard is part of the desktop app. The download is on this page.', 'i-download');
+    }
     return;
   }
   showView('dash');
@@ -3010,6 +3091,15 @@ function authPhase(phase){
   document.getElementById('steamAuthError').hidden = phase !== 'error';
 }
 function runSteamAuth(){
+  // In the app the page is loaded from disk, so an absolute path resolves to file:///api/...
+  // Navigating there does not fail politely — it takes the window off the dashboard and the
+  // app is dead until it is restarted. The desktop build has no hosted session to sign into
+  // anyway: it talks to the game server directly using your own pairing.
+  if(IS_DESKTOP){
+    authPhase('idle');
+    appSignIn();
+    return;
+  }
   authPhase('busy');
   const next = authIntent && /^[a-z]+$/.test(authIntent) ? '?next=' + authIntent : '';
   // full-page redirect: Steam will not render in an iframe or a popup we control
@@ -3237,9 +3327,9 @@ async function logOut(){
   }
 
   const h = location.hash;
-  // The desktop app is the dashboard. There is no marketing page to land on, so unless a
-  // pairing link asked for something else it opens straight into it.
-  const want = (IS_DESKTOP && !h) ? 'dash' : h.replace('#','');
+  // In the app, routing has exactly one owner: initAppShell decides between the login screen
+  // and the dashboard. Setting a view here as well left both showing at once.
+  const want = IS_DESKTOP ? '' : h.replace('#','');
   if(want === 'dash' || want === 'dashboard'){
     if(Session.entitled) document.body.classList.add('dash');
     else if(Session.signedIn) document.body.classList.add('pricing');
@@ -3439,6 +3529,89 @@ async function checkDownload(){
   } catch { /* offline or blocked: the self-hosted link stays */ }
 }
 checkDownload();
+
+/**
+ * The app is a two screen product: sign in, then the dashboard. Everything else on this page
+ * belongs to the website, so in the app it is simply never routed to.
+ */
+const APP_SIGNED_IN = 'rustex.app.signedin';
+
+function winMin(){ window.rustexNative?.win?.minimize(); }
+function winMax(){ window.rustexNative?.win?.maximize(); }
+function winClose(){ window.rustexNative?.win?.close(); }
+
+function appLoginStatus(text){
+  const el = document.getElementById('appLoginStatus');
+  if(!el) return;
+  el.textContent = text || '';
+  el.hidden = !text;
+}
+
+/**
+ * Steam's OpenID flow needs a real browser: it will not render in a frameless app window,
+ * and a page loaded from disk has no origin to come back to. So it opens outside, and the
+ * dashboard is available meanwhile because it never needed the account to work.
+ */
+function appSignIn(btn){
+  const done = btn ? busyButton(btn, 'Opening…') : () => {};
+  try {
+    window.rustexNative?.openExternal('https://rustex-site.vercel.app/api/auth/steam');
+    appLoginStatus('Steam opened in your browser. Finish there, then come back.');
+  } finally { done(); }
+}
+
+function appSkipLogin(){
+  try { localStorage.setItem(APP_SIGNED_IN, '1'); } catch {}
+  showAppDashboard();
+}
+
+function showAppDashboard(){
+  const login = document.getElementById('appLogin');
+  if(login) login.hidden = true;
+  document.body.classList.remove('pricing','settings','billing','pairing');
+  document.body.classList.add('dash');
+  refreshLiveData();
+}
+
+function initAppShell(){
+  if(!IS_DESKTOP) return;
+  const bar = document.getElementById('titlebar');
+  if(bar) bar.hidden = false;
+  window.rustexNative?.info?.().then(i => {
+    const v = document.getElementById('tbVer');
+    if(v && i?.version) v.textContent = 'v' + i.version;
+  }).catch(()=>{});
+  window.rustexNative?.win?.onState?.(st => {
+    const icon = document.getElementById('tbMaxIcon');
+    if(icon) icon.style.opacity = st?.maximized ? '.55' : '1';
+  });
+
+  // Straight past the login once it has been done on this machine.
+  let seen = null;
+  try { seen = localStorage.getItem(APP_SIGNED_IN); } catch {}
+  if(seen){ showAppDashboard(); return; }
+  const login = document.getElementById('appLogin');
+  if(login) login.hidden = false;
+}
+initAppShell();
+
+// Sign in belongs to the website. The app has no hosted session, so the controls are hidden
+// rather than left to fail — and anything still pointing at an absolute /api path is
+// neutralised, since from file:// that navigation would take the window off the dashboard.
+if(IS_DESKTOP){
+  document.addEventListener('DOMContentLoaded', hideAppSignIn);
+  hideAppSignIn();
+}
+function hideAppSignIn(){
+  document.querySelectorAll('[data-auth-only], .steam-btn, #navSignIn').forEach(el => {
+    el.hidden = true;
+    el.style.display = 'none';
+  });
+  document.querySelectorAll('a[href^="/api/"]').forEach(a => {
+    a.removeAttribute('href');
+    a.setAttribute('aria-disabled', 'true');
+  });
+}
 
 // Marketing chrome belongs to the website, not to the app window.
 if(IS_DESKTOP) document.body.classList.add('is-app');
@@ -5502,6 +5675,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 00:02 UTC</div>
+<div class="build-stamp">build 2026-07-30 00:25 UTC</div>
 </body>
 </html>
