@@ -635,6 +635,10 @@ body.is-app{padding-top:34px;}
 .applogin-status{font-size:var(--fs-xs); color:var(--orange); margin:12px 0 0;
   font-family:var(--font-mono);}
 
+/* The app build marks the brand inert: it is not a link there, so it must not look or
+   behave like one. */
+[data-inert]{pointer-events:none; cursor:default;}
+
 /* In-app pairing */
 .pairapp{margin:12px 0 4px; padding:15px 16px; background:var(--surface-2);
   border:1px solid var(--border-strong); border-radius:var(--r-md);}
@@ -5250,6 +5254,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 04:42 UTC</div>
+<div class="build-stamp">build 2026-07-30 05:10 UTC</div>
 </body>
 </html>
