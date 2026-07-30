@@ -1521,15 +1521,14 @@ body.billing #billing-view{display:block;}
     <h1 class="applogin-title">Rustex</h1>
     <p class="applogin-sub">Your Rust server, on your machine.</p>
 
-    <button class="btn btn-primary applogin-btn" onclick="appSignIn(this)">
-      <svg class="icon icon-16"><use href="#i-user"/></svg>Sign in with Steam</button>
+    <button class="btn btn-primary applogin-btn" onclick="appSkipLogin()">
+      <svg class="icon icon-16"><use href="#i-arrow-right"/></svg>Get started</button>
 
-    <button class="btn btn-outline applogin-btn" onclick="appSkipLogin()">
-      Continue without an account</button>
-
-    <p class="applogin-note">Signing in links this machine to your Steam profile on rustex.
-      The dashboard works either way: it talks to the game server directly using your own
-      Rust+ pairing, and nothing about your pairing leaves this computer.</p>
+    <p class="applogin-note">Rustex runs on this machine. It talks to your server directly
+      using your own Rust+ pairing, and nothing about that pairing leaves this computer, so
+      there is no account to sign into.</p>
+    <p class="applogin-note">Signing in on the website is only for managing a subscription.
+      It does not unlock anything here.</p>
     <p class="applogin-status" id="appLoginStatus" hidden></p>
   </div>
 </div>
@@ -2093,317 +2092,7 @@ body.billing #billing-view{display:block;}
 </div>
 
 <!-- ================================================================= DASHBOARD VIEW ================================================================= -->
-<div id="dashboard-view">
-<div class="dash-shell">
-  <aside class="sidebar">
-    <a class="sidebar-brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
-    <div class="side-section-lbl">Overview</div>
-    <a class="side-link active" data-dsec="overview" data-target="" href="#" onclick="showDashSection('overview');return false;"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
-    <a class="side-link" data-dsec="overview" data-target="d-team" href="#" onclick="showDashSection('overview','d-team');return false;"><svg class="icon"><use href="#i-users"/></svg>Team Tracker<span class="count">4</span></a>
-    <a class="side-link" data-dsec="overview" data-target="d-alarm" href="#" onclick="showDashSection('overview','d-alarm');return false;"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</a>
-        <div class="side-section-lbl">Tools</div>
-<a class="side-link" data-dsec="tools" data-target="d-decay" href="#" onclick="showDashSection('tools','d-decay');return false;"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</a>
-    <a class="side-link" data-dsec="tools" data-target="d-devices" href="#" onclick="showDashSection('tools','d-devices');return false;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</a>
-    <a class="side-link" data-dsec="tools" data-target="d-heatmap" href="#" onclick="showDashSection('tools','d-heatmap');return false;"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</a>
-    <div class="side-section-lbl">Market</div>
-    <a class="side-link" data-dsec="market" data-target="d-vending" href="#" onclick="showDashSection('market','d-vending');return false;"><span class="icon-img ic-vending"></span>Vending Search</a>
-    <a class="side-link" data-dsec="market" data-target="d-shopalerts" href="#" onclick="showDashSection('market','d-shopalerts');return false;"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</a>
-    <a class="side-link" data-dsec="market" data-target="d-recycler" href="#" onclick="showDashSection('market','d-recycler');return false;"><svg class="icon"><use href="#i-recycle"/></svg>Recycler</a>
-    <a class="side-link" data-dsec="tools" data-target="d-genetics" href="#" onclick="showDashSection('tools','d-genetics');return false;"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</a>
-    <a class="side-link" data-dsec="tools" data-target="d-chat" href="#" onclick="showDashSection('tools','d-chat');return false;"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</a>
-    <div class="side-foot">
-      <a class="side-link" href="#" onclick="goPairing();return false;"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</a>
-      <a class="side-link" href="#" onclick="goBilling();return false;"><svg class="icon"><use href="#i-tag"/></svg>Subscription</a>
-      <a class="side-link" href="#" onclick="goSettings();return false;"><svg class="icon"><use href="#i-settings"/></svg>Settings</a>
-      <div class="conn-status" style="cursor:pointer;" onclick="goPairing()"><span class="dot"></span>Rust+ Connected</div>
-    </div>
-  </aside>
 
-  <div class="dash-main">
-    <div class="topbar">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
-      <div class="crumb"><b data-acct="serverName">No server paired</b></div>
-      <button class="top-search" onclick="openCmdk()"><svg class="icon icon-15"><use href="#i-search"/></svg>Search players, items, commands…<kbd>⌘K</kbd></button>
-      <div class="top-actions">
-        <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddServer', event)"><svg class="icon icon-14"><use href="#i-grid"/></svg><span id="serverLabel" data-acct="serverName">No server</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
-          <div class="dropdown-panel" id="ddServer">
-            <div class="dropdown-label">Your servers</div>
-            <div class="dropdown-item text-3" style="cursor:default;">No servers paired yet</div>
-            <div class="dropdown-sep"></div>
-            <div class="dropdown-item" onclick="closeDropdowns();goPairing();"><svg class="icon"><use href="#i-plus"/></svg>Pair a new server</div>
-          </div>
-        </div>
-        <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddTeam', event)"><svg class="icon icon-14"><use href="#i-users"/></svg><span id="teamLabel">No team</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
-          <div class="dropdown-panel" id="ddTeam">
-            <div class="dropdown-label">Teams</div>
-            <div class="dropdown-item text-3" style="cursor:default;">No team data yet</div>
-            <div class="dropdown-sep"></div>
-            <div class="dropdown-item"><svg class="icon"><use href="#i-settings"/></svg>Manage teams</div>
-          </div>
-        </div>
-        <div class="dropdown">
-          <button class="icon-btn" onclick="openNotifs(event)"><svg class="icon icon-16"><use href="#i-bell"/></svg><span class="dot-badge" id="notifDot"></span></button>
-          <div class="dropdown-panel" id="ddNotifs" style="width:300px;">
-            <div class="dropdown-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:8px;">Notifications<span class="fs-11 fw-600" style="cursor:pointer; color:var(--orange); text-transform:none; letter-spacing:0" onclick="document.getElementById('notifDot').style.display='none'">Mark all read</span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--crimson)"><use href="#i-siren"/></svg><span>Smart Alarm triggered at North Wall<br/><span class="text-3 fs-11">14s ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--orange)"><use href="#i-tag"/></svg><span>New shop listed at grid B12<br/><span class="text-3 fs-11">2m ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;"><use href="#i-users"/></svg><span>Ramsey went offline<br/><span class="text-3 fs-11">6m ago</span></span></div>
-          </div>
-        </div>
-        <div class="dropdown">
-          <div class="user-chip" onclick="toggleDropdown('ddUser', event)"><img data-acct="avatar" alt=""><span data-acct="name">Player</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
-          <div class="dropdown-panel" id="ddUser">
-            <div class="dropdown-item" onclick="closeDropdowns();goSettings();"><svg class="icon"><use href="#i-users"/></svg>Account</div>
-            <div class="dropdown-item" onclick="closeDropdowns();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</div>
-            <div class="dropdown-item" onclick="closeDropdowns();goBilling();"><svg class="icon"><use href="#i-tag"/></svg>Subscription &amp; billing</div>
-            <div class="dropdown-item" onclick="closeDropdowns();goSettings();"><svg class="icon"><use href="#i-settings"/></svg>Settings</div>
-            <div class="dropdown-sep"></div>
-            <div class="dropdown-item danger" onclick="closeDropdowns();logOut();"><svg class="icon"><use href="#i-x"/></svg>Log out</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="dash-content">
-      <div id="d-overview" class="dash-head">
-        <div><h1>Overview</h1><div class="sub" data-acct="serverName">No server paired</div></div>
-        <div style="display:flex;gap:10px;">
-          <div class="dropdown">
-            <button class="btn btn-outline btn-sm" onclick="toggleDropdown('ddCustomize', event)"><svg class="icon icon-14"><use href="#i-layers"/></svg>Customize</button>
-            <div class="dropdown-panel" id="ddCustomize" style="width:230px;">
-              <div class="dropdown-label">Sections</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</div></div>
-          </div>
-          <button class="btn btn-primary btn-sm" onclick="fireToast()"><svg class="icon icon-14"><use href="#i-plus"/></svg>Quick Alert</button>
-        </div>
-      </div>
-
-      <div class="demo-banner"><svg class="icon"><use href="#i-flask"/></svg><span><b>Demo mode.</b> Everything on this page is sample data, not live Rust+ telemetry.</span><button class="btn btn-ghost btn-sm" style="margin-left:auto;" onclick="exitDemo()">Exit demo</button></div>
-
-      <div class="alert-banner demo-only">
-        <span class="alert-icon blink"><svg class="icon"><use href="#i-siren"/></svg></span>
-        <div class="alert-body"><div class="t">RAID DETECTED: Main Base, North Wall</div><div class="d mono">Smart Alarm tripped 00:14 ago · 2 breach events logged</div></div>
-        <button class="btn btn-primary btn-sm">Call Squad</button>
-        <button class="icon-btn" style="width:34px;height:34px;"><svg class="icon icon-14"><use href="#i-x"/></svg></button>
-      </div>
-
-      <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
-          <button class="dash-tab active" data-dsec="overview" onclick="showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</button>
-          <button class="dash-tab" data-dsec="market" onclick="showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</button>
-          <button class="dash-tab" data-dsec="tools" onclick="showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</button>
-      </div>
-
-      <div class="dash-section active" id="dsec-overview">
-        <div class="live-state w-12" id="liveState" hidden></div>
-        <div class="stat-row w-12">
-          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Server Pop</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="pop">187</span><span class="text-3 fs-14"><span data-live="maxPop"> of 200</span></span></div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Wipe Age</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="wipeAge">3</span><span class="text-3 fs-14"> days</span></div></div>
-          <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Queue</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px; color:var(--crimson)"><span data-live="queue">0</span></div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Squad Online</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="squadOnline">4</span><span class="text-3 fs-14"><span data-live="squadTotal"> of 5</span></span></div></div>
-        </div>
-        <div class="widget card w-12" id="d-team">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div><div id="teamRows">
-          <table class="table">
-            <tbody>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--orange); width:26px; height:26px">KL</span>Kaelthorn <span class="badge badge-leader" style="margin-left:6px">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#5b6472; width:26px; height:26px">VX</span>Vexen</td><td class="mono text-2">K13</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#3d6b5c; width:26px; height:26px">OT</span>Otterloop</td><td class="mono text-2">J15</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--crimson); width:26px; height:26px">RM</span>Ramsey</td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        </div>
-
-        <div class="widget card w-12" id="d-alarm">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
-            <div class="text-3 fs-12">Connect a server to load live events.</div>
-          </div>
-        </div>
-        </div>
-
-      <div class="dash-section" id="dsec-market">
-        <div class="widget card w-6" id="d-vending">
-          <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="vend-bar">
-            <svg class="icon"><use href="#i-search"/></svg>
-            <input id="vendQuery" type="text" placeholder="Search items for sale" autocomplete="off"
-                   oninput="queueVendSearch()" onkeydown="if(event.key==='Enter')runVendSearch()">
-            <button class="btn btn-ghost btn-sm" onclick="refreshVending(this)">Refresh</button>
-          </div>
-          <div id="vendResults" class="vend-list"></div>
-        </div>
-
-        <div class="widget card w-6" id="d-shopalerts">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-megaphone"/></svg>Shop Alerts</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div id="shopAlerts" class="vend-list"></div>
-        </div>
-
-        <div class="widget card w-12" id="d-recycler">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-recycle"/></svg>Recycler Calculator</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="rc-modes">
-            <button class="rc-mode active" data-rmode="mon"  onclick="setRecycleMode('mon')">Monument · 60%</button>
-            <button class="rc-mode" data-rmode="safe" onclick="setRecycleMode('safe')">Safezone · 40%</button>
-          </div>
-
-          <div class="rc-grid" id="rcGrid"></div>
-
-          <div class="rc-out">
-            <div id="rcTotals"><div class="text-3 fs-12">Enter how many of each component you have.</div></div>
-            <div class="rc-note text-3" id="rcNote"></div>
-          </div>
-          <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="clearRecycler()">Clear</button>
-          <p class="text-3 fs-11" style="line-height:1.5; margin:10px 0 0">
-            Yields from Man1ak&rsquo;s recycler chart. Where the chart gives a range the total stays a
-            range rather than guessing a single figure.
-          </p>
-        </div>
-      </div>
-
-      <div class="dash-section" id="dsec-tools">
-        <div class="widget card w-6" id="d-decay">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-clock"/></svg>Decay Timers</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="decay-calc">
-            <div class="decay-row">
-              <label class="decay-lbl" for="decayMat">Material</label>
-              <select class="inp" id="decayMat" onchange="renderDecay()">
-                <option value="twig">Twig</option>
-                <option value="wood">Wood</option>
-                <option value="stone" selected>Stone</option>
-                <option value="sheet">Sheet Metal</option>
-                <option value="armored">Armoured</option>
-              </select>
-            </div>
-
-            <div class="decay-row">
-              <label class="decay-lbl" for="decayHp">Current HP</label>
-              <input class="inp" id="decayHp" type="number" min="0" inputmode="numeric" oninput="renderDecay()">
-            </div>
-
-            <input type="range" id="decayPct" class="decay-slider" min="1" max="100" value="100"
-                   oninput="setDecayPct(this.value)" aria-label="Percent health remaining">
-            <div class="decay-pct"><span id="decayPctLabel">100%</span><span id="decayMax" class="text-3"></span></div>
-
-            <div class="decay-out">
-              <div class="decay-time" id="decayTime">--</div>
-              <div class="decay-sub text-3" id="decaySub">until it collapses</div>
-            </div>
-
-            <p class="text-3 fs-11" style="line-height:1.55; margin:0">
-              Assumes no Tool Cupboard upkeep. Decay only runs once the building has been outside
-              upkeep for a while, so treat this as the time you have after it starts, not a countdown
-              from right now.
-            </p>
-          </div>
-        </div>
-
-        <div class="widget card w-6" id="d-devices">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices</div><button class="btn btn-ghost btn-sm" onclick="refreshDevices(this)">Refresh</button></div>
-          <p class="dev-help">Pair a Smart Switch in the Rust+ app, then add its ID here. The ID is shown on the device in game.</p>
-          <div class="vend-bar">
-            <input id="devId" type="text" inputmode="numeric" placeholder="Device ID" autocomplete="off">
-            <input id="devName" type="text" placeholder="Name (optional)" autocomplete="off"
-                   onkeydown="if(event.key==='Enter')addDevice()">
-            <button class="btn btn-primary btn-sm" onclick="addDevice()">Add</button>
-          </div>
-          <div id="devErr" class="gene-err" hidden></div>
-          <div id="devList" class="dev-list"></div>
-        </div>
-
-        <div class="widget card w-12" id="d-heatmap">
-          <div class="card-head">
-            <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
-              <button type="button" class="pill heat-key" data-layer="raid" aria-pressed="true"><span class="dot" style="background:rgb(229,90,60)"></span>Raids</button>
-              <button type="button" class="pill heat-key" data-layer="crate" aria-pressed="true"><span class="dot" style="background:rgb(245,158,11)"></span>Crates</button>
-              <button type="button" class="pill heat-key" data-layer="cargo" aria-pressed="true"><span class="dot" style="background:rgb(96,165,250)"></span>Cargo</button>
-              <button type="button" class="pill heat-key" data-layer="heli" aria-pressed="true"><span class="dot" style="background:rgb(229,60,60)"></span>Heli</button>
-              <button type="button" class="pill heat-key" data-layer="shop" aria-pressed="true"><span class="dot" style="background:rgb(74,222,128)"></span>Shops</button>
-              <button type="button" class="pill heat-key" data-layer="monument" aria-pressed="true"><span class="dot" style="background:rgb(150,152,160)"></span>Monuments</button>
-            </div>
-          </div>
-          <div class="heat-wrap" data-heat>
-            <canvas id="heatCanvas2" style="height:320px;" role="img" aria-label="Activity heatmap of observed explosions, crates, cargo, helicopters and shops"></canvas>
-            <div class="heat-tip" data-heat-tip></div>
-            <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
-            <div class="heat-zoom">
-              <button type="button" data-heat-zoom="in" aria-label="Zoom in" title="Zoom in"><svg class="icon"><use href="#i-plus"/></svg></button>
-              <button type="button" data-heat-zoom="out" aria-label="Zoom out" title="Zoom out"><svg class="icon"><use href="#i-minus"/></svg></button>
-              <button type="button" data-heat-zoom="reset" aria-label="Reset view" title="Reset view"><svg class="icon"><use href="#i-crosshair"/></svg></button>
-            </div>
-          </div>
-        </div>
-
-        <div class="widget card w-6" id="d-genetics">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-flask"/></svg>Genetics Lab</div><span class="pill pill-orange" id="dashGeneMatchPill"><span class="dot"></span>0% to target</span></div>
-          <div class="planter">
-            <div class="planter-soil" role="group" aria-label="Planter box seen from above: Donor A, Center plant, Donor B">
-              <div class="plant-slot" data-flow="right">
-                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
-                <div class="slot-body">
-                  <span class="slot-tag">Donor A</span>
-                  <div class="gene-blocks" id="dashDonorAGeneRow"></div>
-                </div>
-              </div>
-              <div class="plant-slot is-center">
-                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
-                <div class="slot-body">
-                  <span class="slot-tag">Center &middot; your clone</span>
-                  <div class="gene-blocks" id="dashCenterGeneRow"></div>
-                </div>
-              </div>
-              <div class="plant-slot" data-flow="left">
-                <span class="plant-sprite ic-hemp" aria-hidden="true"></span>
-                <div class="slot-body">
-                  <span class="slot-tag">Donor B</span>
-                  <div class="gene-blocks" id="dashDonorBGeneRow"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <p class="planter-caption"><svg class="icon"><use href="#i-flask"/></svg>Tap any gene to change it. Plant your two best clones either side of the one you want to improve.</p>
-          <div class="gene-target">
-            <span class="slot-tag">Target</span>
-            <div class="gene-blocks" id="dashTargetGeneRow"></div>
-            <button class="btn btn-primary btn-sm" onclick="simulateCrossbreed()">Crossbreed</button>
-          </div>
-          <div class="progress"><span id="dashGeneBar" style="width:0%"></span></div>
-        </div>
-
-        <div class="widget card w-6" id="d-chat">
-          <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
-          <div class="chat-log" id="chatLog">
-            <div class="text-3 fs-12">Connect a server to load team chat.</div>
-          </div>
-          <div class="chat-send">
-            <input class="inp" id="chatSend" type="text" maxlength="250" placeholder="Message your team"
-                   onkeydown="if(event.key==='Enter')sendChatFromBox(this.nextElementSibling)">
-            <button class="btn btn-primary btn-sm" onclick="sendChatFromBox(this)">Send</button>
-          </div>
-
-          <div class="announce">
-            <div class="announce-hd">Announce to team chat</div>
-            <p class="text-3 fs-11" style="margin:0 0 9px; line-height:1.5">
-              Rustex posts these into your squad&rsquo;s chat as they happen, once each. Everything is
-              off until you turn it on.
-            </p>
-            <label class="announce-row"><input type="checkbox" data-ann="cargo"  onchange="toggleAnnounce(this)"><span>Cargo Ship</span></label>
-            <label class="announce-row"><input type="checkbox" data-ann="heli"   onchange="toggleAnnounce(this)"><span>Patrol Helicopter</span></label>
-            <label class="announce-row"><input type="checkbox" data-ann="crate"  onchange="toggleAnnounce(this)"><span>Locked Crate</span></label>
-            <label class="announce-row"><input type="checkbox" data-ann="death"  onchange="toggleAnnounce(this)"><span>Teammate dies</span></label>
-            <label class="announce-row"><input type="checkbox" data-ann="online" onchange="toggleAnnounce(this)"><span>Teammate comes online</span></label>
-          </div>
-
-          <button class="btn btn-outline btn-sm" style="margin-top:10px;" onclick="loadTeamChat(this)">Refresh chat</button>
-        </div>
-        </div>
-      </div>
-    
-    </div>
-  </div>
-</div>
 </div>
 
 
@@ -3118,8 +2807,11 @@ function runSteamAuth(){
   // app is dead until it is restarted. The desktop build has no hosted session to sign into
   // anyway: it talks to the game server directly using your own pairing.
   if(IS_DESKTOP){
+    // No hosted session exists for the app, and sending people to a browser only stranded
+    // them on the marketing page.
     authPhase('idle');
-    appSignIn();
+    fireCustomToast('No account needed',
+      'Rustex runs on this machine against your own pairing.', 'i-wifi');
     return;
   }
   authPhase('busy');
@@ -3456,7 +3148,7 @@ function initAppPairing(){
     setTimeout(() => { goDashboard(); }, 700);
   });
 }
-initAppPairing();
+queueMicrotask(initAppPairing);
 
 /**
  * Downloading an unsigned build without warning someone first is how a real product gets
@@ -3553,7 +3245,7 @@ async function checkDownload(){
     row.hidden = false;
   } catch { /* offline or blocked: the self-hosted link stays */ }
 }
-checkDownload();
+queueMicrotask(checkDownload);
 
 /**
  * The app is a two screen product: sign in, then the dashboard. Everything else on this page
@@ -3577,15 +3269,6 @@ function appLoginStatus(text){
  * and a page loaded from disk has no origin to come back to. So it opens outside, and the
  * dashboard is available meanwhile because it never needed the account to work.
  */
-function appSignIn(btn){
-  const done = btn ? busyButton(btn, 'Opening…') : () => {};
-  try {
-    window.rustexNative?.openExternal('https://rustex-site.vercel.app/api/auth/steam?next=settings');
-    appLoginStatus('Steam opened in your browser. Sign in there, then come back to this window '
-      + 'and choose Continue. The dashboard is here in the app, not on the website.');
-  } finally { done(); }
-}
-
 function appSkipLogin(){
   try { localStorage.setItem(APP_SIGNED_IN, '1'); } catch {}
   showAppDashboard();
@@ -3616,10 +3299,12 @@ function initAppShell(){
   let seen = null;
   try { seen = localStorage.getItem(APP_SIGNED_IN); } catch {}
   if(seen){ showAppDashboard(); return; }
+  // Showing the login must also take the dashboard down, or both end up on screen.
+  document.body.classList.remove('dash');
   const login = document.getElementById('appLogin');
   if(login) login.hidden = false;
 }
-initAppShell();
+queueMicrotask(initAppShell);
 
 // Sign in belongs to the website. The app has no hosted session, so the controls are hidden
 // rather than left to fail — and anything still pointing at an absolute /api path is
@@ -3840,6 +3525,10 @@ let rcMult = 1, rcItems = [];
 document.querySelectorAll('#rcChips .rc-chip').forEach(chip=>{
   chip.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', chip.dataset.item); });
 });
+// This demo lives on the landing page, which the app build does not ship. Wiring it
+// unconditionally threw before the rest of the script had run, so everything declared
+// below it stayed in its temporal dead zone and the whole app came up broken.
+if(rcDrop){
 rcDrop.addEventListener('dragover', e=>{ e.preventDefault(); rcDrop.classList.add('over'); });
 rcDrop.addEventListener('dragleave', ()=> rcDrop.classList.remove('over'));
 rcDrop.addEventListener('drop', e=>{
@@ -3847,6 +3536,7 @@ rcDrop.addEventListener('drop', e=>{
   const item = e.dataTransfer.getData('text/plain');
   if(RC_YIELDS[item]){ rcItems.push(item); renderRc(); }
 });
+}
 document.querySelectorAll('#rcZoneTabs .tab').forEach(tab=>{
   tab.addEventListener('click', ()=>{
     document.querySelectorAll('#rcZoneTabs .tab').forEach(t=>t.classList.remove('active'));
@@ -3854,6 +3544,7 @@ document.querySelectorAll('#rcZoneTabs .tab').forEach(tab=>{
   });
 });
 function renderRc(){
+  if(!rcDrop) return;
   if(rcItems.length===0){ rcDrop.innerHTML = '<span class="text-3 fs-12">Drop components here…</span>'; document.getElementById('rcOutput').innerHTML = '<span>Not set</span>'; return; }
   rcDrop.innerHTML = rcItems.map(i=>{
     const {ic, label} = RC_YIELDS[i];
@@ -5701,6 +5392,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 00:40 UTC</div>
+<div class="build-stamp">build 2026-07-30 01:05 UTC</div>
 </body>
 </html>
