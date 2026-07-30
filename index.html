@@ -653,6 +653,59 @@ body.is-app .dash-shell{min-height:calc(100vh - 34px);}
 body.is-app.app-booting > *:not(.titlebar){visibility:hidden;}
 body.is-app.app-booting{background:var(--bg);}
 
+/* Raid calculator. Built from the same cards, pills, inputs and steppers as everything
+   else — the only new pieces are the two column split and the cost readout. */
+.raid-sub{font-size:var(--fs-sm); color:var(--text-3); margin:0 0 12px; line-height:1.5;}
+.raid-tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px;}
+.raid-metrics{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:4px;}
+.raid-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start;}
+.raid-label{display:block; font-size:var(--fs-2xs); text-transform:uppercase; letter-spacing:.08em;
+  color:var(--text-3); font-weight:700; margin:0 0 7px;}
+.raid-label-row{display:flex; align-items:baseline; justify-content:space-between; margin-top:15px;}
+.raid-hint{text-transform:none; letter-spacing:0; font-weight:400; font-size:var(--fs-2xs);}
+.raid-select{width:100%; max-width:none;}
+.raid-rows{display:flex; flex-direction:column; gap:2px;}
+.raid-row{display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:10px;
+  padding:5px 6px; border-radius:var(--r-sm);}
+.raid-row:hover{background:var(--surface-2);}
+.raid-name{font-size:var(--fs-sm); color:var(--text-2); overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap;}
+.raid-unit{font-size:var(--fs-2xs); color:var(--text-3); font-family:var(--font-mono);}
+.raid-row.off .raid-name, .raid-row.off .raid-unit{opacity:.45;}
+.raid-out{display:flex; flex-direction:column; gap:11px;}
+.raid-verdict{display:flex; align-items:center; gap:9px; padding:11px 13px; border-radius:var(--r-md);
+  font-size:var(--fs-md); font-weight:600; border:1px solid var(--border);}
+.raid-verdict.ok{color:var(--success); border-color:rgba(95,168,92,.3); background:var(--success-soft);}
+.raid-verdict.no{color:var(--warning); border-color:rgba(200,146,46,.3); background:var(--warning-soft);}
+.raid-cost{display:flex; align-items:baseline; gap:9px; padding-bottom:10px;
+  border-bottom:1px solid var(--border);}
+.raid-cost b{font-size:var(--fs-num); font-weight:800; color:var(--orange); font-family:var(--font-mono);}
+.raid-cost span{font-size:var(--fs-sm); color:var(--text-3);}
+.raid-bar{height:5px; background:var(--surface-3); border-radius:var(--r-sm); overflow:hidden;}
+.raid-bar > span{display:block; height:100%; background:var(--orange); transition:width .22s ease;}
+.raid-break{display:flex; flex-direction:column; gap:4px;}
+.raid-break-row{display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+  font-size:var(--fs-sm); color:var(--text-2);}
+.raid-break-row .mono{color:var(--text-3); font-size:var(--fs-xs);}
+.raid-break-row.total{border-top:1px solid var(--border); padding-top:6px; margin-top:3px;
+  color:var(--text); font-weight:700;}
+.raid-list{display:flex; flex-direction:column; gap:3px;}
+.raid-item{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:9px;
+  font-size:var(--fs-sm); color:var(--text-2); padding:4px 6px; border-radius:var(--r-sm);}
+.raid-item:hover{background:var(--surface-2);}
+.raid-item .tick{color:var(--success); font-weight:700;}
+.raid-item .cross{color:var(--text-3); font-weight:700;}
+.raid-item .mono{color:var(--text-3); font-size:var(--fs-xs); white-space:nowrap;}
+.raid-empty{font-size:var(--fs-sm); color:var(--text-3); line-height:1.5;}
+.raid-opt{display:grid; grid-template-columns:auto 1fr auto; gap:10px; align-items:baseline;
+  padding:6px; border-radius:var(--r-sm); font-size:var(--fs-sm); color:var(--text-2);}
+.raid-opt:hover{background:var(--surface-2);}
+.raid-opt.top{background:var(--orange-soft); color:var(--text);}
+.raid-opt .rank{font-size:var(--fs-2xs); color:var(--text-3); font-family:var(--font-mono);}
+.raid-opt.top .rank{color:var(--orange);}
+.raid-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:2px;}
+@media (max-width:900px){ .raid-grid{grid-template-columns:1fr; gap:16px;} }
+
 /* In-app pairing */
 .pairapp{margin:12px 0 4px; padding:15px 16px; background:var(--surface-2);
   border:1px solid var(--border-strong); border-radius:var(--r-md);}
@@ -1423,6 +1476,7 @@ body.billing #billing-view{display:block;}
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
 <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 004 0"/></symbol>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 17v2.5A1.5 1.5 0 005.5 21h13a1.5 1.5 0 001.5-1.5V17"/></symbol>
+<symbol id="i-bomb" viewBox="0 0 24 24"><circle cx="10.5" cy="14.5" r="6.5"/><path d="M15.2 9.8 18 7"/><path d="M17 5.5 19.5 8"/><path d="M20 4.5v-2M22.5 5.5h2"/></symbol>
 <symbol id="rc-pipe" viewBox="0 0 24 24"><path d="M5 16.5 16 5.5"/><path d="M8 19.5 19 8.5"/><path d="M5 16.5a2.1 2.1 0 003 3"/><path d="M16 5.5a2.1 2.1 0 013 3"/></symbol>
 <symbol id="rc-sign" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="10" rx="1.5"/><path d="M12 14v6"/><path d="M9 9h6M12 6.5 15 9l-3 2.5"/></symbol>
 <symbol id="rc-sheet" viewBox="0 0 24 24"><path d="M3 9.5 12 5l9 4.5"/><path d="M3 13.5 12 9l9 4.5"/><path d="M3 17.5 12 13l9 4.5"/></symbol>
@@ -3951,6 +4005,7 @@ function showDashSection(id, focusWidget){
   // The heatmap lives in tools; fetch the server's real map the first time it is opened.
   if(id === 'tools' && document.getElementById('heatCanvas2')) loadServerMap();
   if(id === 'tools' && document.getElementById('geneList')) renderGenes();
+  if(id === 'tools' && document.getElementById('raidTarget')) raidRender();
   if(id === 'tools' && document.getElementById('devList')){ loadDevices(); renderDevices(); refreshDevices(); }
   if(focusWidget){
     const el = document.getElementById(focusWidget);
@@ -5084,6 +5139,416 @@ function renderRecycler(){
 // Full-health decay durations with no Tool Cupboard upkeep, and the max HP of one
 // wall of each tier. Decay is linear across the duration, so a wall at half health
 // has half the time left.
+// ---- raid calculator: view --------------------------------------------------------
+/**
+ * Presentation only. Every number here comes back from the engine above; nothing on this
+ * side does arithmetic, so the figures on screen and the figures under test cannot disagree.
+ */
+let raidMode = 'calc';
+let raidOptMetric = 'cheapest';
+const raidLoadout = {};
+const raidOwned = {};
+
+const raidNum = n => Number(n || 0).toLocaleString('en-US');
+
+function raidTab(mode){
+  raidMode = mode;
+  document.querySelectorAll('[data-raidtab]').forEach(b =>
+    b.classList.toggle('active', b.dataset.raidtab === mode));
+  document.querySelectorAll('[data-raidpane]').forEach(el =>
+    el.hidden = el.dataset.raidpane !== mode);
+  raidRender();
+}
+
+function raidMetric(metric){
+  raidOptMetric = metric;
+  document.querySelectorAll('[data-metric]').forEach(b =>
+    b.classList.toggle('active', b.dataset.metric === metric));
+  raidRender();
+}
+
+function raidStep(store, key, delta){
+  const bag = store === 'own' ? raidOwned : raidLoadout;
+  bag[key] = Math.max(0, (Number(bag[key]) || 0) + delta);
+  if(!bag[key]) delete bag[key];
+  raidRender();
+}
+
+function raidSet(store, key, value){
+  const bag = store === 'own' ? raidOwned : raidLoadout;
+  const n = Math.max(0, Math.min(9999, Math.floor(Number(value) || 0)));
+  if(n) bag[key] = n; else delete bag[key];
+  raidRenderOutput();
+}
+
+function raidReset(){
+  for(const k of Object.keys(raidLoadout)) delete raidLoadout[k];
+  for(const k of Object.keys(raidOwned)) delete raidOwned[k];
+  raidRender();
+}
+
+/** One stepper row per explosive, using the same controls as the recycler. */
+function raidRows(store){
+  const bag = store === 'own' ? raidOwned : raidLoadout;
+  const target = raidTarget(document.getElementById('raidTarget')?.value);
+  return EXPLOSIVE_ORDER.map(key => {
+    const ex = EXPLOSIVES[key];
+    const need = target ? target.solo[key] : 0;
+    const dead = store !== 'own' && target && !need;
+    return '<div class="raid-row' + (dead ? ' off' : '') + '">'
+      + '<span class="raid-name">' + escapeHtml(ex.name)
+      +   '<span class="raid-unit"> · ' + raidNum(ex.sulfur) + ' sul' + (ex.perRound ? '/rd' : '') + '</span>'
+      +   (dead ? '<span class="raid-unit"> · cannot breach</span>' : '') + '</span>'
+      + '<span class="rc-step">'
+      +   '<button type="button" class="rc-btn" onclick="raidStep(\'' + store + '\',\'' + key + '\',-1)" aria-label="one fewer ' + escapeHtml(ex.name) + '">&minus;</button>'
+      +   '<input class="rc-qty" type="text" inputmode="numeric" placeholder="0" value="' + (bag[key] || '') + '"'
+      +     ' oninput="raidSet(\'' + store + '\',\'' + key + '\', this.value)" aria-label="' + escapeHtml(ex.name) + ' quantity">'
+      +   '<button type="button" class="rc-btn" onclick="raidStep(\'' + store + '\',\'' + key + '\',1)" aria-label="one more ' + escapeHtml(ex.name) + '">+</button>'
+      + '</span>'
+      + '<span class="raid-unit">' + (bag[key] ? raidNum(bag[key] * ex.sulfur) : '&mdash;') + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+function raidLoadoutText(loadout){
+  return EXPLOSIVE_ORDER.filter(k => loadout[k])
+    .map(k => loadout[k] + ' ' + EXPLOSIVES[k].short).join(' + ') || 'nothing';
+}
+
+/** Copies the loadout and its cost, so it can be pasted to the squad. */
+function raidCopy(){
+  const target = raidTarget(document.getElementById('raidTarget')?.value);
+  const evald = raidEvaluate(target, raidLoadout);
+  const text = target.name + ': ' + raidLoadoutText(raidLoadout)
+    + ' = ' + raidNum(evald.sulfur) + ' sulfur'
+    + (evald.enough ? '' : ' (not enough, ' + evald.percent + '%)');
+  navigator.clipboard?.writeText(text)
+    .then(() => fireCustomToast('Copied', text, 'i-check'))
+    .catch(() => fireCustomToast('Could not copy', text, 'i-lock'));
+}
+
+function raidBreakdown(evald){
+  if(!evald.lines.length) return '';
+  const rows = evald.lines.map(l =>
+    '<div class="raid-break-row"><span>' + l.qty + ' &times; ' + escapeHtml(l.short)
+    + (l.usable ? '' : ' <span class="mono">no effect</span>') + '</span>'
+    + '<span class="mono">' + raidNum(l.sulfur) + '</span></div>').join('');
+  const res = Object.entries(evald.resources)
+    .filter(([r]) => r !== 'Sulfur')
+    .map(([r, n]) => '<div class="raid-break-row"><span>' + escapeHtml(r) + '</span>'
+      + '<span class="mono">' + raidNum(n) + '</span></div>').join('');
+  return '<div class="raid-break">' + rows
+    + '<div class="raid-break-row total"><span>Total sulfur</span><span class="mono">'
+    + raidNum(evald.sulfur) + '</span></div></div>'
+    + (res ? '<div class="raid-label" style="margin-top:12px">Also needs</div><div class="raid-break">' + res + '</div>' : '');
+}
+
+function raidRenderOutput(){
+  const out = document.getElementById('raidOut');
+  const sel = document.getElementById('raidTarget');
+  if(!out || !sel) return;
+  const target = raidTarget(sel.value);
+  if(!target){ out.innerHTML = ''; return; }
+
+  if(raidMode === 'calc'){
+    const e = raidEvaluate(target, raidLoadout);
+    if(!e.count){
+      out.innerHTML = '<div class="raid-empty">Add explosives on the left to see what it costs '
+        + 'and whether it gets through ' + escapeHtml(target.name.toLowerCase()) + '.</div>';
+      return;
+    }
+    const short = e.enough ? '' :
+      '<div class="raid-label" style="margin-top:4px">Still need</div><div class="raid-list">'
+      + e.shortfall.slice(0, 3).map(sf => '<div class="raid-item"><span class="cross">+</span>'
+        + '<span>' + sf.qty + ' more ' + escapeHtml(sf.short) + '</span>'
+        + '<span class="mono">' + raidNum(sf.qty * EXPLOSIVES[sf.key].sulfur) + ' sul</span></div>').join('')
+      + '</div>';
+    out.innerHTML = '<div class="raid-out">'
+      + '<div class="raid-cost"><b>' + raidNum(e.sulfur) + '</b><span>sulfur &middot; '
+      +   e.count + ' item' + (e.count === 1 ? '' : 's') + '</span></div>'
+      + '<div class="raid-bar"><span style="width:' + e.percent + '%"></span></div>'
+      + '<div class="raid-verdict ' + (e.enough ? 'ok' : 'no') + '">'
+      +   (e.enough ? 'Enough to breach ' + escapeHtml(target.name)
+                    : e.percent + '% of the way through') + '</div>'
+      + short
+      + '<div class="raid-label" style="margin-top:4px">Breakdown</div>'
+      + raidBreakdown(e)
+      + '<div class="raid-actions"><button class="btn btn-ghost btn-sm" onclick="raidCopy()">Copy loadout</button></div>'
+      + '</div>';
+    return;
+  }
+
+  if(raidMode === 'inv'){
+    const owned = Object.keys(raidOwned).length;
+    if(!owned){
+      out.innerHTML = '<div class="raid-empty">Enter what you are carrying and this lists every '
+        + 'structure you can already get through, and what the rest would take.</div>';
+      return;
+    }
+    const rep = raidInventoryReport(raidOwned);
+    const can = rep.can.length
+      ? rep.can.map(r => '<div class="raid-item"><span class="tick">&check;</span>'
+          + '<span>' + escapeHtml(r.target.name) + ' <span class="mono">' + escapeHtml(raidLoadoutText(r.loadout)) + '</span></span>'
+          + '<span class="mono">' + raidNum(r.sulfur) + ' sul</span></div>').join('')
+      : '<div class="raid-empty">Nothing yet. Add a few more explosives.</div>';
+    const cannot = rep.cannot.map(r => '<div class="raid-item"><span class="cross">&times;</span>'
+      + '<span>' + escapeHtml(r.target.name)
+      + (r.shortfall.length ? ' <span class="mono">need ' + r.shortfall[0].qty + ' more ' + escapeHtml(r.shortfall[0].short) + '</span>' : '')
+      + '</span><span class="mono">' + r.percent + '%</span></div>').join('');
+    out.innerHTML = '<div class="raid-out">'
+      + '<div class="raid-label">You can raid</div><div class="raid-list">' + can + '</div>'
+      + (cannot ? '<div class="raid-label" style="margin-top:6px">Not yet</div><div class="raid-list">' + cannot + '</div>' : '')
+      + '</div>';
+    return;
+  }
+
+  // best raid
+  const limits = raidOptMetric === 'owned' && Object.keys(raidOwned).length ? raidOwned : null;
+  const solved = raidSolve(target, { limits, metric:raidOptMetric });
+  if(!solved){
+    out.innerHTML = '<div class="raid-empty">Nothing you are carrying gets through '
+      + escapeHtml(target.name.toLowerCase()) + '. Add more under My Explosives.</div>';
+    return;
+  }
+  const e = raidEvaluate(target, solved.best.loadout);
+  const others = solved.options.filter(o => JSON.stringify(o.loadout) !== JSON.stringify(solved.best.loadout));
+  out.innerHTML = '<div class="raid-out">'
+    + '<div class="raid-cost"><b>' + raidNum(solved.best.sulfur) + '</b><span>sulfur &middot; '
+    +   escapeHtml(raidLoadoutText(solved.best.loadout)) + '</span></div>'
+    + '<div class="raid-verdict ok">Cheapest way through ' + escapeHtml(target.name) + '</div>'
+    + '<div class="raid-label" style="margin-top:4px">Breakdown</div>' + raidBreakdown(e)
+    + (others.length ? '<div class="raid-label" style="margin-top:12px">Other options</div>'
+        + '<div class="raid-list">' + others.slice(0, 5).map((o, i) =>
+            '<div class="raid-opt"><span class="rank">' + (i + 2) + '</span>'
+            + '<span>' + escapeHtml(raidLoadoutText(o.loadout)) + '</span>'
+            + '<span class="mono">' + raidNum(o.sulfur) + ' sul</span></div>').join('') + '</div>'
+      : '')
+    + '</div>';
+}
+
+function raidRender(){
+  const sel = document.getElementById('raidTarget');
+  if(!sel) return;
+  if(!sel.options.length){
+    const cats = [...new Set(RAID_TARGETS.map(t => t.category))];
+    sel.innerHTML = cats.map(c => '<optgroup label="' + escapeHtml(c) + '">'
+      + RAID_TARGETS.filter(t => t.category === c)
+          .map(t => '<option value="' + t.id + '">' + escapeHtml(t.name) + '</option>').join('')
+      + '</optgroup>').join('');
+    sel.value = 'door-sheet';
+  }
+  const load = document.getElementById('raidLoadout');
+  if(load) load.innerHTML = raidRows('load');
+  const inv = document.getElementById('raidInv');
+  if(inv) inv.innerHTML = raidRows('own');
+  raidRenderOutput();
+}
+
+// ---- raid calculator: data --------------------------------------------------------
+/**
+ * One place for every raid number. Change these and the whole feature follows, because the
+ * engine below and the UI further down both read from here and neither hardcodes a cost.
+ *
+ * `sulfur` is the crafting cost of one unit. Explosive ammo is priced per round.
+ */
+const EXPLOSIVES = {
+  rocket:   { name:'Rocket',          short:'Rocket',   sulfur:1400, icon:'i-rocket',
+              craft:{ 'Sulfur':1400, 'Metal Fragments':100, 'Charcoal':1950 } },
+  c4:       { name:'Timed Explosive', short:'C4',       sulfur:2200, icon:'i-bomb',
+              craft:{ 'Sulfur':2200, 'Metal Fragments':200, 'Charcoal':3000, 'Cloth':5 } },
+  satchel:  { name:'Satchel Charge',  short:'Satchel',  sulfur:480,  icon:'i-satchel',
+              craft:{ 'Sulfur':480, 'Metal Fragments':80, 'Charcoal':720, 'Rope':1 } },
+  beancan:  { name:'Beancan Grenade', short:'Beancan',  sulfur:240,  icon:'i-beancan',
+              craft:{ 'Sulfur':240, 'Metal Fragments':40, 'Charcoal':360 } },
+  ammo:     { name:'Explosive 5.56',  short:'Explo ammo', sulfur:25, icon:'i-ammo', perRound:true,
+              craft:{ 'Sulfur':25, 'Metal Fragments':10, 'Charcoal':30 } },
+};
+const EXPLOSIVE_ORDER = ['rocket', 'c4', 'satchel', 'beancan', 'ammo'];
+
+/**
+ * How many of one explosive it takes alone. A target is modelled as 100 raid points and each
+ * explosive contributes 100/quantity, so any mix that reaches 100 gets through.
+ *
+ * Modelling it this way rather than in raw hitpoints keeps the published single-explosive
+ * numbers exactly right, and makes mixed loadouts fall out of the same arithmetic instead of
+ * needing a second table that could disagree with the first.
+ *
+ * A blank means that explosive cannot realistically breach that target.
+ */
+const RAID_TARGETS = [
+  { id:'door-wood',   name:'Wooden Door',      category:'Doors',
+    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  } },
+  { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors',
+    solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  } },
+  { id:'door-garage', name:'Garage Door',      category:'Doors',
+    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 } },
+  { id:'door-armor',  name:'Armored Door',     category:'Doors',
+    solo:{ rocket:5,  c4:3, satchel:15, beancan:31, ammo:245 } },
+  { id:'wall-wood',   name:'Wooden Wall',      category:'Walls',
+    solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  } },
+  { id:'wall-stone',  name:'Stone Wall',       category:'Walls',
+    solo:{ rocket:4,  c4:2, satchel:10, beancan:20, ammo:0   } },
+  { id:'wall-sheet',  name:'Sheet Metal Wall', category:'Walls',
+    solo:{ rocket:8,  c4:4, satchel:23, beancan:46, ammo:0   } },
+  { id:'wall-armor',  name:'Armored Wall',     category:'Walls',
+    solo:{ rocket:15, c4:8, satchel:40, beancan:80, ammo:0   } },
+];
+
+// ---- raid calculator: engine ------------------------------------------------------
+/**
+ * Deliberately free of any DOM. Everything here takes plain objects and returns plain
+ * objects so the numbers can be tested without a browser, and so the UI can be rebuilt
+ * without touching the arithmetic.
+ */
+const RAID_POINTS = 100;
+
+const raidTarget = id => RAID_TARGETS.find(t => t.id === id) || null;
+
+/** What one unit of an explosive contributes toward breaching a target. 0 means it cannot. */
+function raidYield(target, key){
+  const need = target?.solo?.[key];
+  return need > 0 ? RAID_POINTS / need : 0;
+}
+
+/** Scores a loadout: { rocket:2, satchel:1 } against a target. */
+function raidEvaluate(target, loadout){
+  let points = 0, sulfur = 0, count = 0;
+  const lines = [];
+  for(const key of EXPLOSIVE_ORDER){
+    const qty = Math.max(0, Math.floor(Number(loadout?.[key]) || 0));
+    if(!qty) continue;
+    const ex = EXPLOSIVES[key];
+    const contributes = raidYield(target, key) * qty;
+    const cost = ex.sulfur * qty;
+    points += contributes;
+    sulfur += cost;
+    count += qty;
+    lines.push({ key, name:ex.name, short:ex.short, qty, sulfur:cost, usable:contributes > 0 });
+  }
+  const enough = points >= RAID_POINTS - 1e-9;
+  return {
+    lines, sulfur, count, enough,
+    percent: Math.min(100, Math.round(points)),
+    // What is still missing, expressed in each explosive that could finish the job.
+    shortfall: enough ? null : raidShortfall(target, RAID_POINTS - points),
+    resources: raidResources(loadout),
+  };
+}
+
+/** Remaining points expressed as "n more of X", for every explosive that can breach. */
+function raidShortfall(target, pointsLeft){
+  const out = [];
+  for(const key of EXPLOSIVE_ORDER){
+    const per = raidYield(target, key);
+    if(per <= 0) continue;
+    out.push({ key, short:EXPLOSIVES[key].short, qty:Math.ceil(pointsLeft / per - 1e-9) });
+  }
+  return out.sort((a, b) => a.qty * EXPLOSIVES[a.key].sulfur - b.qty * EXPLOSIVES[b.key].sulfur);
+}
+
+/** Raw materials for a loadout, summed across every explosive in it. */
+function raidResources(loadout){
+  const total = {};
+  for(const key of EXPLOSIVE_ORDER){
+    const qty = Math.max(0, Math.floor(Number(loadout?.[key]) || 0));
+    if(!qty) continue;
+    for(const [res, per] of Object.entries(EXPLOSIVES[key].craft || {}))
+      total[res] = (total[res] || 0) + per * qty;
+  }
+  return total;
+}
+
+/**
+ * Searches combinations rather than just comparing single explosives, because a mix is often
+ * cheaper than any one type alone. The space is small — five explosives against a target that
+ * needs at most a few dozen of the cheapest — so an exhaustive walk with pruning is exact and
+ * still instant, which beats a heuristic that can quietly miss the best answer.
+ *
+ * `limits` caps each explosive, which is what makes "use what I have" fall out of the same
+ * function instead of needing a second one.
+ */
+function raidSolve(target, { limits = null, metric = 'cheapest', maxNodes = 200000 } = {}){
+  if(!target) return null;
+  const keys = EXPLOSIVE_ORDER.filter(k => raidYield(target, k) > 0);
+  if(!keys.length) return null;
+
+  const cap = key => {
+    const solo = Math.ceil(RAID_POINTS / raidYield(target, key));
+    const owned = limits ? Math.max(0, Math.floor(Number(limits[key]) || 0)) : Infinity;
+    return Math.min(solo, owned);
+  };
+
+  const score = r => metric === 'fewest' ? [r.count, r.sulfur]
+                   : metric === 'owned'  ? [-r.owned, r.sulfur, r.count]
+                   : [r.sulfur, r.count];
+  const better = (a, b) => {
+    if(!b) return true;
+    const A = score(a), B = score(b);
+    for(let i = 0; i < A.length; i++){ if(A[i] !== B[i]) return A[i] < B[i]; }
+    return false;
+  };
+
+  let best = null, nodes = 0;
+  const found = [];
+
+  (function walk(i, loadout, points, sulfur, count){
+    if(nodes++ > maxNodes) return;
+    if(points >= RAID_POINTS - 1e-9){
+      const owned = limits ? Object.entries(loadout).reduce((n, [k, q]) => n + Math.min(q, Number(limits[k]) || 0), 0) : 0;
+      const result = { loadout:{ ...loadout }, sulfur, count, owned };
+      found.push(result);
+      if(better(result, best)) best = result;
+      return;
+    }
+    if(i >= keys.length) return;
+    // Even taking every remaining explosive at its cap, can this branch still get there?
+    let reachable = points;
+    for(let j = i; j < keys.length; j++) reachable += raidYield(target, keys[j]) * cap(keys[j]);
+    if(reachable < RAID_POINTS - 1e-9) return;
+    // Prune on cost as well: a branch already dearer than the best answer cannot win.
+    if(best && metric === 'cheapest' && sulfur >= best.sulfur) return;
+
+    const key = keys[i], per = raidYield(target, key), unit = EXPLOSIVES[key].sulfur;
+    for(let q = cap(key); q >= 0; q--){
+      const next = q ? { ...loadout, [key]:q } : loadout;
+      walk(i + 1, next, points + per * q, sulfur + unit * q, count + q);
+    }
+  })(0, {}, 0, 0, 0);
+
+  if(!best) return null;
+  // A handful of distinct alternatives, cheapest first, for the comparison list.
+  const seen = new Set();
+  const options = found
+    .sort((a, b) => a.sulfur - b.sulfur || a.count - b.count)
+    .filter(r => { const k = JSON.stringify(r.loadout); if(seen.has(k)) return false; seen.add(k); return true; })
+    .slice(0, 6);
+  return { best, options };
+}
+
+/** The single cheapest way through using one explosive type only. */
+function raidSoloOptions(target){
+  return EXPLOSIVE_ORDER
+    .filter(k => raidYield(target, k) > 0)
+    .map(k => ({ key:k, qty:target.solo[k], sulfur:target.solo[k] * EXPLOSIVES[k].sulfur }))
+    .sort((a, b) => a.sulfur - b.sulfur);
+}
+
+/** Every target, split by whether the given inventory can breach it. */
+function raidInventoryReport(inventory){
+  const can = [], cannot = [];
+  for(const target of RAID_TARGETS){
+    const solved = raidSolve(target, { limits:inventory, metric:'cheapest' });
+    if(solved){
+      can.push({ target, ...solved.best });
+    } else {
+      // Nothing owned gets through, so say what would.
+      const evald = raidEvaluate(target, inventory);
+      cannot.push({ target, shortfall:evald.shortfall ? evald.shortfall.slice(0, 2) : [], percent:evald.percent });
+    }
+  }
+  return { can, cannot };
+}
+
 const DECAY = {
   twig:     { name:'Twig',         hp:10,   hours:1  },
   wood:     { name:'Wood',         hp:250,  hours:3  },
@@ -5303,6 +5768,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 07:04 UTC</div>
+<div class="build-stamp">build 2026-07-30 07:24 UTC</div>
 </body>
 </html>
