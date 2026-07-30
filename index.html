@@ -3260,9 +3260,13 @@ async function appSignIn(btn){
       showAppDashboard();
       return;
     }
+    // Say what actually went wrong. "Steam did not confirm" was hiding a cookie that never
+    // reached the API, which is not something Steam had any part in.
     appLoginStatus(r?.reason === 'closed'
       ? 'Sign in was cancelled.'
-      : (r?.error || 'Steam did not confirm that sign in. Try again.'));
+      : r?.error
+        ? 'Sign in did not complete: ' + r.error
+        : 'Sign in did not complete. Try again.');
   } catch(err){
     appLoginStatus(err.message);
   } finally { done(); }
@@ -5893,6 +5897,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 08:09 UTC</div>
+<div class="build-stamp">build 2026-07-30 10:18 UTC</div>
 </body>
 </html>
