@@ -1533,14 +1533,14 @@ body.billing #billing-view{display:block;}
     <h1 class="applogin-title">Rustex</h1>
     <p class="applogin-sub">Your Rust server, on your machine.</p>
 
-    <button class="btn btn-primary applogin-btn" onclick="appSkipLogin()">
-      <svg class="icon icon-16"><use href="#i-arrow-right"/></svg>Get started</button>
+    <button class="btn btn-primary applogin-btn" onclick="appSignIn(this)">
+      <svg class="steam-glyph" style="width:17px;height:17px"><use href="#i-steam"/></svg>Sign in with Steam</button>
+    <button class="btn btn-outline applogin-btn" onclick="appSkipLogin()">Continue without an account</button>
 
     <p class="applogin-note">Rustex talks to your server directly using your own Rust+
       pairing, and nothing about that pairing leaves this computer.</p>
-    <p class="applogin-note">Signing in is not wired up yet, so this build is open. Once
-      subscriptions go live you will sign in with Steam here and the app will check your
-      plan on launch.</p>
+    <p class="applogin-note">Signing in opens Steam in a Rustex window and keeps you signed
+      in on this machine. It is what a subscription will be checked against.</p>
     <p class="applogin-status" id="appLoginStatus" hidden></p>
   </div>
 </div>
@@ -1615,7 +1615,6 @@ body.billing #billing-view{display:block;}
     <div class="nav-links">
     </div>
     <div class="nav-actions">
-      <button class="btn btn-ghost" onclick="openCmdk()"><svg class="icon icon-15"><use href="#i-command"/></svg>Search</button>
       <button class="btn btn-steam" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in with Steam</button>
       <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
       <button class="btn btn-primary" data-when="entitled" onclick="goDashboard()">Open Dashboard<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
@@ -2484,7 +2483,16 @@ const Session = {
   async refresh(){
     // The desktop build talks to the game server directly and has no hosted session to ask
     // about. No user is invented for it — it simply runs unauthenticated and local.
-    if(IS_DESKTOP){ this.user = null; this.plan = null; syncAuthUI(); return null; }
+    if(IS_DESKTOP){
+      // The app keeps its own cookie jar, so a previous sign in is still valid on launch.
+      try {
+        const me = await window.rustexNative?.auth?.me?.();
+        this.user = me?.signedIn ? me.user : null;
+        this.plan = me?.signedIn ? (me.plan || null) : null;
+      } catch { this.user = null; this.plan = null; }
+      syncAuthUI();
+      return this.user;
+    }
     try {
       const r = await fetch('/api/auth/me', { credentials:'same-origin', cache:'no-store' });
       if(r.ok){ const j = await r.json(); this.user = j.user; this.plan = j.plan || null; }
@@ -2673,8 +2681,7 @@ function runSteamAuth(){
     // No hosted session exists for the app, and sending people to a browser only stranded
     // them on the marketing page.
     authPhase('idle');
-    fireCustomToast('Sign in is not ready yet',
-      'This build is open. Subscription checks arrive with it.', 'i-wifi');
+    appSignIn();
     return;
   }
   authPhase('busy');
@@ -3132,6 +3139,33 @@ function appLoginStatus(text){
  * and a page loaded from disk has no origin to come back to. So it opens outside, and the
  * dashboard is available meanwhile because it never needed the account to work.
  */
+/**
+ * Real Steam sign-in. The main process opens the flow in a window the app owns, so the
+ * session cookie lands in the app's own jar and /api/auth/me answers for the signed-in user.
+ * Sending people to the system browser put that cookie somewhere the app could never read.
+ */
+async function appSignIn(btn){
+  const done = btn ? busyButton(btn, 'Opening Steam…') : () => {};
+  appLoginStatus('Opening Steam…');
+  try {
+    const r = await window.rustexNative.auth.signIn();
+    if(r?.signedIn){
+      Session.user = r.user;
+      Session.plan = r.plan || null;
+      syncAuthUI();
+      appLoginStatus('');
+      fireCustomToast('Signed in', Session.displayName || 'Welcome back.', 'i-user');
+      showAppDashboard();
+      return;
+    }
+    appLoginStatus(r?.reason === 'closed'
+      ? 'Sign in was cancelled.'
+      : (r?.error || 'Steam did not confirm that sign in. Try again.'));
+  } catch(err){
+    appLoginStatus(err.message);
+  } finally { done(); }
+}
+
 function appSkipLogin(){
   try { localStorage.setItem(APP_SIGNED_IN, '1'); } catch {}
   showAppDashboard();
@@ -5259,6 +5293,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 06:08 UTC</div>
+<div class="build-stamp">build 2026-07-30 06:26 UTC</div>
 </body>
 </html>
