@@ -4053,6 +4053,10 @@ function showDashSection(id, focusWidget){
   if(id === 'tools' && document.getElementById('geneList')) renderGenes();
   if(id === 'tools' && document.getElementById('raidTarget')) raidRender();
   if(id === 'tools' && document.getElementById('devList')){ loadDevices(); renderDevices(); refreshDevices(); }
+  // Chat was the one tools panel with no hook, so it sat on "Connect a server" text written
+  // before a server existed. The poller only refreshes a panel that is already visible, which
+  // is never true until something loads it once.
+  if(id === 'tools' && document.getElementById('chatLog')){ loadTeamChat(); pokeChat(); }
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -5897,6 +5901,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 11:19 UTC</div>
+<div class="build-stamp">build 2026-07-30 18:41 UTC</div>
 </body>
 </html>
