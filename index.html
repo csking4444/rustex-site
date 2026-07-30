@@ -45,6 +45,16 @@
   /* Boxy. Rust's UI is built from square plates — the old 8–20px radii were the
      single biggest thing making this read as a generic SaaS dashboard. */
   --r-sm:0px; --r-md:2px; --r-lg:2px; --r-xl:3px;
+  /* Type scale. One product, one set of sizes — the landing page, dashboard and desktop app
+     all read from these. Adding a size outside the scale is how drift starts. */
+  --fs-2xs:10px;   /* meta, counts, table micro-labels */
+  --fs-xs:11px;    /* eyebrows, pills, captions */
+  --fs-sm:12px;    /* dense UI: rows, chat, list items */
+  --fs-md:13px;    /* body copy and controls */
+  --fs-lg:14px;    /* emphasis, card titles */
+  --fs-xl:16px;    /* section headings inside panels */
+  --fs-num:26px;   /* the big stat figures */
+  --fs-h3:20px; --fs-h2:24px; --fs-h1:30px; --fs-hero:34px;
   --shadow-sm:0 2px 8px rgba(0,0,0,0.35);
   --shadow-md:0 8px 28px rgba(0,0,0,0.45);
   --shadow-lg:0 24px 64px rgba(0,0,0,0.55);
@@ -57,7 +67,7 @@ html{scroll-behavior:smooth;}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;} }
 body{
   margin:0; background:var(--bg); color:var(--text); font-family:var(--font-ui);
-  -webkit-font-smoothing:antialiased; font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased; font-size:16px; line-height:1.55;
   position:relative;
 }
 body::before{
@@ -79,7 +89,7 @@ img,svg{display:block;}
 .container{max-width:var(--container); margin:0 auto; padding:0 48px;}
 .mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
 .eyebrow{
-  font-size:11.5px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
+  font-size:12px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase;
   color:var(--orange); display:flex; align-items:center; gap:8px;
 }
 .eyebrow::before{content:""; width:16px; height:1px; background:var(--orange);}
@@ -92,7 +102,7 @@ img,svg{display:block;}
 /* buttons */
 .btn{
   display:inline-flex; align-items:center; justify-content:center; gap:8px;
-  height:44px; padding:0 20px; border-radius:var(--r-md); font-size:13.5px; font-weight:600;
+  height:44px; padding:0 20px; border-radius:var(--r-md); font-size:14px; font-weight:600;
   border:1px solid transparent; transition:transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
   white-space:nowrap;
 }
@@ -103,7 +113,7 @@ img,svg{display:block;}
 .btn-outline:hover{background:var(--hover); border-color:var(--border-accent);}
 .btn-ghost{background:transparent; color:var(--text-2); height:38px; padding:0 12px;}
 .btn-ghost:hover{color:var(--text); background:var(--surface-2);}
-.btn-sm{height:34px; padding:0 14px; font-size:12.5px; border-radius:var(--r-sm);}
+.btn-sm{height:34px; padding:0 14px; font-size:13px; border-radius:var(--r-sm);}
 .btn-block{width:100%;}
 
 /* glass / panel */
@@ -127,7 +137,7 @@ img,svg{display:block;}
 .hud-frame .hb-bl{bottom:-1px; left:-1px; border-bottom:2px solid; border-left:2px solid; border-bottom-left-radius:6px;}
 
 /* status pill */
-.pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px 4px 8px; border-radius:var(--r-sm); font-size:11.5px; font-weight:600; letter-spacing:.02em; border:1px solid var(--border);}
+.pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px 4px 8px; border-radius:var(--r-sm); font-size:12px; font-weight:600; letter-spacing:.02em; border:1px solid var(--border);}
 .pill .dot{width:6px; height:6px; border-radius:50%; flex-shrink:0;}
 .pill-online{background:var(--success-soft); color:var(--success); border-color:rgba(74,222,128,.25);}
 .pill-online .dot{background:var(--success); box-shadow:0 0 0 3px rgba(74,222,128,.18);}
@@ -160,7 +170,7 @@ img,svg{display:block;}
 
 /* table */
 .table{width:100%; border-collapse:collapse; font-size:13px;}
-.table th{text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; padding:0 10px 10px; border-bottom:1px solid var(--border);}
+.table th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; padding:0 10px 10px; border-bottom:1px solid var(--border);}
 .table td{padding:11px 10px; border-bottom:1px solid var(--border); vertical-align:middle;}
 .table tr:last-child td{border-bottom:none;}
 .table tbody tr{transition:background .15s ease;}
@@ -181,7 +191,7 @@ img,svg{display:block;}
 
 /* tabs */
 .tabs{display:inline-flex; padding:3px; background:var(--surface-3); border:1px solid var(--border); border-radius:var(--r-md); gap:2px;}
-.tab{padding:7px 14px; font-size:12.5px; font-weight:600; color:var(--text-2); border-radius:var(--r-sm); background:transparent; border:none; transition:.15s;}
+.tab{padding:7px 14px; font-size:13px; font-weight:600; color:var(--text-2); border-radius:var(--r-sm); background:transparent; border:none; transition:.15s;}
 .tab.active{background:var(--orange); color:#1a0f08;}
 
 /* item icons — real Rust item categories, color-coded */
@@ -240,7 +250,7 @@ img,svg{display:block;}
   padding:8px 10px; border-radius:var(--r-sm); background:rgba(16,16,16,.94);
   border:1px solid var(--border-strong); box-shadow:var(--shadow-md);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
-  font-size:11.5px; line-height:1.5; opacity:0;
+  font-size:12px; line-height:1.5; opacity:0;
   transform:translate3d(-50%,calc(-100% - 14px),0) scale(.96); transform-origin:50% 100%;
   transition:opacity .13s ease, transform .13s ease;
 }
@@ -261,7 +271,7 @@ img,svg{display:block;}
 .heat-zoom .icon{width:14px; height:14px;}
 .heat-hint{
   position:absolute; left:10px; bottom:10px; z-index:3; pointer-events:none;
-  font-size:10.5px; color:var(--text-3); background:rgba(16,16,16,.72);
+  font-size:11px; color:var(--text-3); background:rgba(16,16,16,.72);
   border:1px solid var(--border); border-radius:var(--r-sm); padding:4px 8px;
   backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
   transition:opacity .2s ease;
@@ -274,7 +284,7 @@ img,svg{display:block;}
 /* ============================ account, pricing & billing ============================ */
 .page-head{padding:86px 0 34px;}
 .page-head h1{font-size:clamp(28px,3.6vw,42px); margin:14px 0 12px;}
-.page-head .sub{color:var(--text-2); font-size:15px; max-width:600px;}
+.page-head .sub{color:var(--text-2); font-size:16px; max-width:600px;}
 
 /* --- pricing --- */
 .plan-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; align-items:start;}
@@ -285,18 +295,18 @@ img,svg{display:block;}
   box-shadow:0 0 0 1px rgba(217,119,69,.14), 0 22px 50px -26px var(--orange-glow);}
 .plan .plan-tag{position:absolute; top:-10px; left:24px; font-size:10px; font-weight:700; letter-spacing:.09em;
   text-transform:uppercase; color:#1a0f08; background:var(--orange); padding:4px 9px; border-radius:var(--r-sm);}
-.plan h3{font-size:15px; font-weight:700;}
+.plan h3{font-size:16px; font-weight:700;}
 .plan .price{display:flex; align-items:baseline; gap:6px;}
 .plan .price .amt{font-family:var(--font-mono); font-size:34px; font-weight:700; letter-spacing:-.02em;}
 .plan .price .per{font-size:12px; color:var(--text-3);}
 .plan ul{display:flex; flex-direction:column; gap:9px; margin-top:2px;}
-.plan li{display:flex; gap:9px; align-items:flex-start; font-size:12.5px; color:var(--text-2);}
+.plan li{display:flex; gap:9px; align-items:flex-start; font-size:13px; color:var(--text-2);}
 .plan li .icon{width:14px; height:14px; color:var(--success); flex-shrink:0; margin-top:2px;}
 .plan li.off{color:var(--text-3);}
 .plan li.off .icon{color:var(--text-3);}
 .plan .btn{margin-top:auto;}
-.billing-toggle{display:inline-flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-2);}
-.save-chip{font-size:10.5px; font-weight:700; color:var(--success); background:var(--success-soft);
+.billing-toggle{display:inline-flex; align-items:center; gap:10px; font-size:13px; color:var(--text-2);}
+.save-chip{font-size:11px; font-weight:700; color:var(--success); background:var(--success-soft);
   border:1px solid rgba(74,222,128,.25); padding:2px 7px; border-radius:var(--r-sm);}
 
 /* --- sign in with steam --- */
@@ -312,8 +322,8 @@ img,svg{display:block;}
   border-radius:var(--r-xl); box-shadow:var(--shadow-lg); padding:28px 26px 24px; text-align:center;
   animation:authPop .26s cubic-bezier(.16,.8,.3,1);}
 @keyframes authPop{from{opacity:0; transform:translateY(12px) scale(.97)} to{opacity:1; transform:none}}
-.auth-card h3{font-size:17px; margin-bottom:7px;}
-.auth-card .auth-sub{font-size:12.5px; color:var(--text-3); margin-bottom:20px; line-height:1.55;}
+.auth-card h3{font-size:16px; margin-bottom:7px;}
+.auth-card .auth-sub{font-size:13px; color:var(--text-3); margin-bottom:20px; line-height:1.55;}
 .auth-badge{width:56px; height:56px; margin:0 auto 16px; border-radius:var(--r-md); display:flex; align-items:center;
   justify-content:center; background:linear-gradient(180deg,#2a475e,#1b2838); border:1px solid #3d6a8a;}
 .auth-badge .steam-glyph{width:30px; height:30px; fill:#fff;}
@@ -336,12 +346,12 @@ img,svg{display:block;}
 .auth-error{display:flex; gap:10px; text-align:left; padding:12px 13px; border-radius:var(--r-md);
   background:var(--crimson-soft); border:1px solid rgba(179,38,30,.32); margin-bottom:16px;}
 .auth-error .icon{width:16px; height:16px; color:#ef6a62; flex-shrink:0; margin-top:1px;}
-.auth-error b{display:block; font-size:12.5px; margin-bottom:2px;}
-.auth-error span{font-size:11.5px; color:var(--text-2);}
+.auth-error b{display:block; font-size:13px; margin-bottom:2px;}
+.auth-error span{font-size:12px; color:var(--text-2);}
 
 /* --- account chrome --- */
 .user-chip{display:flex; align-items:center; gap:8px; padding:5px 10px 5px 6px; border-radius:var(--r-sm);
-  border:1px solid var(--border-strong); background:var(--surface-2); font-size:12.5px; font-weight:600;
+  border:1px solid var(--border-strong); background:var(--surface-2); font-size:13px; font-weight:600;
   cursor:pointer; transition:background .15s ease, border-color .15s ease;}
 .user-chip:hover{background:var(--hover); border-color:var(--border-accent);}
 .user-chip img{width:24px; height:24px; border-radius:50%; object-fit:cover;}
@@ -356,7 +366,7 @@ img,svg{display:block;}
 .field-row{display:grid; grid-template-columns:190px 1fr; gap:16px; align-items:center;
   padding:14px 0; border-bottom:1px solid var(--border);}
 .field-row:last-child{border-bottom:none;}
-.field-row .fl{font-size:12.5px; color:var(--text-3); font-weight:600;}
+.field-row .fl{font-size:13px; color:var(--text-3); font-weight:600;}
 .field-row .fv{font-size:13px; display:flex; align-items:center; gap:9px; flex-wrap:wrap; min-width:0;}
 .field-row .fv .mono{color:var(--text-2);}
 .inp{background:var(--surface-3); border:1px solid var(--border-strong); border-radius:var(--r-sm);
@@ -369,21 +379,21 @@ select.inp{cursor:pointer;}
   padding:13px 0; border-bottom:1px solid var(--border);}
 .pref-row:last-child{border-bottom:none;}
 .pref-row .pt{font-size:13px; font-weight:600; margin-bottom:2px;}
-.pref-row .pd{font-size:11.5px; color:var(--text-3); max-width:440px;}
+.pref-row .pd{font-size:12px; color:var(--text-3); max-width:440px;}
 .steam-id-copy{cursor:pointer; border:none; background:var(--surface-3); color:var(--text-2);
-  border-radius:var(--r-sm); padding:3px 7px; font-size:10.5px; font-weight:700; transition:.15s;}
+  border-radius:var(--r-sm); padding:3px 7px; font-size:11px; font-weight:700; transition:.15s;}
 .steam-id-copy:hover{background:var(--hover); color:var(--text);}
 
 /* --- billing --- */
 .bill-stat{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
 .bill-stat .card{padding:16px 18px;}
-.bill-stat .lbl{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; margin-bottom:7px;}
-.bill-stat .val{font-size:15px; font-weight:700;}
+.bill-stat .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; margin-bottom:7px;}
+.bill-stat .val{font-size:16px; font-weight:700;}
 .pay-card{display:flex; align-items:center; gap:14px; padding:15px 16px; border-radius:var(--r-md);
   background:var(--surface-2); border:1px solid var(--border);}
 .pay-brand{width:44px; height:30px; border-radius:var(--r-sm); background:linear-gradient(145deg,#2b3350,#141826);
   border:1px solid var(--border-strong); display:flex; align-items:center; justify-content:center;
-  font-size:9.5px; font-weight:800; letter-spacing:.04em; color:#c9d3f0;}
+  font-size:10px; font-weight:800; letter-spacing:.04em; color:#c9d3f0;}
 .danger-zone{border-color:rgba(179,38,30,.3); background:linear-gradient(180deg, rgba(179,38,30,.05), var(--surface) 50%);}
 .btn-danger{background:var(--crimson-soft); color:#ef6a62; border-color:rgba(179,38,30,.35);}
 .btn-danger:hover{background:rgba(179,38,30,.26); border-color:rgba(179,38,30,.55); color:#ff8177;}
@@ -405,7 +415,7 @@ select.inp{cursor:pointer;}
   border-radius:var(--r-md); overflow-x:auto; scrollbar-width:none;}
 .dash-tabs::-webkit-scrollbar{display:none;}
 .dash-tab{display:flex; align-items:center; gap:7px; padding:8px 14px; border-radius:var(--r-sm); border:none;
-  background:transparent; color:var(--text-2); font-size:12.5px; font-weight:600; white-space:nowrap;
+  background:transparent; color:var(--text-2); font-size:13px; font-weight:600; white-space:nowrap;
   transition:background .15s ease, color .15s ease;}
 .dash-tab .icon{width:14px; height:14px;}
 .dash-tab:hover{color:var(--text); background:var(--hover);}
@@ -415,7 +425,7 @@ select.inp{cursor:pointer;}
 @keyframes sectionIn{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
 .demo-banner{display:flex; align-items:center; gap:12px; padding:11px 16px; margin-bottom:16px;
   border-radius:var(--r-md); background:var(--warning-soft); border:1px solid rgba(245,158,11,.28);
-  font-size:12.5px; color:var(--text-2);}
+  font-size:13px; color:var(--text-2);}
 .demo-banner .icon{width:15px; height:15px; color:var(--warning); flex-shrink:0;}
 .demo-banner b{color:var(--text);}
 body:not(.is-demo) .demo-banner{display:none;}
@@ -452,7 +462,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
   /* Section links duplicate the page content below; the actions are what people need. */
   .nav-links{display:none;}
   .nav-actions{gap:7px; min-width:0; flex-wrap:wrap; justify-content:flex-end;}
-  .nav-actions .btn{padding:8px 11px; font-size:12.5px;}
+  .nav-actions .btn{padding:8px 11px; font-size:13px;}
 }
 @media (max-width:560px){
   /* Keep the primary action and the account chip; the rest is reachable from the page. */
@@ -460,7 +470,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
   .nav-actions .user-chip span{display:none;}
   .nav-actions .user-chip{padding:4px; gap:0;}
   .nav-inner{padding:8px 10px;}
-  .brand span:not(.brand-mark){font-size:15px;}
+  .brand span:not(.brand-mark){font-size:16px;}
 }
 @media (max-width:430px){
   /* The build stamp is a diagnostic; on a phone it competes with real content. */
@@ -510,18 +520,23 @@ body:not(.is-demo) .demo-only{display:none !important;}
 
 /* Recycler */
 .rc-modes{display:flex; gap:6px; margin-bottom:14px;}
-.rc-mode{flex:1; padding:9px 10px; font-size:11.5px; font-weight:700; letter-spacing:.03em;
+.rc-mode{flex:1; padding:9px 10px; font-size:12px; font-weight:700; letter-spacing:.03em;
   border-radius:var(--r-sm); border:1px solid var(--border); background:var(--surface-2);
   color:var(--text-3); cursor:pointer; white-space:nowrap;}
 .rc-mode.active{background:var(--orange); color:#140D0A; border-color:var(--orange);}
 .rc-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:2px 22px;}
 .rc-row{padding:5px 0; border-bottom:1px solid var(--border);}
-.rc-row{display:grid; grid-template-columns:20px 1fr auto 86px; align-items:center; gap:10px;}
+/* minmax(0,1fr) so the name gives way to the yield figures rather than the other way
+   round: an ellipsised component name is still readable, a clipped yield is not. */
+.rc-row{display:grid; grid-template-columns:20px minmax(0,1fr) auto 86px;
+  align-items:center; gap:10px;}
 .rc-ico{display:flex; align-items:center; justify-content:center; color:var(--text-3);}
 .rc-ico svg{width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.6;
   stroke-linecap:round; stroke-linejoin:round;}
 .rc-row:hover .rc-ico{color:var(--orange);}
-.rc-yield{font-size:10.5px; color:var(--text-3); font-family:var(--font-mono);
+/* The meta step, not the caption step: this is a dense mono string of figures sharing a row
+   with a name, a stepper and a total, and it is the one thing here that must not be cut. */
+.rc-yield{font-size:var(--fs-2xs); color:var(--text-3); font-family:var(--font-mono);
   white-space:nowrap; text-align:right;}
 .rc-label{font-size:12px; color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .rc-step{display:flex; align-items:stretch; border:1px solid var(--border);
@@ -537,8 +552,8 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .rc-out{margin-top:16px; padding:14px; border-radius:var(--r-md); background:var(--surface-2);
   border:1px solid var(--border-strong); display:flex; flex-direction:column; gap:8px;}
 .rc-total{display:flex; align-items:baseline; gap:9px;}
-.rc-amt{font-size:19px; font-weight:800; color:var(--orange); min-width:62px;}
-.rc-name{font-size:12.5px; color:var(--text-2);}
+.rc-amt{font-size:20px; font-weight:800; color:var(--orange); min-width:62px;}
+.rc-name{font-size:13px; color:var(--text-2);}
 .rc-note{font-size:11px;}
 @media (max-width:1200px){ .rc-grid{grid-template-columns:1fr;} }
 @media (max-width:520px){
@@ -562,7 +577,7 @@ body:not(.is-demo) .demo-only{display:none !important;}
 #d-genetics .plant-slot{padding:10px 7px 9px; gap:7px;}
 #d-genetics .plant-sprite{width:34px; height:34px;}
 #d-genetics .plant-slot.is-center .plant-sprite{width:38px; height:38px;}
-#d-genetics .planter-caption{margin-top:9px; font-size:10.5px; line-height:1.45;}
+#d-genetics .planter-caption{margin-top:9px; font-size:11px; line-height:1.45;}
 .gene-target{display:flex; align-items:center; gap:10px; margin:11px 0 9px;
   padding-top:10px; border-top:1px solid var(--border); flex-wrap:wrap;}
 .gene-target .slot-tag{flex-shrink:0;}
@@ -576,8 +591,29 @@ body:not(.is-demo) .demo-only{display:none !important;}
 
 .dl-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:-38px 0 46px;}
 .dl-btn .icon{width:15px; height:15px;}
-.dl-note{font-size:11.5px; color:var(--text-3); max-width:340px; line-height:1.45;}
+.dl-note{font-size:12px; color:var(--text-3); max-width:340px; line-height:1.45;}
 @media (max-width:700px){ .dl-row{margin:-30px 0 34px;} .nav-dl{display:none;} }
+
+/* In-app pairing */
+.pairapp{margin:12px 0 4px; padding:15px 16px; background:var(--surface-2);
+  border:1px solid var(--border-strong); border-radius:var(--r-md);}
+.pairapp[hidden]{display:none;}
+.pairapp-head{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:12px;}
+.pairapp-badge{font-size:var(--fs-2xs); letter-spacing:.12em; text-transform:uppercase;
+  font-weight:700; color:#140D0A; background:var(--orange); padding:3px 7px;
+  border-radius:var(--r-sm);}
+.pairapp-sub{font-size:var(--fs-sm); color:var(--text-3);}
+.pairapp-steps{margin:0; padding-left:18px; display:flex; flex-direction:column; gap:11px;}
+.pairapp-steps li{font-size:var(--fs-sm); color:var(--text-2); line-height:1.55;}
+.pairapp-steps li::marker{color:var(--orange); font-weight:700;}
+.pairapp-steps b{color:var(--text);}
+.pairapp-row{display:flex; align-items:flex-start; gap:12px; justify-content:space-between;}
+.pairapp-row .btn{flex-shrink:0;}
+.pairapp-status{margin-top:13px; padding-top:11px; border-top:1px solid var(--border);
+  font-size:var(--fs-xs); color:var(--text-3); font-family:var(--font-mono);}
+.pairapp-status.live{color:var(--success);}
+.pairapp-status.err{color:var(--warning);}
+@media (max-width:560px){ .pairapp-row{flex-direction:column; align-items:stretch;} }
 
 /* Download warning dialog */
 .dlm{position:fixed; inset:0; z-index:120; display:flex; align-items:flex-start;
@@ -589,13 +625,13 @@ body:not(.is-demo) .demo-only{display:none !important;}
   border-radius:var(--r-md); box-shadow:var(--shadow-md);}
 .dlm-x{position:absolute; top:12px; right:12px; width:30px; height:30px; border-radius:var(--r-sm);
   border:1px solid var(--border); background:var(--surface-2); color:var(--text-3);
-  font-size:17px; line-height:1; cursor:pointer;}
+  font-size:16px; line-height:1; cursor:pointer;}
 .dlm-x:hover{color:var(--text); border-color:var(--border-strong);}
-.dlm-eyebrow{display:block; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+.dlm-eyebrow{display:block; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
   color:var(--orange); font-weight:700; margin-bottom:9px;}
-.dlm-title{font-size:23px; line-height:1.2; margin:0 0 13px; letter-spacing:-.01em;}
+.dlm-title{font-size:24px; line-height:1.2; margin:0 0 13px; letter-spacing:-.01em;}
 .dlm-lead{font-size:13px; color:var(--text-2); margin:0 0 11px; line-height:1.5;}
-.dlm-list{margin:0 0 17px; padding-left:17px; font-size:12.5px; color:var(--text-2); line-height:1.55;}
+.dlm-list{margin:0 0 17px; padding-left:17px; font-size:13px; color:var(--text-2); line-height:1.55;}
 .dlm-list li{margin-bottom:5px;}
 .dlm-list li::marker{color:var(--orange);}
 /* A drawing of the Windows dialog, not a screenshot: stays sharp at any zoom and adds no weight. */
@@ -605,14 +641,14 @@ body:not(.is-demo) .demo-only{display:none !important;}
 .dlm-smart-b{font-size:12px; line-height:1.5; margin:0 0 11px; color:rgba(255,255,255,.92);}
 .dlm-more{margin:0 0 12px;}
 .dlm-link{font-size:12px; text-decoration:underline; color:#fff;}
-.dlm-smart-meta{font-size:11.5px; line-height:1.55; margin:0 0 15px; color:rgba(255,255,255,.9);}
+.dlm-smart-meta{font-size:12px; line-height:1.55; margin:0 0 15px; color:rgba(255,255,255,.9);}
 .dlm-smart-btns{display:flex; gap:9px; justify-content:flex-end; flex-wrap:wrap;}
 .dlm-fake-btn{display:inline-flex; align-items:center; gap:6px; padding:6px 15px; font-size:12px;
   color:#1b1b1b; background:#e6e6e6; border:1px solid #adadad; border-radius:2px;}
 .dlm-num{display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px;
-  border-radius:2px; background:var(--crimson); color:#fff; font-size:9.5px; font-weight:800;
+  border-radius:2px; background:var(--crimson); color:#fff; font-size:10px; font-weight:800;
   font-family:var(--font-mono); margin-left:6px; flex-shrink:0;}
-.dlm-legend{display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:11.5px;
+.dlm-legend{display:flex; align-items:center; gap:7px; flex-wrap:wrap; font-size:12px;
   color:var(--text-3); margin:0 0 17px;}
 .dlm-legend .dlm-num{margin-left:0;}
 .dlm-note{font-size:12px; color:var(--text-3); line-height:1.55; margin:0 0 11px;}
@@ -659,7 +695,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .vend-bar input::placeholder{color:var(--text-3);}
 .vend-list{display:flex; flex-direction:column; gap:2px; font-size:12px;
   max-height:264px; overflow-y:auto; margin:0 -4px; padding:0 4px;}
-.vend-sum{display:flex; align-items:baseline; gap:8px; font-size:10.5px; color:var(--text-3);
+.vend-sum{display:flex; align-items:baseline; gap:8px; font-size:11px; color:var(--text-3);
   text-transform:uppercase; letter-spacing:.06em; padding:0 6px 6px; margin-bottom:2px;
   border-bottom:1px solid var(--border);}
 .vend-best{margin-left:auto; color:var(--success); letter-spacing:0; text-transform:none;
@@ -670,7 +706,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .vend-row.alert{grid-template-columns:auto 1fr; gap:8px;}
 .vend-item{color:var(--text-2); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .vend-x{color:var(--text-3); margin-left:5px;}
-.vend-bp{font-size:9px; color:var(--orange); border:1px solid var(--orange); border-radius:var(--r-sm);
+.vend-bp{font-size:10px; color:var(--orange); border:1px solid var(--orange); border-radius:var(--r-sm);
   padding:0 3px; margin-left:5px; vertical-align:middle;}
 .vend-grid{color:var(--text-3); font-size:11px; text-align:right;}
 .vend-cost{color:var(--success); font-size:11px; white-space:nowrap; text-align:right;}
@@ -686,7 +722,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .announce{margin-top:14px; padding-top:12px; border-top:1px solid var(--border);}
 .announce-hd{font-size:10px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
   color:var(--text-3); margin-bottom:6px;}
-.announce-row{display:flex; align-items:center; gap:9px; padding:5px 0; font-size:12.5px;
+.announce-row{display:flex; align-items:center; gap:9px; padding:5px 0; font-size:13px;
   color:var(--text-2); cursor:pointer;}
 .announce-row input{accent-color:var(--orange); width:15px; height:15px; cursor:pointer;}
 .chat-log{display:flex; flex-direction:column; gap:7px; max-height:230px; overflow-y:auto;}
@@ -704,7 +740,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 
 /* Live events */
 .act-line{display:flex; align-items:center; gap:9px; padding:8px 0;
-  border-bottom:1px solid var(--border); font-size:12.5px;}
+  border-bottom:1px solid var(--border); font-size:13px;}
 .act-grid{font-size:11px; color:var(--text-3); width:52px; flex-shrink:0;}
 .act-what{color:var(--text-2); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .decay-row{display:grid; grid-template-columns:88px 1fr; align-items:center; gap:10px;}
@@ -737,7 +773,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 /* Setup commands. Both steps get identical weight; previously one sat in a highlighted block
    and the other was buried mid-sentence, which read as though there were only one command. */
 .cmd-row{display:flex; align-items:stretch; gap:0; margin:8px 0 14px; max-width:520px;}
-.cmd{flex:1; min-width:0; font-family:var(--font-mono); font-size:11.5px; padding:9px 11px;
+.cmd{flex:1; min-width:0; font-family:var(--font-mono); font-size:12px; padding:9px 11px;
   background:var(--surface-2); border:1px solid var(--border); border-right:0;
   border-radius:var(--r-sm) 0 0 var(--r-sm); color:var(--text); overflow-x:auto;
   white-space:nowrap; line-height:1.4;}
@@ -749,7 +785,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 
 /* Build stamp, so "which version am I on" is a glance rather than a guess. */
 .build-stamp{position:fixed; right:8px; bottom:6px; z-index:90; font-family:var(--font-mono);
-  font-size:9.5px; color:var(--text-3); opacity:.55; pointer-events:none; letter-spacing:.04em;}
+  font-size:10px; color:var(--text-3); opacity:.55; pointer-events:none; letter-spacing:.04em;}
 
 /* Live status strip. Says where the numbers came from and when, so a stale panel is
    distinguishable from a fresh one at a glance. */
@@ -768,13 +804,13 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
   border-bottom:1px solid var(--border);}
 .team-row:last-child{border-bottom:0;}
 .team-row .av{width:28px; height:28px; border-radius:var(--r-sm); background:var(--surface-3);
-  display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:800;
+  display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;
   color:var(--text-2); flex-shrink:0;}
 .team-row .nm{flex:1; min-width:0; font-size:13px; font-weight:600; display:flex;
   align-items:center; gap:8px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.team-row .nm .tag{font-size:9px; font-weight:800; letter-spacing:.08em; padding:2px 5px;
+.team-row .nm .tag{font-size:10px; font-weight:800; letter-spacing:.08em; padding:2px 5px;
   border-radius:2px; background:var(--orange-soft); color:var(--orange); flex-shrink:0;}
-.team-row .grid{font-size:11.5px; color:var(--text-3); flex-shrink:0;}
+.team-row .grid{font-size:12px; color:var(--text-3); flex-shrink:0;}
 
 /* --- Rust-flavoured surface treatment -------------------------------------
    Three things carry most of the in-game feel: square corners (handled by the
@@ -792,7 +828,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .dash-section.active > .widget:hover{border-color:var(--border-accent);}
 
 /* The active tab is a stamped plate rather than a rounded pill. */
-.dash-tab{border-radius:2px; letter-spacing:.02em; text-transform:uppercase; font-size:11.5px;}
+.dash-tab{border-radius:2px; letter-spacing:.02em; text-transform:uppercase; font-size:12px;}
 .dash-tab.active{box-shadow:inset 0 -2px 0 rgba(0,0,0,.28);}
 
 /* Column headers read as stencilled field labels. */
@@ -815,7 +851,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 
 /* Bigger, calmer headings with real separation from the content beneath. */
 .dash-section.active .card-title,
-.dash-section.active .w-title{font-size:15px; letter-spacing:-.01em;}
+.dash-section.active .w-title{font-size:16px; letter-spacing:-.01em;}
 .dash-section.active .card-head,
 .dash-section.active .w-head{margin-bottom:18px; padding-bottom:14px;
   border-bottom:1px solid var(--border);}
@@ -928,11 +964,11 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
   justify-content:center; font-family:var(--font-mono); font-size:12px; font-weight:700;
   background:var(--orange-soft); color:var(--orange); border:1px solid var(--border-accent);}
 .pair-body{flex:1; min-width:0;}
-.pair-t{font-size:13.5px; font-weight:600;}
-.pair-d{font-size:11.5px; color:var(--text-3); margin-top:2px;}
+.pair-t{font-size:14px; font-weight:600;}
+.pair-d{font-size:12px; color:var(--text-3); margin-top:2px;}
 .pair-manual{margin-top:16px; background:var(--surface); border:1px solid var(--border);
   border-radius:var(--r-lg); padding:16px 20px;}
-.pair-manual summary{cursor:pointer; font-size:12.5px; font-weight:600; color:var(--text-2); list-style:none;}
+.pair-manual summary{cursor:pointer; font-size:13px; font-weight:600; color:var(--text-2); list-style:none;}
 .pair-manual summary::-webkit-details-marker{display:none;}
 .pair-manual summary::before{content:"+ "; color:var(--orange); font-weight:700;}
 .pair-manual[open] summary::before{content:"– ";}
@@ -944,7 +980,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .dropdown-panel{position:absolute; top:calc(100% + 8px); right:0; min-width:240px; background:var(--surface-2); border:1px solid var(--border-strong); border-radius:var(--r-md); box-shadow:var(--shadow-md); padding:6px; z-index:150; display:none;}
 .dropdown-panel.left{right:auto; left:0;}
 .dropdown-panel.open{display:block;}
-.dropdown-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--r-sm); font-size:12.8px; color:var(--text-2); cursor:pointer; transition:.12s;}
+.dropdown-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:var(--r-sm); font-size:13px; color:var(--text-2); cursor:pointer; transition:.12s;}
 .dropdown-item:hover{background:var(--hover); color:var(--text);}
 .dropdown-item .icon{width:15px; height:15px; color:var(--text-3); flex-shrink:0;}
 .dropdown-item .meta{margin-left:auto; font-size:11px; color:var(--text-3);}
@@ -953,7 +989,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .dropdown-item.danger{color:#ef6a62;}
 .dropdown-sep{height:1px; background:var(--border); margin:6px 4px;}
 .dropdown-label{font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-3); font-weight:700; padding:8px 10px 4px;}
-.dropdown-check{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--r-sm); font-size:12.5px; color:var(--text-2); cursor:pointer;}
+.dropdown-check{display:flex; align-items:center; gap:9px; padding:8px 10px; border-radius:var(--r-sm); font-size:13px; color:var(--text-2); cursor:pointer;}
 .dropdown-check:hover{background:var(--hover);}
 .dropdown-check input{accent-color:var(--orange); width:14px; height:14px;}
 
@@ -963,7 +999,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .field input{height:42px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border-strong); padding:0 12px; color:var(--text); font-size:13px; font-family:var(--font-mono); transition:.15s;}
 .field input:focus{border-color:var(--orange); outline:none;}
 .field .hint{font-size:11px; color:var(--text-3);}
-.pair-step{display:flex; align-items:center; gap:10px; font-size:12.5px; color:var(--text-3); transition:.2s;}
+.pair-step{display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text-3); transition:.2s;}
 .pair-step-dot{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--border-strong); flex-shrink:0; position:relative; transition:.2s;}
 .pair-step.active{color:var(--text);}
 .pair-step.active .pair-step-dot{border-color:var(--orange); background:var(--orange-soft);}
@@ -1017,7 +1053,7 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .hero-copy{max-width:760px;}
 .hero-copy h1{font-size:clamp(40px,5.6vw,72px); line-height:1.02; margin:18px 0 20px;}
 .hero-copy h1 .hl{color:transparent; -webkit-background-clip:text; background-clip:text; background-image:linear-gradient(120deg, var(--orange), var(--crimson));}
-.hero-copy .sub{font-size:17px; color:var(--text-2); max-width:560px; margin-bottom:32px;}
+.hero-copy .sub{font-size:16px; color:var(--text-2); max-width:560px; margin-bottom:32px;}
 .hero-cta{display:flex; align-items:center; gap:14px; margin-bottom:56px;}
 .trust-row{display:flex; gap:36px; flex-wrap:wrap; padding-top:28px; border-top:1px solid var(--border);}
 .hero-showcase{margin-top:8px; perspective:1600px;}
@@ -1030,9 +1066,9 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
 .feature-copy{position:relative; z-index:1;}
 .feature-copy .num-tag{font-family:var(--font-mono); font-size:13px; color:var(--orange); font-weight:700; margin-bottom:14px; display:block;}
 .feature-copy h2{font-size:clamp(28px,3vw,40px); margin:12px 0 16px;}
-.feature-copy .desc{color:var(--text-2); font-size:15.5px; margin-bottom:24px; max-width:460px;}
+.feature-copy .desc{color:var(--text-2); font-size:16px; margin-bottom:24px; max-width:460px;}
 .feature-list{display:flex; flex-direction:column; gap:12px; margin-bottom:30px;}
-.feature-list li{display:flex; gap:10px; align-items:flex-start; font-size:13.8px; color:var(--text);}
+.feature-list li{display:flex; gap:10px; align-items:flex-start; font-size:14px; color:var(--text);}
 .feature-list .tick{width:18px; height:18px; border-radius:var(--r-sm); background:var(--orange-soft); color:var(--orange); display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px;}
 .feature-list .tick .icon{width:11px; height:11px; stroke-width:3;}
 .feature-mock{position:relative; z-index:1;}
@@ -1078,7 +1114,7 @@ body.billing #billing-view{display:block;}
 .sidebar{border-right:1px solid var(--border); background:var(--bg-1); padding:18px 14px; display:flex; flex-direction:column; gap:4px; position:sticky; top:0; height:100vh; overflow-y:auto;}
 .sidebar-brand{
   display:flex; align-items:center; gap:10px; padding:8px; margin-bottom:10px;
-  font-weight:800; font-size:15px; color:inherit; text-decoration:none;
+  font-weight:800; font-size:16px; color:inherit; text-decoration:none;
   border-radius:var(--r-md); -webkit-tap-highlight-color:transparent;
   transition:background .16s ease;
 }
@@ -1091,19 +1127,19 @@ body.billing #billing-view{display:block;}
 .side-link .icon{width:16px; height:16px;}
 .side-link:hover{background:var(--surface-2); color:var(--text);}
 .side-link.active{background:var(--orange-soft); color:var(--orange);}
-.side-link .count{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); padding:1px 6px; border-radius:var(--r-sm); color:var(--text-2);}
+.side-link .count{margin-left:auto; font-family:var(--font-mono); font-size:11px; background:var(--surface-3); padding:1px 6px; border-radius:var(--r-sm); color:var(--text-2);}
 .side-foot{margin-top:auto; padding-top:14px; border-top:1px solid var(--border); display:flex; flex-direction:column; gap:10px;}
-.conn-status{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-2); padding:8px 10px;}
+.conn-status{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text-2); padding:8px 10px;}
 .conn-status .dot{width:7px; height:7px; border-radius:50%; background:var(--success); box-shadow:0 0 0 3px rgba(74,222,128,.18);}
 
 .dash-main{min-width:0;}
 .topbar{position:sticky; top:0; z-index:50; display:flex; align-items:center; gap:16px; padding:12px 28px; border-bottom:1px solid var(--border); background:rgba(13,13,13,.85); backdrop-filter:blur(14px);}
 .crumb{font-size:13px; color:var(--text-2); display:flex; align-items:center; gap:8px;}
 .crumb b{color:var(--text); font-weight:700;}
-.top-search{flex:1; max-width:420px; display:flex; align-items:center; gap:10px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); color:var(--text-3); font-size:12.5px;}
-.top-search kbd{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; background:var(--surface-3); border:1px solid var(--border-strong); padding:2px 6px; border-radius:var(--r-sm); color:var(--text-2);}
+.top-search{flex:1; max-width:420px; display:flex; align-items:center; gap:10px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); color:var(--text-3); font-size:13px;}
+.top-search kbd{margin-left:auto; font-family:var(--font-mono); font-size:11px; background:var(--surface-3); border:1px solid var(--border-strong); padding:2px 6px; border-radius:var(--r-sm); color:var(--text-2);}
 .top-actions{display:flex; align-items:center; gap:10px; margin-left:auto;}
-.selector{display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); font-size:12.5px; font-weight:600; cursor:pointer; transition:.15s;}
+.selector{display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer; transition:.15s;}
 .selector:hover{border-color:var(--border-accent);}
 .icon-btn{position:relative; width:38px; height:38px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-2); transition:.15s;}
 .icon-btn:hover{color:var(--text); border-color:var(--border-accent);}
@@ -1113,7 +1149,7 @@ body.billing #billing-view{display:block;}
 .dash-content{padding:26px 28px 80px; max-width:1720px;}
 .dash-head{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; flex-wrap:wrap; gap:14px;}
 .dash-head h1{font-size:24px;}
-.dash-head .sub{color:var(--text-2); font-size:13.5px; margin-top:4px;}
+.dash-head .sub{color:var(--text-2); font-size:14px; margin-top:4px;}
 .stat-row{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;}
 .stat-card{padding:18px 20px;}
 .stat-card .top{display:flex; justify-content:space-between; align-items:flex-start;}
@@ -1125,7 +1161,7 @@ body.billing #billing-view{display:block;}
 .alert-icon .icon{stroke:#fff; width:20px; height:20px;}
 .alert-body{flex:1; min-width:0;}
 .alert-body .t{font-weight:700; font-size:14px; margin-bottom:2px;}
-.alert-body .d{font-size:12.5px; color:var(--text-2);}
+.alert-body .d{font-size:13px; color:var(--text-2);}
 
 .widget-grid{display:grid; grid-template-columns:repeat(12,1fr); gap:16px;}
 .w-4{grid-column:span 4;} .w-5{grid-column:span 5;} .w-6{grid-column:span 6;} .w-7{grid-column:span 7;} .w-8{grid-column:span 8;} .w-12{grid-column:span 12;}
@@ -1151,12 +1187,12 @@ body.billing #billing-view{display:block;}
 .cmdk-overlay.open{display:flex;}
 .cmdk{width:560px; max-width:90vw;}
 .cmdk-input{display:flex; align-items:center; gap:10px; padding:16px 18px; border-bottom:1px solid var(--border);}
-.cmdk-input input{flex:1; background:transparent; border:none; outline:none; color:var(--text); font-size:15px; font-family:inherit;}
+.cmdk-input input{flex:1; background:transparent; border:none; outline:none; color:var(--text); font-size:16px; font-family:inherit;}
 .cmdk-list{padding:8px; max-height:340px; overflow-y:auto;}
-.cmdk-item{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--r-sm); font-size:13.5px; color:var(--text-2);}
+.cmdk-item{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:var(--r-sm); font-size:14px; color:var(--text-2);}
 .cmdk-item:hover, .cmdk-item.sel{background:var(--surface-2); color:var(--text);}
 .cmdk-item .icon{color:var(--orange);}
-.cmdk-item .k{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--text-3);}
+.cmdk-item .k{margin-left:auto; font-family:var(--font-mono); font-size:11px; color:var(--text-3);}
 
 /* toast */
 .toast-stack{position:fixed; bottom:22px; right:22px; z-index:300; display:flex; flex-direction:column; gap:10px; align-items:flex-end;}
@@ -1250,7 +1286,7 @@ body.billing #billing-view{display:block;}
 .plant-slot.is-center .plant-sprite{width:48px; height:48px;}
 .slot-body{width:100%; min-width:0; display:grid; gap:7px; justify-items:center;}
 .slot-tag{
-  font-size:9.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
   color:var(--text-3); text-align:center; line-height:1.3;
 }
 .plant-slot.is-center .slot-tag{color:var(--orange);}
@@ -1259,7 +1295,7 @@ body.billing #billing-view{display:block;}
   grid-auto-flow:row; grid-template-columns:repeat(6,minmax(0,1fr)); grid-auto-columns:auto;
   width:100%; gap:3px;
 }
-.plant-slot .gene{width:100%; height:auto; aspect-ratio:1; font-size:11.5px; min-width:0;}
+.plant-slot .gene{width:100%; height:auto; aspect-ratio:1; font-size:12px; min-width:0;}
 .planter-caption{
   display:flex; align-items:center; gap:8px; margin-top:10px;
   font-size:11px; color:var(--text-3);
@@ -1380,7 +1416,7 @@ body.billing #billing-view{display:block;}
     <div id="steamAuthIdle">
       <button class="btn btn-steam btn-block" onclick="runSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
       <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="closeSteamAuth()">Cancel</button>
-      <p class="text-3" style="font-size:10.5px;margin-top:14px;line-height:1.5;">By continuing you agree to the terms. Steam and the Steam logo are trademarks of Valve Corporation.</p>
+      <p class="text-3" style="font-size:11px;margin-top:14px;line-height:1.5;">By continuing you agree to the terms. Steam and the Steam logo are trademarks of Valve Corporation.</p>
     </div>
 
     <div id="steamAuthBusy" hidden>
@@ -1527,9 +1563,9 @@ body.billing #billing-view{display:block;}
           <div class="panel-2" style="padding:16px;">
             <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-users"/></svg>Squad Online 4 of 5</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--orange)">KL</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Kaelthorn</div><div class="text-3 mono" style="font-size:10.5px">GRID K14</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:#5b6472">VX</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Vexen</div><div class="text-3 mono" style="font-size:10.5px">GRID K13</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--crimson)">RM</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Ramsey</div><div class="text-3 mono" style="font-size:10.5px">LAST SEEN F9</div></div><span class="pill pill-dead"><span class="dot"></span>Dead</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--orange)">KL</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Kaelthorn</div><div class="text-3 mono" style="font-size:11px">GRID K14</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:#5b6472">VX</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Vexen</div><div class="text-3 mono" style="font-size:11px">GRID K13</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--crimson)">RM</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Ramsey</div><div class="text-3 mono" style="font-size:11px">LAST SEEN F9</div></div><span class="pill pill-dead"><span class="dot"></span>Dead</span></div>
             </div>
           </div>
           <div class="panel-2" style="padding:16px;">
@@ -1619,7 +1655,7 @@ body.billing #billing-view{display:block;}
         <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;opacity:.6;">
           <span class="item-ic photo ic-rifle" title="Assault Rifle"></span>
           <div style="flex:1"><div style="font-weight:700;font-size:13px">Assault Rifle</div><div class="text-3" style="font-size:11px">Grid K3 · 1.2km away</div></div>
-          <div style="text-align:right"><div class="mono" style="font-weight:700">195 Scrap</div><div class="text-3" style="font-size:10.5px;margin-top:4px;">Out of stock</div></div>
+          <div style="text-align:right"><div class="mono" style="font-weight:700">195 Scrap</div><div class="text-3" style="font-size:11px;margin-top:4px;">Out of stock</div></div>
         </div>
       </div>
     </div>
@@ -1780,7 +1816,7 @@ body.billing #billing-view{display:block;}
 
       <div class="progress" style="margin:12px 0;"><span id="geneBar" style="width:0%"></span></div>
 
-      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:10.5px;" class="text-3">
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:11px;" class="text-3">
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#4ADE80;margin-right:5px;"></span>G Growth</span>
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#FBBF24;margin-right:5px;"></span>Y Yield</span>
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#a78bfa;margin-right:5px;"></span>H Hardiness</span>
@@ -1815,10 +1851,10 @@ body.billing #billing-view{display:block;}
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices (6 paired)</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px;font-weight:600">Auto Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px;font-weight:600">Auto Turret · South</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px;font-weight:600">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:12.5px;font-weight:600">Storage Lighting</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Auto Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Auto Turret · South</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Storage Lighting</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
       </div>
       <div class="card-title" style="margin-bottom:10px;"><svg class="icon"><use href="#i-lock"/></svg>Tool Cupboard Upkeep</div>
       <div class="progress" style="margin-bottom:10px;"><span style="width:64%"></span></div>
@@ -1865,7 +1901,7 @@ body.billing #billing-view{display:block;}
       </div>
       <div class="rc-drop" id="rcDrop"><span class="text-3" style="font-size:12px;">Drop components here…</span></div>
       <div class="card-title" style="margin:16px 0 10px;"><svg class="icon"><use href="#i-layers"/></svg>Output</div>
-      <div id="rcOutput" style="display:flex;gap:16px;flex-wrap:wrap;" class="mono text-2" style="font-size:12.5px;">
+      <div id="rcOutput" style="display:flex;gap:16px;flex-wrap:wrap;" class="mono text-2" style="font-size:13px;">
         <span>Not set</span>
       </div>
     </div>
@@ -1950,7 +1986,7 @@ body.billing #billing-view{display:block;}
     <span class="eyebrow" style="justify-content:center">Ready when you are</span>
     <h2>Run a smarter wipe,<br/>starting tonight.</h2>
     <p class="sub">Every feature above, live in one console. Free to start. Pair your server in under two minutes.</p>
-    <button class="btn btn-primary" style="height:52px;padding:0 30px;font-size:14.5px;" onclick="goDashboard()">Open Dashboard<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+    <button class="btn btn-primary" style="height:52px;padding:0 30px;font-size:14px;" onclick="goDashboard()">Open Dashboard<svg class="icon"><use href="#i-arrow-right"/></svg></button>
   </div>
 </section>
 
@@ -2019,9 +2055,9 @@ body.billing #billing-view{display:block;}
           <button class="icon-btn" onclick="openNotifs(event)"><svg class="icon" style="width:16px;height:16px"><use href="#i-bell"/></svg><span class="dot-badge" id="notifDot"></span></button>
           <div class="dropdown-panel" id="ddNotifs" style="width:300px;">
             <div class="dropdown-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:8px;">Notifications<span style="cursor:pointer;color:var(--orange);font-weight:600;text-transform:none;letter-spacing:0;font-size:11px;" onclick="document.getElementById('notifDot').style.display='none'">Mark all read</span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--crimson)"><use href="#i-siren"/></svg><span>Smart Alarm triggered at North Wall<br/><span class="text-3" style="font-size:10.5px;">14s ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--orange)"><use href="#i-tag"/></svg><span>New shop listed at grid B12<br/><span class="text-3" style="font-size:10.5px;">2m ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;"><use href="#i-users"/></svg><span>Ramsey went offline<br/><span class="text-3" style="font-size:10.5px;">6m ago</span></span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--crimson)"><use href="#i-siren"/></svg><span>Smart Alarm triggered at North Wall<br/><span class="text-3" style="font-size:11px;">14s ago</span></span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--orange)"><use href="#i-tag"/></svg><span>New shop listed at grid B12<br/><span class="text-3" style="font-size:11px;">2m ago</span></span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;"><use href="#i-users"/></svg><span>Ramsey went offline<br/><span class="text-3" style="font-size:11px;">6m ago</span></span></div>
           </div>
         </div>
         <div class="dropdown">
@@ -2091,7 +2127,7 @@ body.billing #billing-view{display:block;}
         <div class="widget card w-12" id="d-alarm">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
-            <div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>
+            <div class="text-3" style="font-size:12px;">Connect a server to load live events.</div>
           </div>
         </div>
         </div>
@@ -2123,11 +2159,11 @@ body.billing #billing-view{display:block;}
           <div class="rc-grid" id="rcGrid"></div>
 
           <div class="rc-out">
-            <div id="rcTotals"><div class="text-3" style="font-size:11.5px;">Enter how many of each component you have.</div></div>
+            <div id="rcTotals"><div class="text-3" style="font-size:12px;">Enter how many of each component you have.</div></div>
             <div class="rc-note text-3" id="rcNote"></div>
           </div>
           <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="clearRecycler()">Clear</button>
-          <p class="text-3" style="font-size:10.5px;line-height:1.5;margin:10px 0 0;">
+          <p class="text-3" style="font-size:11px;line-height:1.5;margin:10px 0 0;">
             Yields from Man1ak&rsquo;s recycler chart. Where the chart gives a range the total stays a
             range rather than guessing a single figure.
           </p>
@@ -2163,7 +2199,7 @@ body.billing #billing-view{display:block;}
               <div class="decay-sub text-3" id="decaySub">until it collapses</div>
             </div>
 
-            <p class="text-3" style="font-size:10.5px;line-height:1.55;margin:0;">
+            <p class="text-3" style="font-size:11px;line-height:1.55;margin:0;">
               Assumes no Tool Cupboard upkeep. Decay only runs once the building has been outside
               upkeep for a while, so treat this as the time you have after it starts, not a countdown
               from right now.
@@ -2247,7 +2283,7 @@ body.billing #billing-view{display:block;}
         <div class="widget card w-6" id="d-chat">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div class="chat-log" id="chatLog">
-            <div class="text-3" style="font-size:11.5px;">Connect a server to load team chat.</div>
+            <div class="text-3" style="font-size:12px;">Connect a server to load team chat.</div>
           </div>
           <div class="chat-send">
             <input class="inp" id="chatSend" type="text" maxlength="250" placeholder="Message your team"
@@ -2257,7 +2293,7 @@ body.billing #billing-view{display:block;}
 
           <div class="announce">
             <div class="announce-hd">Announce to team chat</div>
-            <p class="text-3" style="font-size:10.5px;margin:0 0 9px;line-height:1.5;">
+            <p class="text-3" style="font-size:11px;margin:0 0 9px;line-height:1.5;">
               Rustex posts these into your squad&rsquo;s chat as they happen, once each. Everything is
               off until you turn it on.
             </p>
@@ -2352,14 +2388,14 @@ body.billing #billing-view{display:block;}
           <button class="btn btn-outline btn-block" onclick="choosePlan('clan')">Choose Clan</button>
         </div>
     </div>
-    <p class="text-3" style="font-size:11.5px;margin-top:20px;text-align:center;">
+    <p class="text-3" style="font-size:12px;margin-top:20px;text-align:center;">
       Prices in USD. Cancel any time. Access runs to the end of the period you already paid for.
     </p>
     <div class="card" style="margin-top:26px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
       <svg class="icon" style="width:18px;height:18px;color:var(--warning);flex-shrink:0;"><use href="#i-flask"/></svg>
       <div style="flex:1;min-width:220px;">
-        <div style="font-weight:700;font-size:13.5px;margin-bottom:3px;">Checkout isn't connected yet</div>
-        <div class="text-3" style="font-size:12.5px;">No payment provider is wired up, so nothing here can charge you. You can still open the dashboard with clearly-marked sample data.</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:3px;">Checkout isn't connected yet</div>
+        <div class="text-3" style="font-size:13px;">No payment provider is wired up, so nothing here can charge you. You can still open the dashboard with clearly-marked sample data.</div>
       </div>
       <button class="btn btn-outline" onclick="enterDemo()">Open dashboard in demo mode</button>
     </div>
@@ -2371,8 +2407,8 @@ body.billing #billing-view{display:block;}
     <div class="card" style="display:flex;gap:16px;align-items:flex-start;">
       <svg class="icon" style="width:18px;height:18px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-lock"/></svg>
       <div>
-        <div style="font-weight:700;font-size:13.5px;margin-bottom:4px;">You need a Steam account to subscribe</div>
-        <div class="text-3" style="font-size:12.5px;max-width:620px;">Rustex pairs through Rust's own in-game request, so billing is tied to the Steam account you actually play on. Signing in takes one click and we never see your Steam password.</div>
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">You need a Steam account to subscribe</div>
+        <div class="text-3" style="font-size:13px;max-width:620px;">Rustex pairs through Rust's own in-game request, so billing is tied to the Steam account you actually play on. Signing in takes one click and we never see your Steam password.</div>
         <button class="btn btn-steam btn-sm" style="margin-top:13px;" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
       </div>
     </div>
@@ -2419,7 +2455,7 @@ body.billing #billing-view{display:block;}
         <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
           <img data-acct="avatar" alt="" style="width:64px;height:64px;border-radius:16px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
           <div style="min-width:0;flex:1;">
-            <div style="font-weight:800;font-size:17px;" data-acct="name">Player</div>
+            <div style="font-weight:800;font-size:16px;" data-acct="name">Player</div>
             <div class="text-3" style="font-size:12px;margin-top:3px;">Signed in through Steam · member since <span data-acct="created">Not set</span> · <a data-acct="profileUrl" href="#" target="_blank" rel="noopener" style="color:var(--text-2);text-decoration:underline;">View Steam profile</a></div>
           </div>
           <span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>No plan</span>
@@ -2438,7 +2474,7 @@ body.billing #billing-view{display:block;}
         <div class="card-title" style="margin-bottom:6px;"><svg class="icon"><use href="#i-wifi"/></svg>Connections</div>
         <div class="field-row">
           <span class="fl">Rust+ account</span>
-          <span class="fv"><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span><span class="text-3" style="font-size:11.5px;" data-acct="rustplusWho">Not set</span></span>
+          <span class="fv"><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span><span class="text-3" style="font-size:12px;" data-acct="rustplusWho">Not set</span></span>
         </div>
         <div class="field-row">
           <span class="fl">Connected servers</span>
@@ -2487,13 +2523,13 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="saveSettings()">Save changes</button>
         <button class="btn btn-ghost" onclick="loadSettingsForm()">Discard</button>
-        <span class="text-3" style="font-size:11.5px;margin-left:auto;" id="settingsSaved"></span>
+        <span class="text-3" style="font-size:12px;margin-left:auto;" id="settingsSaved"></span>
       </div>
 
       <div class="card danger-zone" style="margin-top:6px;">
         <div class="card-title" style="margin-bottom:8px;color:#ef6a62;"><svg class="icon" style="color:#ef6a62"><use href="#i-lock"/></svg>Session</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-          <div class="text-3" style="font-size:12.5px;max-width:460px;">Logging out clears this browser's Rustex session. Your servers stay paired and your subscription is unaffected.</div>
+          <div class="text-3" style="font-size:13px;max-width:460px;">Logging out clears this browser's Rustex session. Your servers stay paired and your subscription is unaffected.</div>
           <button class="btn btn-danger" onclick="logOut()"><svg class="icon" style="width:15px;height:15px"><use href="#i-x"/></svg>Log out</button>
         </div>
       </div>
@@ -2549,8 +2585,8 @@ body.billing #billing-view{display:block;}
         <div style="display:flex;gap:16px;align-items:flex-start;">
           <svg class="icon" style="width:18px;height:18px;color:var(--text-3);flex-shrink:0;margin-top:1px;"><use href="#i-tag"/></svg>
           <div style="flex:1;">
-            <div style="font-weight:700;font-size:13.5px;margin-bottom:4px;">No active subscription</div>
-            <div class="text-3" style="font-size:12.5px;max-width:560px;">There's nothing to bill yet: no plan, no payment method on file and no invoices. Once a payment provider is connected, your plan and receipts will appear here.</div>
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">No active subscription</div>
+            <div class="text-3" style="font-size:13px;max-width:560px;">There's nothing to bill yet: no plan, no payment method on file and no invoices. Once a payment provider is connected, your plan and receipts will appear here.</div>
             <button class="btn btn-outline btn-sm" style="margin-top:13px;" onclick="goPricing()">See plans</button>
           </div>
         </div>
@@ -2561,7 +2597,7 @@ body.billing #billing-view{display:block;}
         <div class="field-row"><span class="fl">Renews on</span><span class="fv mono" data-acct="renewsAt">Not set</span></div>
         <div class="field-row"><span class="fl">Amount</span><span class="fv mono" data-acct="amount">Not set</span></div>
         <div class="field-row"><span class="fl">Started</span><span class="fv mono" data-acct="startedAt">Not set</span></div>
-        <div id="billingCompNote" class="text-3" style="font-size:11.5px;margin-top:2px;" hidden>This access was granted directly, not through a paid subscription, so there's nothing to bill, upgrade or cancel.</div>
+        <div id="billingCompNote" class="text-3" style="font-size:12px;margin-top:2px;" hidden>This access was granted directly, not through a paid subscription, so there's nothing to bill, upgrade or cancel.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
           <button class="btn btn-primary btn-sm" onclick="goPricing()" data-bill="upgrade"><svg class="icon" style="width:14px;height:14px"><use href="#i-trend-up"/></svg>Upgrade plan</button>
           <button class="btn btn-outline btn-sm" onclick="goPricing()" data-bill="downgrade">Change plan</button>
@@ -2572,12 +2608,12 @@ body.billing #billing-view{display:block;}
 
       <div class="card">
         <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-lock"/></svg>Payment method</div></div>
-        <div id="billingNoCard" class="text-3" style="font-size:12.5px;padding:4px 0 2px;">No payment method on file.</div>
+        <div id="billingNoCard" class="text-3" style="font-size:13px;padding:4px 0 2px;">No payment method on file.</div>
         <div class="pay-card" id="billingCard" hidden>
           <span class="pay-brand" data-acct="cardBrand">CARD</span>
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:600;">•••• •••• •••• <span class="mono" data-acct="cardLast4">••••</span></div>
-            <div class="text-3" style="font-size:11.5px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">Not set</span> · <span data-acct="cardName">Not set</span></div>
+            <div class="text-3" style="font-size:12px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">Not set</span> · <span data-acct="cardName">Not set</span></div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="updatePaymentMethod()">Update</button>
         </div>
@@ -2585,7 +2621,7 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="card">
-        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-layers"/></svg>Billing history</div><span class="text-3" style="font-size:11.5px;" id="invoiceCount"></span></div>
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-layers"/></svg>Billing history</div><span class="text-3" style="font-size:12px;" id="invoiceCount"></span></div>
         <div style="overflow-x:auto;">
           <table class="table" id="invoiceTable">
             <thead><tr><th>Invoice</th><th>Date</th><th>Plan</th><th>Amount</th><th>Status</th><th style="text-align:right">Receipt</th></tr></thead>
@@ -2621,7 +2657,7 @@ body.billing #billing-view{display:block;}
     <div style="text-align:center;margin-bottom:34px;">
       <span class="eyebrow" style="justify-content:center;">Rust+ pairing</span>
       <h1 style="font-size:clamp(27px,3.4vw,38px);margin:14px 0 12px;">Pair straight from the game.</h1>
-      <p class="text-2" style="font-size:14.5px;max-width:560px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses, after a one-time setup on your PC.</p>
+      <p class="text-2" style="font-size:14px;max-width:560px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses, after a one-time setup on your PC.</p>
     </div>
 
 
@@ -2635,8 +2671,8 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;gap:13px;align-items:flex-start;">
         <svg class="icon" style="width:17px;height:17px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-wifi"/></svg>
         <div style="min-width:0;">
-          <div style="font-weight:700;font-size:13.5px;margin-bottom:5px;">Automatic pairing isn&rsquo;t available here</div>
-          <div class="text-2" style="font-size:12.5px;line-height:1.6;">
+          <div style="font-weight:700;font-size:14px;margin-bottom:5px;">Automatic pairing isn&rsquo;t available here</div>
+          <div class="text-2" style="font-size:13px;line-height:1.6;">
             Catching the in-game <b>Pair With Server</b> push needs a service that stays connected to
             Google&rsquo;s push network, which static hosting cannot do. Live raid alarms need the same thing.
             <b style="color:var(--text)">Everything else works today</b>: connect a server by hand below and
@@ -2683,12 +2719,12 @@ body.billing #billing-view{display:block;}
     </div>
 
     <div class="card" style="margin-top:16px;">
-      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-grid"/></svg>Paired servers</div><span class="text-3" style="font-size:11.5px;" id="pairedCount"></span></div>
+      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-grid"/></svg>Paired servers</div><span class="text-3" style="font-size:12px;" id="pairedCount"></span></div>
       <div id="pairedList" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="pairedEmpty" style="text-align:center;padding:24px 10px;">
         <svg class="icon" style="width:20px;height:20px;color:var(--text-3);margin:0 auto 9px;"><use href="#i-wifi"/></svg>
-        <div class="text-2" style="font-size:12.5px;font-weight:600;margin-bottom:3px;">Nothing paired yet</div>
-        <div class="text-3" style="font-size:11.5px;">Servers land here once pairing is connected.</div>
+        <div class="text-2" style="font-size:13px;font-weight:600;margin-bottom:3px;">Nothing paired yet</div>
+        <div class="text-3" style="font-size:12px;">Servers land here once pairing is connected.</div>
       </div>
     </div>
 
@@ -2696,7 +2732,7 @@ body.billing #billing-view{display:block;}
       <div class="card-title" style="margin-bottom:4px;">Connect a server</div>
       <div style="margin-top:14px;">
         <textarea class="inp" id="mPaste" rows="3" placeholder="Paste the pairing output here and the fields below fill themselves"
-          style="max-width:none;width:100%;resize:vertical;font-family:var(--font-mono);font-size:11.5px;line-height:1.5;"
+          style="max-width:none;width:100%;resize:vertical;font-family:var(--font-mono);font-size:12px;line-height:1.5;"
           oninput="parsePairing(this.value)"></textarea>
         <div id="pasteNote" class="text-3" style="font-size:11px;margin-top:6px;" hidden></div>
       </div>
@@ -2709,6 +2745,28 @@ body.billing #billing-view{display:block;}
         <input class="inp" type="text" id="mPlayerId" onpaste="handleFieldPaste(event)" placeholder="Player ID (Steam 64)" style="max-width:none;" inputmode="numeric" autocomplete="off">
         <input class="inp" type="text" id="mToken" onpaste="handleFieldPaste(event)" placeholder="Player token" style="max-width:none;" inputmode="numeric" autocomplete="off">
       </div>
+      <div class="pairapp" id="pairApp" hidden>
+        <div class="pairapp-head">
+          <span class="pairapp-badge">Desktop app</span>
+          <span class="pairapp-sub">Rustex can do the pairing itself. No terminal, no commands.</span>
+        </div>
+        <ol class="pairapp-steps">
+          <li>
+            <div class="pairapp-row">
+              <span><b>Link your Steam account.</b> Once per machine. Opens the Rust+ login in your browser; the result is saved on this PC and never sent to Rustex.</span>
+              <button class="btn btn-outline btn-sm" id="pairRegBtn" onclick="appPairRegister(this)">Link account</button>
+            </div>
+          </li>
+          <li>
+            <div class="pairapp-row">
+              <span><b>Start listening,</b> then in game press <b>ESC &rarr; Rust+ &rarr; Pair With Server</b> while on the server you want.</span>
+              <button class="btn btn-primary btn-sm" id="pairListenBtn" onclick="appPairListen(this)">Start listening</button>
+            </div>
+          </li>
+        </ol>
+        <div class="pairapp-status" id="pairStatus">Not listening.</div>
+      </div>
+
       <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
         <b style="color:var(--text)">Step 1.</b> Link your Steam account. Runs once, opens the Rust+
         login, saves the result on your PC. Nothing is sent to Rustex.
@@ -3023,8 +3081,8 @@ function renderSettings(){
   wrap.innerHTML = Session.servers.length ? Session.servers.map(s =>
     '<div class="panel-2" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">'
     + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
-    + '<div style="flex:1;min-width:0;"><div style="font-size:12.5px;font-weight:600;">' + s.name + '</div>'
-    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.addr + '</div></div>'
+    + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;">' + s.name + '</div>'
+    + '<div class="text-3 mono" style="font-size:11px;">' + s.addr + '</div></div>'
     + '<button class="btn btn-ghost btn-sm" onclick="unpairServer(\'' + s.id + '\')">Unpair</button></div>'
   ).join('') : '<div class="text-3" style="font-size:12px;">No servers paired yet — pair one from the pairing page.</div>';
 }
@@ -3201,6 +3259,89 @@ async function logOut(){
   if(document.body.classList.contains('billing')) renderBilling();
   if(document.body.classList.contains('pairing')) renderPairedServers();
 })();
+
+/**
+ * Pairing inside the app.
+ *
+ * The website has to ask people to run two npx commands, because a page cannot start a
+ * process or hold the FCM listener open. The app can do both, so the only thing left for the
+ * user is pressing Pair in game. The manual instructions stay on the website untouched.
+ */
+function pairStatus(text, kind){
+  const el = document.getElementById('pairStatus');
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'pairapp-status' + (kind ? ' ' + kind : '');
+}
+
+async function appPairRegister(btn){
+  const done = busyButton(btn, 'Opening…');
+  pairStatus('Opening the Rust+ login in your browser. Finish there, then come back.');
+  try {
+    const r = await window.rustexNative.pairing.register();
+    if(r?.ok){ pairStatus('Steam account linked. Start listening next.', 'live'); }
+    else { pairStatus(r?.message || 'Linking did not finish.', 'err'); }
+  } catch(err){
+    pairStatus(err.message, 'err');
+  } finally { done(); }
+}
+
+async function appPairListen(btn){
+  const state = await window.rustexNative.pairing.state();
+  if(state?.running){
+    await window.rustexNative.pairing.stop();
+    if(btn) btn.textContent = 'Start listening';
+    pairStatus('Not listening.');
+    return;
+  }
+  const done = busyButton(btn, 'Starting…');
+  try {
+    await window.rustexNative.pairing.listen();
+    if(btn) btn.textContent = 'Stop listening';
+    pairStatus('Listening. In game: ESC \u2192 Rust+ \u2192 Pair With Server.', 'live');
+  } catch(err){
+    pairStatus(err.message, 'err');
+  } finally { done(); }
+}
+
+function initAppPairing(){
+  if(!IS_DESKTOP || !window.rustexNative?.pairing) return;
+  const panel = document.getElementById('pairApp');
+  if(panel) panel.hidden = false;
+  // The manual commands are for people without the app.
+  document.querySelectorAll('.cmd-row').forEach(el => { el.style.display = 'none'; });
+
+  window.rustexNative.pairing.onStatus(st => {
+    if(!st?.running){
+      const btn = document.getElementById('pairListenBtn');
+      if(btn) btn.textContent = 'Start listening';
+      pairStatus(st?.message ? 'Listener stopped: ' + st.message : 'Not listening.',
+                 st?.message ? 'err' : '');
+    }
+  });
+
+  // A pairing arriving is the whole point: add the server and go, rather than filling a form
+  // and asking the user to press one more button.
+  window.rustexNative.pairing.onFound(found => {
+    if(!found) return;
+    const already = Session.servers.some(x => String(x.playerToken) === String(found.playerToken)
+                                           && x.ip === found.ip);
+    if(already){ pairStatus('That server is already paired.', 'live'); return; }
+    Session.servers.push({
+      id: 's' + Date.now(),
+      ip: found.ip, port: String(found.port),
+      playerId: String(found.playerId), playerToken: String(found.playerToken),
+      name: found.name || (found.ip + ':' + found.port),
+      addr: found.ip + ':' + found.port,
+    });
+    saveServers();
+    renderPairedServers();
+    pairStatus('Paired ' + (found.name || found.ip) + '. Opening the dashboard.', 'live');
+    fireCustomToast('Server paired', found.name || found.addr || found.ip, 'i-wifi');
+    setTimeout(() => { goDashboard(); }, 700);
+  });
+}
+initAppPairing();
 
 /**
  * Downloading an unsigned build without warning someone first is how a real product gets
@@ -4029,7 +4170,7 @@ function renderPairedServers(){
     '<div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;">'
     + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
     + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">' + s.name + '</div>'
-    + '<div class="text-3 mono" style="font-size:10.5px;">' + s.addr + '</div></div>'
+    + '<div class="text-3 mono" style="font-size:11px;">' + s.addr + '</div></div>'
     + '<button class="icon-btn" style="width:30px;height:30px;" title="Unpair" onclick="unpairServer(\'' + s.id + '\')">'
     + '<svg class="icon" style="width:13px;height:13px"><use href="#i-x"/></svg></button></div>'
   ).join('');
@@ -4224,7 +4365,7 @@ function clearLiveFigures(){
   });
   const body = document.getElementById('teamRows');
   if(body) body.innerHTML =
-    '<div class="text-3" style="font-size:11.5px;padding:4px 0;">Connect a server to see your team.</div>';
+    '<div class="text-3" style="font-size:12px;padding:4px 0;">Connect a server to see your team.</div>';
 }
 
 /** Replaces the sample roster with the real one. */
@@ -4518,7 +4659,7 @@ async function loadTeamChat(btn){
   const log = document.getElementById('chatLog');
   const server = Session.servers[0];
   if(!log) return;
-  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to load team chat.</div>'; return; }
+  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to load team chat.</div>'; return; }
 
   const done = busyButton(btn, 'Loading…');
   try {
@@ -4564,7 +4705,7 @@ function renderChatLog(log, msgs, note){
     chatLine('You', p.message, p.failed ? 'chat-failed' : 'chat-sending')).join('');
   const body = (sent || waiting)
     ? sent + waiting
-    : '<div class="text-3" style="font-size:11.5px;">No messages in the recent buffer.</div>';
+    : '<div class="text-3" style="font-size:12px;">No messages in the recent buffer.</div>';
   const warn = note ? '<div class="chat-note">' + escapeHtml(note) + '</div>' : '';
   log.innerHTML = body + warn;
   log.scrollTop = log.scrollHeight;
@@ -4623,7 +4764,7 @@ async function loadActivity(){
   const log = document.getElementById('activityLog');
   const server = Session.servers[0];
   if(!log) return;
-  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to load live events.</div>'; return; }
+  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to load live events.</div>'; return; }
 
   try {
     const [markers, info] = await Promise.all([
@@ -4645,9 +4786,9 @@ async function loadActivity(){
           return '<div class="act-line"><span class="act-grid mono">' + escapeHtml(where) + '</span>'
             + '<span class="act-what">' + escapeHtml(what) + '</span></div>';
         }).join('')
-      : '<div class="text-3" style="font-size:11.5px;">Nothing on the map right now.</div>';
+      : '<div class="text-3" style="font-size:12px;">Nothing on the map right now.</div>';
   } catch(err){
-    log.innerHTML = '<div class="text-3" style="font-size:11.5px;">' + escapeHtml(err.message) + '</div>';
+    log.innerHTML = '<div class="text-3" style="font-size:12px;">' + escapeHtml(err.message) + '</div>';
   }
 }
 
@@ -4690,9 +4831,9 @@ async function refreshVending(btn){
   const server = Session.servers[0];
   if(!list) return;
   if(!server){
-    list.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to search vending machines.</div>';
+    list.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to search vending machines.</div>';
     const al = document.getElementById('shopAlerts');
-    if(al) al.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to watch for shop changes.</div>';
+    if(al) al.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to watch for shop changes.</div>';
     return;
   }
   const done = btn ? busyButton(btn, 'Reading…') : () => {};
@@ -4713,7 +4854,7 @@ async function refreshVending(btn){
     diffShops();
     runVendSearch();
   } catch(err){
-    list.innerHTML = '<div class="text-3" style="font-size:11.5px;">' + escapeHtml(err.message) + '</div>';
+    list.innerHTML = '<div class="text-3" style="font-size:12px;">' + escapeHtml(err.message) + '</div>';
   } finally { done(); }
 }
 
@@ -4728,7 +4869,7 @@ function runVendSearch(){
   if(!list) return;
   const q = (document.getElementById('vendQuery')?.value || '').trim().toLowerCase();
   if(!vendShops.length){
-    list.innerHTML = '<div class="text-3" style="font-size:11.5px;">No vending machines on the map yet. Refresh to read them.</div>';
+    list.innerHTML = '<div class="text-3" style="font-size:12px;">No vending machines on the map yet. Refresh to read them.</div>';
     return;
   }
   const hits = vendOrders()
@@ -4737,7 +4878,7 @@ function runVendSearch(){
     .slice(0, 40);
 
   if(!hits.length){
-    list.innerHTML = '<div class="text-3" style="font-size:11.5px;">Nothing matching "'
+    list.innerHTML = '<div class="text-3" style="font-size:12px;">Nothing matching "'
       + escapeHtml(q) + '" is for sale right now.</div>';
     return;
   }
@@ -4770,7 +4911,7 @@ function diffShops(){
   const now = new Map(vendShops.map(s => [s.id, s]));
   if(!vendPrev){
     vendPrev = now;
-    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">Watching ' + now.size
+    box.innerHTML = '<div class="text-3" style="font-size:12px;">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. Changes since you opened the page appear here.</div>';
     return;
   }
@@ -4797,7 +4938,7 @@ function diffShops(){
       + '"><span class="dot"></span>' + (kind === 'new' ? 'New' : 'Gone') + '</span>'
       + '<span class="vend-item">' + escapeHtml(text) + '</span></div>').join('');
   else
-    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">Watching ' + now.size
+    box.innerHTML = '<div class="text-3" style="font-size:12px;">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. No changes since the last read.</div>';
 }
 
@@ -4841,7 +4982,7 @@ function renderGenes(){
   const box = document.getElementById('geneList');
   if(!box) return;
   if(!geneList.length){
-    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">No clones added yet.</div>';
+    box.innerHTML = '<div class="text-3" style="font-size:12px;">No clones added yet.</div>';
     return;
   }
   // Best first, so the one to plant is at the top.
@@ -4928,11 +5069,11 @@ function renderDevices(){
   const box = document.getElementById('devList');
   if(!box) return;
   if(!Session.servers[0]){
-    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">Connect a server to control your devices.</div>';
+    box.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to control your devices.</div>';
     return;
   }
   if(!devices.length){
-    box.innerHTML = '<div class="text-3" style="font-size:11.5px;">No devices added yet.</div>';
+    box.innerHTML = '<div class="text-3" style="font-size:12px;">No devices added yet.</div>';
     return;
   }
   box.innerHTML = devices.map(d => {
@@ -5129,7 +5270,7 @@ function renderRecycler(){
         return '<div class="rc-total"><span class="rc-amt mono">' + amount + '</span>'
              + '<span class="rc-name">' + escapeHtml(YIELD_LABEL[k] || k) + '</span></div>';
       }).join('')
-    : '<div class="text-3" style="font-size:11.5px;">Enter how many of each component you have.</div>';
+    : '<div class="text-3" style="font-size:12px;">Enter how many of each component you have.</div>';
 
   const secs = items * (recycleMode === 'mon' ? 5 : 8);
   const note = document.getElementById('rcNote');
@@ -5361,6 +5502,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-29 23:28 UTC</div>
+<div class="build-stamp">build 2026-07-30 00:02 UTC</div>
 </body>
 </html>
