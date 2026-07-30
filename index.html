@@ -1370,6 +1370,25 @@ body.billing #billing-view{display:block;}
   .sidebar{display:none;}
   .container{padding:0 24px;}
 }
+
+/* ---------------------------------------------------------------------------------
+   Utilities. These exist so the same value is not typed inline in eighty places: the
+   type steps, the two weights the product actually uses, and icon sizes. Everything
+   below reads from the tokens above, so the website, dashboard and desktop app cannot
+   drift apart the way they had.
+   --------------------------------------------------------------------------------- */
+.fs-10{font-size:var(--fs-2xs);} .fs-11{font-size:var(--fs-xs);}
+.fs-12{font-size:var(--fs-sm);}  .fs-13{font-size:var(--fs-md);}
+.fs-14{font-size:var(--fs-lg);}  .fs-16{font-size:var(--fs-xl);}
+.fs-20{font-size:var(--fs-h3);}  .fs-24{font-size:var(--fs-h2);}
+.fs-26{font-size:var(--fs-num);} .fs-30{font-size:var(--fs-h1);}
+.fs-34{font-size:var(--fs-hero);}
+.fw-500{font-weight:500;} .fw-600{font-weight:600;}
+.fw-700{font-weight:700;} .fw-800{font-weight:800;}
+.icon-11{width:11px;height:11px;} .icon-12{width:12px;height:12px;}
+.icon-13{width:13px;height:13px;} .icon-14{width:14px;height:14px;}
+.icon-15{width:15px;height:15px;} .icon-16{width:16px;height:16px;}
+.icon-17{width:17px;height:17px;} .icon-18{width:18px;height:18px;}
 </style>
 </head>
 <body>
@@ -1457,7 +1476,7 @@ body.billing #billing-view{display:block;}
     <div id="steamAuthIdle">
       <button class="btn btn-steam btn-block" onclick="runSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
       <button class="btn btn-ghost btn-block" style="margin-top:8px;" onclick="closeSteamAuth()">Cancel</button>
-      <p class="text-3" style="font-size:11px;margin-top:14px;line-height:1.5;">By continuing you agree to the terms. Steam and the Steam logo are trademarks of Valve Corporation.</p>
+      <p class="text-3 fs-11" style="margin-top:14px; line-height:1.5">By continuing you agree to the terms. Steam and the Steam logo are trademarks of Valve Corporation.</p>
     </div>
 
     <div id="steamAuthBusy" hidden>
@@ -1503,7 +1522,7 @@ body.billing #billing-view{display:block;}
     <p class="applogin-sub">Your Rust server, on your machine.</p>
 
     <button class="btn btn-primary applogin-btn" onclick="appSignIn(this)">
-      <svg class="icon" style="width:16px;height:16px"><use href="#i-user"/></svg>Sign in with Steam</button>
+      <svg class="icon icon-16"><use href="#i-user"/></svg>Sign in with Steam</button>
 
     <button class="btn btn-outline applogin-btn" onclick="appSkipLogin()">
       Continue without an account</button>
@@ -1552,7 +1571,7 @@ body.billing #billing-view{display:block;}
     <div class="dlm-actions">
       <button type="button" class="btn btn-ghost" onclick="closeDlWarning()">Cancel</button>
       <a class="btn btn-primary" id="dlmGo" href="/download/Rustex-Setup-0.1.0.exe" download
-         onclick="confirmDlWarning()"><svg class="icon" style="width:15px;height:15px"><use href="#i-download"/></svg>Download anyway</a>
+         onclick="confirmDlWarning()"><svg class="icon icon-15"><use href="#i-download"/></svg>Download anyway</a>
     </div>
   </div>
 </div>
@@ -1562,7 +1581,7 @@ body.billing #billing-view{display:block;}
     <div class="cmdk-input">
       <svg class="icon" style="color:var(--text-3)"><use href="#i-search"/></svg>
       <input type="text" placeholder="Search players, items, commands…" id="cmdkInput" autocomplete="off" />
-      <span class="mono text-3" style="font-size:11px">ESC</span>
+      <span class="mono text-3 fs-11">ESC</span>
     </div>
     <div class="cmdk-list">
       <div class="cmdk-item sel" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-users"/></svg>Jump to Team Tracker<span class="k">G T</span></div>
@@ -1588,10 +1607,10 @@ body.billing #billing-view{display:block;}
       <a href="#" onclick="goPairing();return false;">Pairing</a>
     </div>
     <div class="nav-actions">
-      <button class="btn btn-ghost" onclick="openCmdk()"><svg class="icon" style="width:15px;height:15px"><use href="#i-command"/></svg>Search</button>
+      <button class="btn btn-ghost" onclick="openCmdk()"><svg class="icon icon-15"><use href="#i-command"/></svg>Search</button>
       <button class="btn btn-steam" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in with Steam</button>
-      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
-      <button class="btn btn-primary" data-when="entitled" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
+      <button class="btn btn-primary" data-when="entitled" onclick="goDashboard()">Open Dashboard<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
       <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
     </div>
   </div>
@@ -1606,7 +1625,7 @@ body.billing #billing-view{display:block;}
         <h1>Own every wipe from<br/>first spawn to <span class="hl">final raid.</span></h1>
         <p class="sub">Rustex fuses your server's Rust+ telemetry into one console: squad positions, raid alarms, markets and base status, updated live, no alt-tabbing required.</p>
         <div class="hero-cta">
-          <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+          <button class="btn btn-primary" onclick="goDashboard()">Open Dashboard<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
           <a href="#f01" class="btn btn-outline">See it in action</a>
         </div>
         <div class="dl-row" id="dlRow">
@@ -1629,24 +1648,24 @@ body.billing #billing-view{display:block;}
         <span class="hb-tr"></span><span class="hb-bl"></span>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px 14px;border-bottom:1px solid var(--border);margin-bottom:14px;">
           <div class="window-dots"><span></span><span></span><span></span></div>
-          <span class="mono text-3" style="font-size:11px">rustex.app/dashboard</span>
+          <span class="mono text-3 fs-11">rustex.app/dashboard</span>
           <span class="pill pill-online"><span class="dot"></span>Live</span>
         </div>
         <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px;padding:0 8px 8px;">
           <div class="panel-2" style="padding:16px;">
             <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-users"/></svg>Squad Online 4 of 5</div>
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--orange)">KL</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Kaelthorn</div><div class="text-3 mono" style="font-size:11px">GRID K14</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:#5b6472">VX</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Vexen</div><div class="text-3 mono" style="font-size:11px">GRID K13</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
-              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--crimson)">RM</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Ramsey</div><div class="text-3 mono" style="font-size:11px">LAST SEEN F9</div></div><span class="pill pill-dead"><span class="dot"></span>Dead</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--orange)">KL</span><div style="flex:1"><div class="fs-13 fw-600">Kaelthorn</div><div class="text-3 mono fs-11">GRID K14</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:#5b6472">VX</span><div style="flex:1"><div class="fs-13 fw-600">Vexen</div><div class="text-3 mono fs-11">GRID K13</div></div><span class="pill pill-online"><span class="dot"></span>Online</span></div>
+              <div style="display:flex;align-items:center;gap:10px;"><span class="avatar" style="background:var(--crimson)">RM</span><div style="flex:1"><div class="fs-13 fw-600">Ramsey</div><div class="text-3 mono fs-11">LAST SEEN F9</div></div><span class="pill pill-dead"><span class="dot"></span>Dead</span></div>
             </div>
           </div>
           <div class="panel-2" style="padding:16px;">
             <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-siren"/></svg>Alarm Feed</div>
-            <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
-              <div><span class="text-3 mono" style="font-size:10px">02:41</span><div>Main TC upkeep <b style="color:var(--warning)">18%</b></div></div>
-              <div><span class="text-3 mono" style="font-size:10px">02:24</span><div>New vending shop @ <b>B12</b></div></div>
-              <div><span class="text-3 mono" style="font-size:10px">01:58</span><div>Patrol Heli inbound, grid <b>J9</b></div></div>
+            <div class="fs-12" style="display:flex; flex-direction:column; gap:10px">
+              <div><span class="text-3 mono fs-10">02:41</span><div>Main TC upkeep <b style="color:var(--warning)">18%</b></div></div>
+              <div><span class="text-3 mono fs-10">02:24</span><div>New vending shop @ <b>B12</b></div></div>
+              <div><span class="text-3 mono fs-10">01:58</span><div>Patrol Heli inbound, grid <b>J9</b></div></div>
             </div>
           </div>
         </div>
@@ -1669,7 +1688,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Online, offline and dead status</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid reference for each teammate</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">View Team Tracker<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">View Team Tracker<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -1678,11 +1697,11 @@ body.billing #billing-view{display:block;}
         <table class="table">
           <thead><tr><th>Member</th><th>Role</th><th>Grid</th><th>Status</th></tr></thead>
           <tbody>
-            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--orange);width:26px;height:26px;font-size:10px">KL</span>Kaelthorn</td><td><span class="badge badge-leader">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:#5b6472;width:26px;height:26px;font-size:10px">VX</span>Vexen</td><td><span class="badge">Builder</span></td><td class="mono text-2">K13</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:#3d6b5c;width:26px;height:26px;font-size:10px">OT</span>Otterloop</td><td><span class="badge">Farmer</span></td><td class="mono text-2">J15</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:#7a5a8a;width:26px;height:26px;font-size:10px">NV</span>Novasol</td><td><span class="badge">Scout</span></td><td class="mono text-2">K16</td><td><span class="pill pill-offline"><span class="dot"></span>Offline</span></td></tr>
-            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--crimson);width:26px;height:26px;font-size:10px">RM</span>Ramsey</td><td><span class="badge">Raider</span></td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
+            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--orange); width:26px; height:26px">KL</span>Kaelthorn</td><td><span class="badge badge-leader">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#5b6472; width:26px; height:26px">VX</span>Vexen</td><td><span class="badge">Builder</span></td><td class="mono text-2">K13</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#3d6b5c; width:26px; height:26px">OT</span>Otterloop</td><td><span class="badge">Farmer</span></td><td class="mono text-2">J15</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#7a5a8a; width:26px; height:26px">NV</span>Novasol</td><td><span class="badge">Scout</span></td><td class="mono text-2">K16</td><td><span class="pill pill-offline"><span class="dot"></span>Offline</span></td></tr>
+            <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--crimson); width:26px; height:26px">RM</span>Ramsey</td><td><span class="badge">Raider</span></td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
           </tbody>
         </table>
       </div>
@@ -1704,31 +1723,31 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Grid reference for every shop</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Stock level on every listing</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Search Vending<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Search Vending<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-head"><div class="card-title"><span class="icon-img ic-vending"></span>Vending Search</div></div>
       <div style="display:flex;align-items:center;gap:10px;height:40px;padding:0 12px;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--border);margin-bottom:14px;">
-        <svg class="icon" style="color:var(--text-3);width:15px;height:15px"><use href="#i-search"/></svg>
-        <span class="text-2" style="font-size:13px">assault rifle</span>
+        <svg class="icon icon-15" style="color:var(--text-3)"><use href="#i-search"/></svg>
+        <span class="text-2 fs-13">assault rifle</span>
         <span class="pill pill-orange" style="margin-left:auto"><span class="dot"></span>3 results</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;">
           <span class="item-ic photo ic-rifle" title="Assault Rifle"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">Assault Rifle</div><div class="text-3" style="font-size:11px">Grid B12 · 340m away</div></div>
-          <div style="text-align:right"><div class="mono" style="font-weight:700;color:var(--success)">180 Scrap</div><div class="progress" style="width:70px;margin-top:5px;"><span style="width:80%"></span></div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">Assault Rifle</div><div class="text-3 fs-11">Grid B12 · 340m away</div></div>
+          <div style="text-align:right"><div class="mono fw-700" style="color:var(--success)">180 Scrap</div><div class="progress" style="width:70px;margin-top:5px;"><span style="width:80%"></span></div></div>
         </div>
         <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;">
           <span class="item-ic photo ic-rifle" title="Assault Rifle"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">Assault Rifle</div><div class="text-3" style="font-size:11px">Grid F7 · 690m away</div></div>
-          <div style="text-align:right"><div class="mono" style="font-weight:700">210 Scrap</div><div class="progress" style="width:70px;margin-top:5px;"><span style="width:35%"></span></div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">Assault Rifle</div><div class="text-3 fs-11">Grid F7 · 690m away</div></div>
+          <div style="text-align:right"><div class="mono fw-700">210 Scrap</div><div class="progress" style="width:70px;margin-top:5px;"><span style="width:35%"></span></div></div>
         </div>
         <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;opacity:.6;">
           <span class="item-ic photo ic-rifle" title="Assault Rifle"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">Assault Rifle</div><div class="text-3" style="font-size:11px">Grid K3 · 1.2km away</div></div>
-          <div style="text-align:right"><div class="mono" style="font-weight:700">195 Scrap</div><div class="text-3" style="font-size:11px;margin-top:4px;">Out of stock</div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">Assault Rifle</div><div class="text-3 fs-11">Grid K3 · 1.2km away</div></div>
+          <div style="text-align:right"><div class="mono fw-700">195 Scrap</div><div class="text-3 fs-11" style="margin-top:4px">Out of stock</div></div>
         </div>
       </div>
     </div>
@@ -1749,7 +1768,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Shops that have gone</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>New listings in shops you already saw</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Enable Shop Alerts<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Enable Shop Alerts<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -1758,22 +1777,22 @@ body.billing #billing-view{display:block;}
         <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;">
           <span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>
           <span class="pill pill-orange" style="flex-shrink:0"><span class="dot"></span>New</span>
-          <div><div style="font-size:13px;font-weight:600">Assault Rifle ×3 listed at B12</div><div class="text-3 mono" style="font-size:11px">180 scrap each · 12s ago</div></div>
+          <div><div class="fs-13 fw-600">Assault Rifle ×3 listed at B12</div><div class="text-3 mono fs-11">180 scrap each · 12s ago</div></div>
         </div>
         <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;">
           <span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>
           <span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Restock</span>
-          <div><div style="font-size:13px;font-weight:600">High Quality Metal back in stock at F7</div><div class="text-3 mono" style="font-size:11px">2m ago</div></div>
+          <div><div class="fs-13 fw-600">High Quality Metal back in stock at F7</div><div class="text-3 mono fs-11">2m ago</div></div>
         </div>
         <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);align-items:center;">
           <span class="item-ic sm photo ic-vending" title="Vending Machine" style="opacity:.5"></span>
           <span class="pill pill-offline" style="flex-shrink:0"><span class="dot"></span>Removed</span>
-          <div><div style="font-size:13px;font-weight:600">Shop at grid K3 taken down</div><div class="text-3 mono" style="font-size:11px">6m ago</div></div>
+          <div><div class="fs-13 fw-600">Shop at grid K3 taken down</div><div class="text-3 mono fs-11">6m ago</div></div>
         </div>
         <div style="display:flex;gap:12px;padding:12px 0;align-items:center;">
           <span class="item-ic sm photo ic-rocket" title="Rocket Launcher"></span>
           <span class="pill pill-orange" style="flex-shrink:0"><span class="dot"></span>New</span>
-          <div><div style="font-size:13px;font-weight:600">Rocket Launcher listed at J9</div><div class="text-3 mono" style="font-size:11px">11m ago</div></div>
+          <div><div class="fs-13 fw-600">Rocket Launcher listed at J9</div><div class="text-3 mono fs-11">11m ago</div></div>
         </div>
       </div>
     </div>
@@ -1793,7 +1812,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Twig through armoured tiers</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Time left from current hitpoints</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Track Decay<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Track Decay<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -1801,21 +1820,21 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="panel-2" style="padding:13px 14px;display:flex;align-items:center;gap:14px;">
           <span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">2by2</div><div class="text-3" style="font-size:11px">Armored · Grid K14</div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">2by2</div><div class="text-3 fs-11">Armored · Grid K14</div></div>
           <div class="progress crimson" style="width:90px;"><span style="width:18%"></span></div>
-          <span class="mono" style="font-weight:700;color:var(--crimson);width:70px;text-align:right;">05:12:47</span>
+          <span class="mono fw-700" style="color:var(--crimson); width:70px; text-align:right">05:12:47</span>
         </div>
         <div class="panel-2" style="padding:13px 14px;display:flex;align-items:center;gap:14px;">
           <span class="item-ic sm photo ic-metalfrag" title="Metal Fragments"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">farm base</div><div class="text-3" style="font-size:11px">Sheet Metal · Grid J11</div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">farm base</div><div class="text-3 fs-11">Sheet Metal · Grid J11</div></div>
           <div class="progress" style="width:90px;"><span style="width:46%"></span></div>
-          <span class="mono" style="font-weight:700;color:var(--warning);width:70px;text-align:right;">1d 19:33</span>
+          <span class="mono fw-700" style="color:var(--warning); width:70px; text-align:right">1d 19:33</span>
         </div>
         <div class="panel-2" style="padding:13px 14px;display:flex;align-items:center;gap:14px;">
           <span class="item-ic sm photo ic-stones" title="Stones"></span>
-          <div style="flex:1"><div style="font-weight:700;font-size:13px">stone base</div><div class="text-3" style="font-size:11px">Stone · Grid F9</div></div>
+          <div style="flex:1"><div class="fs-13 fw-700">stone base</div><div class="text-3 fs-11">Stone · Grid F9</div></div>
           <div class="progress success" style="width:90px;"><span style="width:81%"></span></div>
-          <span class="mono" style="font-weight:700;color:var(--success);width:70px;text-align:right;">3d 06:14</span>
+          <span class="mono fw-700" style="color:var(--success); width:70px; text-align:right">3d 06:14</span>
         </div>
       </div>
       <div class="map-grid" style="margin-top:14px;min-height:120px;">
@@ -1842,7 +1861,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Target genome with live match</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Two donor slots, as in a planter</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Genetics Lab<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Genetics Lab<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:20px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -1851,8 +1870,8 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;gap:14px;align-items:center;margin-bottom:14px;">
         <div class="item-ic photo ic-planter" style="width:52px;height:52px;border-radius:var(--r-md);border:1px solid var(--border-strong);flex-shrink:0;" title="Large Planter Box"></div>
         <div>
-          <div style="font-weight:700;font-size:13px;">Hemp · Large Planter Box</div>
-          <div class="text-3" style="font-size:11px;">Target genome for most crops: <b class="mono" style="color:var(--text-2)">GGGYYY</b> (3 Growth, 3 Yield)</div>
+          <div class="fs-13 fw-700">Hemp · Large Planter Box</div>
+          <div class="text-3 fs-11">Target genome for most crops: <b class="mono" style="color:var(--text-2)">GGGYYY</b> (3 Growth, 3 Yield)</div>
         </div>
       </div>
 
@@ -1889,7 +1908,7 @@ body.billing #billing-view{display:block;}
 
       <div class="progress" style="margin:12px 0;"><span id="geneBar" style="width:0%"></span></div>
 
-      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:11px;" class="text-3">
+      <div style="display:flex; gap:14px; flex-wrap:wrap; margin-bottom:14px" class="text-3 fs-11">
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#4ADE80;margin-right:5px;"></span>G Growth</span>
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#FBBF24;margin-right:5px;"></span>Y Yield</span>
         <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:#a78bfa;margin-right:5px;"></span>H Hardiness</span>
@@ -1898,10 +1917,10 @@ body.billing #billing-view{display:block;}
       </div>
 
       <div class="panel-2" style="padding:13px 14px;display:flex;align-items:center;gap:12px;justify-content:space-between;">
-        <span class="text-2" style="font-size:12px;">Donor weight must <b style="color:var(--text)">strictly exceed</b> the center's own. A tie keeps the center's gene, same as in-game.</span>
+        <span class="text-2 fs-12">Donor weight must <b style="color:var(--text)">strictly exceed</b> the center's own. A tie keeps the center's gene, same as in-game.</span>
         <button class="btn btn-primary btn-sm" onclick="simulateCrossbreed()" style="flex-shrink:0;">Simulate Cross</button>
       </div>
-      <p class="text-3" style="font-size:11px;margin-top:10px;">Click any Center, Donor A, or Donor B gene to cycle it, and the match score updates live.</p>
+      <p class="text-3 fs-11" style="margin-top:10px">Click any Center, Donor A, or Donor B gene to cycle it, and the match score updates live.</p>
     </div>
   </div>
 </section>
@@ -1918,24 +1937,24 @@ body.billing #billing-view{display:block;}
       <ul class="feature-list">
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggle paired smart switches</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Control Devices<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Control Devices<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-title" style="margin-bottom:12px;"><svg class="icon"><use href="#i-cpu"/></svg>Smart Devices (6 paired)</div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;">
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Auto Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Auto Turret · South</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
-        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span style="font-size:13px;font-weight:600">Storage Lighting</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span class="fs-13 fw-600">Auto Turret · North</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span class="fs-13 fw-600">Auto Turret · South</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span class="fs-13 fw-600">Garage Door</span><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+        <div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;justify-content:space-between;"><span class="fs-13 fw-600">Storage Lighting</span><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
       </div>
       <div class="card-title" style="margin-bottom:10px;"><svg class="icon"><use href="#i-lock"/></svg>Tool Cupboard Upkeep</div>
       <div class="progress" style="margin-bottom:10px;"><span style="width:64%"></span></div>
       <div style="display:flex;gap:18px;flex-wrap:wrap;">
-        <span style="display:flex;align-items:center;gap:7px;font-size:12px;" class="mono text-2"><span class="item-ic sm photo ic-wood" title="Wood"></span>8,200</span>
-        <span style="display:flex;align-items:center;gap:7px;font-size:12px;" class="mono text-2"><span class="item-ic sm photo ic-stones" title="Stones"></span>12,400</span>
-        <span style="display:flex;align-items:center;gap:7px;font-size:12px;" class="mono text-2"><span class="item-ic sm photo ic-metalfrag" title="Metal Fragments"></span>3,150</span>
-        <span style="display:flex;align-items:center;gap:7px;font-size:12px;" class="mono text-2"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
+        <span style="display:flex; align-items:center; gap:7px" class="mono text-2 fs-12"><span class="item-ic sm photo ic-wood" title="Wood"></span>8,200</span>
+        <span style="display:flex; align-items:center; gap:7px" class="mono text-2 fs-12"><span class="item-ic sm photo ic-stones" title="Stones"></span>12,400</span>
+        <span style="display:flex; align-items:center; gap:7px" class="mono text-2 fs-12"><span class="item-ic sm photo ic-metalfrag" title="Metal Fragments"></span>3,150</span>
+        <span style="display:flex; align-items:center; gap:7px" class="mono text-2 fs-12"><span class="item-ic sm photo ic-hqm" title="High Quality Metal"></span>88</span>
       </div>
     </div>
   </div>
@@ -1955,7 +1974,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Exact output totals</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monument and safe zone rates</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Calculate Yields<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Calculate Yields<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:20px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -1966,13 +1985,13 @@ body.billing #billing-view{display:block;}
           <button class="tab" data-mult="0.5">Safe Zone</button>
         </div>
       </div>
-      <p class="text-3" style="font-size:11px;margin-bottom:8px;">Drag an item chip into the recycler.</p>
+      <p class="text-3 fs-11" style="margin-bottom:8px">Drag an item chip into the recycler.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;" id="rcChips">
         <div class="rc-chip" draggable="true" data-item="ar"><span class="item-ic sm photo ic-rifle" title="Assault Rifle"></span>Assault Rifle</div>
         <div class="rc-chip" draggable="true" data-item="door"><span class="item-ic sm photo ic-garagedoor" title="Garage Door"></span>Garage Door</div>
         <div class="rc-chip" draggable="true" data-item="jacket"><span class="item-ic sm photo ic-roadsign" title="Road Sign Jacket"></span>Road Sign Jacket</div>
       </div>
-      <div class="rc-drop" id="rcDrop"><span class="text-3" style="font-size:12px;">Drop components here…</span></div>
+      <div class="rc-drop" id="rcDrop"><span class="text-3 fs-12">Drop components here…</span></div>
       <div class="card-title" style="margin:16px 0 10px;"><svg class="icon"><use href="#i-layers"/></svg>Output</div>
       <div id="rcOutput" style="display:flex;gap:16px;flex-wrap:wrap;" class="mono text-2" style="font-size:13px;">
         <span>Not set</span>
@@ -1994,7 +2013,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Read and send team chat</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Event announcements posted to chat</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Chat Assistant<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Chat Assistant<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -2007,7 +2026,7 @@ body.billing #billing-view{display:block;}
         <div class="chat-bubble chat-bot"><b>Rustex Bot</b> Event: Patrol Helicopter active near J9. Tracking...</div>
       </div>
       <div style="display:flex;gap:8px;">
-        <input style="flex:1;height:38px;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--border);padding:0 12px;color:var(--text);font-size:13px;" placeholder="/help for commands" />
+        <input class="fs-13" style="flex:1; height:38px; border-radius:var(--r-md); background:var(--surface-2); border:1px solid var(--border); padding:0 12px; color:var(--text)" placeholder="/help for commands" />
         <button class="btn btn-primary btn-sm">Send</button>
       </div>
     </div>
@@ -2029,7 +2048,7 @@ body.billing #billing-view{display:block;}
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>The server's own map image</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggleable layers</li>
       </ul>
-      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Heatmap<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></a>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Heatmap<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
@@ -2059,15 +2078,15 @@ body.billing #billing-view{display:block;}
     <span class="eyebrow" style="justify-content:center">Ready when you are</span>
     <h2>Run a smarter wipe,<br/>starting tonight.</h2>
     <p class="sub">Every feature above, live in one console. Free to start. Pair your server in under two minutes.</p>
-    <button class="btn btn-primary" style="height:52px;padding:0 30px;font-size:14px;" onclick="goDashboard()">Open Dashboard<svg class="icon"><use href="#i-arrow-right"/></svg></button>
+    <button class="btn btn-primary fs-14" style="height:52px; padding:0 30px" onclick="goDashboard()">Open Dashboard<svg class="icon"><use href="#i-arrow-right"/></svg></button>
   </div>
 </section>
 
 <footer class="footer">
   <div class="container" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
-    <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home" style="font-size:14px;"><span class="brand-mark" style="width:24px;height:24px;"><svg aria-hidden="true" style="width:13px;height:13px"><use href="#i-mark"/></svg></span>Rustex</a>
-    <span class="text-3" style="font-size:12px;">Not affiliated with Facepunch Studios. Rust+ is a trademark of Facepunch Studios Ltd.</span>
-    <span class="text-3" style="font-size:12px;">© 2026 Rustex</span>
+    <a class="brand fs-14" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark" style="width:24px;height:24px;"><svg aria-hidden="true" style="width:13px;height:13px"><use href="#i-mark"/></svg></span>Rustex</a>
+    <span class="text-3 fs-12">Not affiliated with Facepunch Studios. Rust+ is a trademark of Facepunch Studios Ltd.</span>
+    <span class="text-3 fs-12">© 2026 Rustex</span>
   </div>
 </footer>
 
@@ -2102,12 +2121,12 @@ body.billing #billing-view{display:block;}
 
   <div class="dash-main">
     <div class="topbar">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
       <div class="crumb"><b data-acct="serverName">No server paired</b></div>
-      <button class="top-search" onclick="openCmdk()"><svg class="icon" style="width:15px;height:15px"><use href="#i-search"/></svg>Search players, items, commands…<kbd>⌘K</kbd></button>
+      <button class="top-search" onclick="openCmdk()"><svg class="icon icon-15"><use href="#i-search"/></svg>Search players, items, commands…<kbd>⌘K</kbd></button>
       <div class="top-actions">
         <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddServer', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-grid"/></svg><span id="serverLabel" data-acct="serverName">No server</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="selector" onclick="toggleDropdown('ddServer', event)"><svg class="icon icon-14"><use href="#i-grid"/></svg><span id="serverLabel" data-acct="serverName">No server</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddServer">
             <div class="dropdown-label">Your servers</div>
             <div class="dropdown-item text-3" style="cursor:default;">No servers paired yet</div>
@@ -2116,7 +2135,7 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
         <div class="dropdown">
-          <div class="selector" onclick="toggleDropdown('ddTeam', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-users"/></svg><span id="teamLabel">No team</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="selector" onclick="toggleDropdown('ddTeam', event)"><svg class="icon icon-14"><use href="#i-users"/></svg><span id="teamLabel">No team</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddTeam">
             <div class="dropdown-label">Teams</div>
             <div class="dropdown-item text-3" style="cursor:default;">No team data yet</div>
@@ -2125,16 +2144,16 @@ body.billing #billing-view{display:block;}
           </div>
         </div>
         <div class="dropdown">
-          <button class="icon-btn" onclick="openNotifs(event)"><svg class="icon" style="width:16px;height:16px"><use href="#i-bell"/></svg><span class="dot-badge" id="notifDot"></span></button>
+          <button class="icon-btn" onclick="openNotifs(event)"><svg class="icon icon-16"><use href="#i-bell"/></svg><span class="dot-badge" id="notifDot"></span></button>
           <div class="dropdown-panel" id="ddNotifs" style="width:300px;">
-            <div class="dropdown-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:8px;">Notifications<span style="cursor:pointer;color:var(--orange);font-weight:600;text-transform:none;letter-spacing:0;font-size:11px;" onclick="document.getElementById('notifDot').style.display='none'">Mark all read</span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--crimson)"><use href="#i-siren"/></svg><span>Smart Alarm triggered at North Wall<br/><span class="text-3" style="font-size:11px;">14s ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--orange)"><use href="#i-tag"/></svg><span>New shop listed at grid B12<br/><span class="text-3" style="font-size:11px;">2m ago</span></span></div>
-            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;"><use href="#i-users"/></svg><span>Ramsey went offline<br/><span class="text-3" style="font-size:11px;">6m ago</span></span></div>
+            <div class="dropdown-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:8px;">Notifications<span class="fs-11 fw-600" style="cursor:pointer; color:var(--orange); text-transform:none; letter-spacing:0" onclick="document.getElementById('notifDot').style.display='none'">Mark all read</span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--crimson)"><use href="#i-siren"/></svg><span>Smart Alarm triggered at North Wall<br/><span class="text-3 fs-11">14s ago</span></span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;color:var(--orange)"><use href="#i-tag"/></svg><span>New shop listed at grid B12<br/><span class="text-3 fs-11">2m ago</span></span></div>
+            <div class="dropdown-item" style="align-items:flex-start;"><svg class="icon" style="margin-top:2px;"><use href="#i-users"/></svg><span>Ramsey went offline<br/><span class="text-3 fs-11">6m ago</span></span></div>
           </div>
         </div>
         <div class="dropdown">
-          <div class="user-chip" onclick="toggleDropdown('ddUser', event)"><img data-acct="avatar" alt=""><span data-acct="name">Player</span><svg class="icon" style="width:13px;height:13px"><use href="#i-chevron-down"/></svg></div>
+          <div class="user-chip" onclick="toggleDropdown('ddUser', event)"><img data-acct="avatar" alt=""><span data-acct="name">Player</span><svg class="icon icon-13"><use href="#i-chevron-down"/></svg></div>
           <div class="dropdown-panel" id="ddUser">
             <div class="dropdown-item" onclick="closeDropdowns();goSettings();"><svg class="icon"><use href="#i-users"/></svg>Account</div>
             <div class="dropdown-item" onclick="closeDropdowns();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Rust+ Pairing</div>
@@ -2152,11 +2171,11 @@ body.billing #billing-view{display:block;}
         <div><h1>Overview</h1><div class="sub" data-acct="serverName">No server paired</div></div>
         <div style="display:flex;gap:10px;">
           <div class="dropdown">
-            <button class="btn btn-outline btn-sm" onclick="toggleDropdown('ddCustomize', event)"><svg class="icon" style="width:14px;height:14px"><use href="#i-layers"/></svg>Customize</button>
+            <button class="btn btn-outline btn-sm" onclick="toggleDropdown('ddCustomize', event)"><svg class="icon icon-14"><use href="#i-layers"/></svg>Customize</button>
             <div class="dropdown-panel" id="ddCustomize" style="width:230px;">
               <div class="dropdown-label">Sections</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('overview')"><svg class="icon"><use href="#i-home"/></svg>Overview</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('market')"><svg class="icon"><use href="#i-tag"/></svg>Market</div><div class="dropdown-item" onclick="closeDropdowns();showDashSection('tools')"><svg class="icon"><use href="#i-flask"/></svg>Tools</div></div>
           </div>
-          <button class="btn btn-primary btn-sm" onclick="fireToast()"><svg class="icon" style="width:14px;height:14px"><use href="#i-plus"/></svg>Quick Alert</button>
+          <button class="btn btn-primary btn-sm" onclick="fireToast()"><svg class="icon icon-14"><use href="#i-plus"/></svg>Quick Alert</button>
         </div>
       </div>
 
@@ -2166,7 +2185,7 @@ body.billing #billing-view{display:block;}
         <span class="alert-icon blink"><svg class="icon"><use href="#i-siren"/></svg></span>
         <div class="alert-body"><div class="t">RAID DETECTED: Main Base, North Wall</div><div class="d mono">Smart Alarm tripped 00:14 ago · 2 breach events logged</div></div>
         <button class="btn btn-primary btn-sm">Call Squad</button>
-        <button class="icon-btn" style="width:34px;height:34px;"><svg class="icon" style="width:14px;height:14px"><use href="#i-x"/></svg></button>
+        <button class="icon-btn" style="width:34px;height:34px;"><svg class="icon icon-14"><use href="#i-x"/></svg></button>
       </div>
 
       <div class="dash-tabs" role="tablist" aria-label="Dashboard sections">
@@ -2178,19 +2197,19 @@ body.billing #billing-view{display:block;}
       <div class="dash-section active" id="dsec-overview">
         <div class="live-state w-12" id="liveState" hidden></div>
         <div class="stat-row w-12">
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Server Pop</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="pop">187</span><span class="text-3" style="font-size:14px"><span data-live="maxPop"> of 200</span></span></div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Wipe Age</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="wipeAge">3</span><span class="text-3" style="font-size:14px"> days</span></div></div>
-          <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Queue</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;color:var(--crimson)"><span data-live="queue">0</span></div></div>
-          <div class="card stat-card"><div class="top"><span class="stat lbl" style="font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.08em;font-weight:600;">Squad Online</span></div><div class="num mono" style="font-size:26px;font-weight:700;margin-top:6px;"><span data-live="squadOnline">4</span><span class="text-3" style="font-size:14px"><span data-live="squadTotal"> of 5</span></span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Server Pop</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="pop">187</span><span class="text-3 fs-14"><span data-live="maxPop"> of 200</span></span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Wipe Age</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="wipeAge">3</span><span class="text-3 fs-14"> days</span></div></div>
+          <div class="card stat-card" style="border-color:rgba(179,38,30,.35)"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Queue</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px; color:var(--crimson)"><span data-live="queue">0</span></div></div>
+          <div class="card stat-card"><div class="top"><span class="stat lbl fs-11 fw-600" style="color:var(--text-3); text-transform:uppercase; letter-spacing:.08em">Squad Online</span></div><div class="num mono fs-26 fw-700" style="margin-top:6px"><span data-live="squadOnline">4</span><span class="text-3 fs-14"><span data-live="squadTotal"> of 5</span></span></div></div>
         </div>
         <div class="widget card w-12" id="d-team">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-users"/></svg>Team Tracker</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div><div id="teamRows">
           <table class="table">
             <tbody>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--orange);width:26px;height:26px;font-size:10px">KL</span>Kaelthorn <span class="badge badge-leader" style="margin-left:6px">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:#5b6472;width:26px;height:26px;font-size:10px">VX</span>Vexen</td><td class="mono text-2">K13</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:#3d6b5c;width:26px;height:26px;font-size:10px">OT</span>Otterloop</td><td class="mono text-2">J15</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
-              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar" style="background:var(--crimson);width:26px;height:26px;font-size:10px">RM</span>Ramsey</td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
+              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--orange); width:26px; height:26px">KL</span>Kaelthorn <span class="badge badge-leader" style="margin-left:6px">Leader</span></td><td class="mono text-2">K14</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#5b6472; width:26px; height:26px">VX</span>Vexen</td><td class="mono text-2">K13</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:#3d6b5c; width:26px; height:26px">OT</span>Otterloop</td><td class="mono text-2">J15</td><td><span class="pill pill-online"><span class="dot"></span>Online</span></td></tr>
+              <tr><td style="display:flex;align-items:center;gap:9px"><span class="avatar fs-10" style="background:var(--crimson); width:26px; height:26px">RM</span>Ramsey</td><td class="mono text-2">F9</td><td><span class="pill pill-dead"><span class="dot"></span>Dead</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -2200,7 +2219,7 @@ body.billing #billing-view{display:block;}
         <div class="widget card w-12" id="d-alarm">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-siren"/></svg>Activity Feed</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div id="activityLog" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 24px;">
-            <div class="text-3" style="font-size:12px;">Connect a server to load live events.</div>
+            <div class="text-3 fs-12">Connect a server to load live events.</div>
           </div>
         </div>
         </div>
@@ -2232,11 +2251,11 @@ body.billing #billing-view{display:block;}
           <div class="rc-grid" id="rcGrid"></div>
 
           <div class="rc-out">
-            <div id="rcTotals"><div class="text-3" style="font-size:12px;">Enter how many of each component you have.</div></div>
+            <div id="rcTotals"><div class="text-3 fs-12">Enter how many of each component you have.</div></div>
             <div class="rc-note text-3" id="rcNote"></div>
           </div>
           <button class="btn btn-ghost btn-sm" style="margin-top:10px;" onclick="clearRecycler()">Clear</button>
-          <p class="text-3" style="font-size:11px;line-height:1.5;margin:10px 0 0;">
+          <p class="text-3 fs-11" style="line-height:1.5; margin:10px 0 0">
             Yields from Man1ak&rsquo;s recycler chart. Where the chart gives a range the total stays a
             range rather than guessing a single figure.
           </p>
@@ -2272,7 +2291,7 @@ body.billing #billing-view{display:block;}
               <div class="decay-sub text-3" id="decaySub">until it collapses</div>
             </div>
 
-            <p class="text-3" style="font-size:11px;line-height:1.55;margin:0;">
+            <p class="text-3 fs-11" style="line-height:1.55; margin:0">
               Assumes no Tool Cupboard upkeep. Decay only runs once the building has been outside
               upkeep for a while, so treat this as the time you have after it starts, not a countdown
               from right now.
@@ -2356,7 +2375,7 @@ body.billing #billing-view{display:block;}
         <div class="widget card w-6" id="d-chat">
           <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-chat"/></svg>Chat Assistant</div><span class="drag-handle"><svg class="icon"><use href="#i-grip"/></svg></span></div>
           <div class="chat-log" id="chatLog">
-            <div class="text-3" style="font-size:12px;">Connect a server to load team chat.</div>
+            <div class="text-3 fs-12">Connect a server to load team chat.</div>
           </div>
           <div class="chat-send">
             <input class="inp" id="chatSend" type="text" maxlength="250" placeholder="Message your team"
@@ -2366,7 +2385,7 @@ body.billing #billing-view{display:block;}
 
           <div class="announce">
             <div class="announce-hd">Announce to team chat</div>
-            <p class="text-3" style="font-size:11px;margin:0 0 9px;line-height:1.5;">
+            <p class="text-3 fs-11" style="margin:0 0 9px; line-height:1.5">
               Rustex posts these into your squad&rsquo;s chat as they happen, once each. Everything is
               off until you turn it on.
             </p>
@@ -2394,10 +2413,10 @@ body.billing #billing-view{display:block;}
   <div class="container nav-inner">
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-actions" style="margin-left:auto;">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
-      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
-      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
     </div>
   </div>
@@ -2425,7 +2444,7 @@ body.billing #billing-view{display:block;}
           
           <div>
             <h3>Scout</h3>
-            <p class="text-3" style="font-size:12px;margin-top:5px;">For a solo player holding one base.</p>
+            <p class="text-3 fs-12" style="margin-top:5px">For a solo player holding one base.</p>
           </div>
           <div class="price">
             <span class="amt mono" data-price-m="4.99" data-price-y="47.90">$4.99</span>
@@ -2438,7 +2457,7 @@ body.billing #billing-view{display:block;}
           <span class="plan-tag">Most popular</span>
           <div>
             <h3>Raider</h3>
-            <p class="text-3" style="font-size:12px;margin-top:5px;">For a squad running a wipe properly.</p>
+            <p class="text-3 fs-12" style="margin-top:5px">For a squad running a wipe properly.</p>
           </div>
           <div class="price">
             <span class="amt mono" data-price-m="9.99" data-price-y="95.90">$9.99</span>
@@ -2451,7 +2470,7 @@ body.billing #billing-view{display:block;}
           
           <div>
             <h3>Clan</h3>
-            <p class="text-3" style="font-size:12px;margin-top:5px;">For a full clan with several bases.</p>
+            <p class="text-3 fs-12" style="margin-top:5px">For a full clan with several bases.</p>
           </div>
           <div class="price">
             <span class="amt mono" data-price-m="19.99" data-price-y="191.90">$19.99</span>
@@ -2461,14 +2480,14 @@ body.billing #billing-view{display:block;}
           <button class="btn btn-outline btn-block" onclick="choosePlan('clan')">Choose Clan</button>
         </div>
     </div>
-    <p class="text-3" style="font-size:12px;margin-top:20px;text-align:center;">
+    <p class="text-3 fs-12" style="margin-top:20px; text-align:center">
       Prices in USD. Cancel any time. Access runs to the end of the period you already paid for.
     </p>
     <div class="card" style="margin-top:26px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-      <svg class="icon" style="width:18px;height:18px;color:var(--warning);flex-shrink:0;"><use href="#i-flask"/></svg>
+      <svg class="icon icon-18" style="color:var(--warning); flex-shrink:0"><use href="#i-flask"/></svg>
       <div style="flex:1;min-width:220px;">
-        <div style="font-weight:700;font-size:14px;margin-bottom:3px;">Checkout isn't connected yet</div>
-        <div class="text-3" style="font-size:13px;">No payment provider is wired up, so nothing here can charge you. You can still open the dashboard with clearly-marked sample data.</div>
+        <div class="fs-14 fw-700" style="margin-bottom:3px">Checkout isn't connected yet</div>
+        <div class="text-3 fs-13">No payment provider is wired up, so nothing here can charge you. You can still open the dashboard with clearly-marked sample data.</div>
       </div>
       <button class="btn btn-outline" onclick="enterDemo()">Open dashboard in demo mode</button>
     </div>
@@ -2478,10 +2497,10 @@ body.billing #billing-view{display:block;}
 <section style="padding-bottom:100px;">
   <div class="container">
     <div class="card" style="display:flex;gap:16px;align-items:flex-start;">
-      <svg class="icon" style="width:18px;height:18px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-lock"/></svg>
+      <svg class="icon icon-18" style="color:var(--orange); flex-shrink:0; margin-top:1px"><use href="#i-lock"/></svg>
       <div>
-        <div style="font-weight:700;font-size:14px;margin-bottom:4px;">You need a Steam account to subscribe</div>
-        <div class="text-3" style="font-size:13px;max-width:620px;">Rustex pairs through Rust's own in-game request, so billing is tied to the Steam account you actually play on. Signing in takes one click and we never see your Steam password.</div>
+        <div class="fs-14 fw-700" style="margin-bottom:4px">You need a Steam account to subscribe</div>
+        <div class="text-3 fs-13" style="max-width:620px">Rustex pairs through Rust's own in-game request, so billing is tied to the Steam account you actually play on. Signing in takes one click and we never see your Steam password.</div>
         <button class="btn btn-steam btn-sm" style="margin-top:13px;" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph"><use href="#i-steam"/></svg>Sign in through Steam</button>
       </div>
     </div>
@@ -2495,10 +2514,10 @@ body.billing #billing-view{display:block;}
   <div class="container nav-inner">
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-actions" style="margin-left:auto;">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
-      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
-      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
     </div>
   </div>
@@ -2528,8 +2547,8 @@ body.billing #billing-view{display:block;}
         <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
           <img data-acct="avatar" alt="" style="width:64px;height:64px;border-radius:16px;border:1px solid var(--border-strong);object-fit:cover;flex-shrink:0;">
           <div style="min-width:0;flex:1;">
-            <div style="font-weight:800;font-size:16px;" data-acct="name">Player</div>
-            <div class="text-3" style="font-size:12px;margin-top:3px;">Signed in through Steam · member since <span data-acct="created">Not set</span> · <a data-acct="profileUrl" href="#" target="_blank" rel="noopener" style="color:var(--text-2);text-decoration:underline;">View Steam profile</a></div>
+            <div class="fs-16 fw-800" data-acct="name">Player</div>
+            <div class="text-3 fs-12" style="margin-top:3px">Signed in through Steam · member since <span data-acct="created">Not set</span> · <a data-acct="profileUrl" href="#" target="_blank" rel="noopener" style="color:var(--text-2);text-decoration:underline;">View Steam profile</a></div>
           </div>
           <span class="pill pill-orange" data-acct="planPill"><span class="dot"></span>No plan</span>
         </div>
@@ -2547,13 +2566,13 @@ body.billing #billing-view{display:block;}
         <div class="card-title" style="margin-bottom:6px;"><svg class="icon"><use href="#i-wifi"/></svg>Connections</div>
         <div class="field-row">
           <span class="fl">Rust+ account</span>
-          <span class="fv"><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span><span class="text-3" style="font-size:12px;" data-acct="rustplusWho">Not set</span></span>
+          <span class="fv"><span class="pill pill-online" data-acct="rustplusPill"><span class="dot"></span>Connected</span><span class="text-3 fs-12" data-acct="rustplusWho">Not set</span></span>
         </div>
         <div class="field-row">
           <span class="fl">Connected servers</span>
           <span class="fv" style="flex-direction:column;align-items:flex-start;gap:8px;">
             <div id="settingsServers" style="display:flex;flex-direction:column;gap:8px;width:100%;"></div>
-            <button class="btn btn-outline btn-sm" onclick="goPairing()"><svg class="icon" style="width:14px;height:14px"><use href="#i-plus"/></svg>Pair another server</button>
+            <button class="btn btn-outline btn-sm" onclick="goPairing()"><svg class="icon icon-14"><use href="#i-plus"/></svg>Pair another server</button>
           </span>
         </div>
         <div class="field-row">
@@ -2578,7 +2597,7 @@ body.billing #billing-view{display:block;}
           <span class="fl"><label for="setAppearance">Appearance</label></span>
           <span class="fv" style="flex-direction:column;align-items:flex-start;gap:6px;">
             <select class="inp" id="setAppearance"><option value="dark">Dark (tactical)</option><option value="system" disabled>Match system (coming soon)</option></select>
-            <span class="text-3" style="font-size:11px;">Rustex is built dark on purpose: the HUD reads correctly against near-black.</span>
+            <span class="text-3 fs-11">Rustex is built dark on purpose: the HUD reads correctly against near-black.</span>
           </span>
         </div>
       </div>
@@ -2596,14 +2615,14 @@ body.billing #billing-view{display:block;}
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="saveSettings()">Save changes</button>
         <button class="btn btn-ghost" onclick="loadSettingsForm()">Discard</button>
-        <span class="text-3" style="font-size:12px;margin-left:auto;" id="settingsSaved"></span>
+        <span class="text-3 fs-12" style="margin-left:auto" id="settingsSaved"></span>
       </div>
 
       <div class="card danger-zone" style="margin-top:6px;">
         <div class="card-title" style="margin-bottom:8px;color:#ef6a62;"><svg class="icon" style="color:#ef6a62"><use href="#i-lock"/></svg>Session</div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-          <div class="text-3" style="font-size:13px;max-width:460px;">Logging out clears this browser's Rustex session. Your servers stay paired and your subscription is unaffected.</div>
-          <button class="btn btn-danger" onclick="logOut()"><svg class="icon" style="width:15px;height:15px"><use href="#i-x"/></svg>Log out</button>
+          <div class="text-3 fs-13" style="max-width:460px">Logging out clears this browser's Rustex session. Your servers stay paired and your subscription is unaffected.</div>
+          <button class="btn btn-danger" onclick="logOut()"><svg class="icon icon-15"><use href="#i-x"/></svg>Log out</button>
         </div>
       </div>
 
@@ -2618,10 +2637,10 @@ body.billing #billing-view{display:block;}
   <div class="container nav-inner">
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-actions" style="margin-left:auto;">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
-      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" data-when="entitled" onclick="goDashboard()">Dashboard<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <button class="btn btn-primary" data-when="out" onclick="openSteamAuth()"><svg class="steam-glyph" style="width:15px;height:15px"><use href="#i-steam"/></svg>Sign in</button>
-      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon" style="width:15px;height:15px"><use href="#i-chevron-right"/></svg></button>
+      <button class="btn btn-primary" data-when="in" onclick="goPricing()">Choose a plan<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></button>
       <div class="user-chip" data-when="in entitled" onclick="goSettings()"><img data-acct="avatar" alt=""><span data-acct="name">Player</span></div>
     </div>
   </div>
@@ -2656,10 +2675,10 @@ body.billing #billing-view{display:block;}
 
       <div class="card" id="billingNone" hidden>
         <div style="display:flex;gap:16px;align-items:flex-start;">
-          <svg class="icon" style="width:18px;height:18px;color:var(--text-3);flex-shrink:0;margin-top:1px;"><use href="#i-tag"/></svg>
+          <svg class="icon icon-18" style="color:var(--text-3); flex-shrink:0; margin-top:1px"><use href="#i-tag"/></svg>
           <div style="flex:1;">
-            <div style="font-weight:700;font-size:14px;margin-bottom:4px;">No active subscription</div>
-            <div class="text-3" style="font-size:13px;max-width:560px;">There's nothing to bill yet: no plan, no payment method on file and no invoices. Once a payment provider is connected, your plan and receipts will appear here.</div>
+            <div class="fs-14 fw-700" style="margin-bottom:4px">No active subscription</div>
+            <div class="text-3 fs-13" style="max-width:560px">There's nothing to bill yet: no plan, no payment method on file and no invoices. Once a payment provider is connected, your plan and receipts will appear here.</div>
             <button class="btn btn-outline btn-sm" style="margin-top:13px;" onclick="goPricing()">See plans</button>
           </div>
         </div>
@@ -2670,9 +2689,9 @@ body.billing #billing-view{display:block;}
         <div class="field-row"><span class="fl">Renews on</span><span class="fv mono" data-acct="renewsAt">Not set</span></div>
         <div class="field-row"><span class="fl">Amount</span><span class="fv mono" data-acct="amount">Not set</span></div>
         <div class="field-row"><span class="fl">Started</span><span class="fv mono" data-acct="startedAt">Not set</span></div>
-        <div id="billingCompNote" class="text-3" style="font-size:12px;margin-top:2px;" hidden>This access was granted directly, not through a paid subscription, so there's nothing to bill, upgrade or cancel.</div>
+        <div id="billingCompNote" class="text-3 fs-12" style="margin-top:2px" hidden>This access was granted directly, not through a paid subscription, so there's nothing to bill, upgrade or cancel.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
-          <button class="btn btn-primary btn-sm" onclick="goPricing()" data-bill="upgrade"><svg class="icon" style="width:14px;height:14px"><use href="#i-trend-up"/></svg>Upgrade plan</button>
+          <button class="btn btn-primary btn-sm" onclick="goPricing()" data-bill="upgrade"><svg class="icon icon-14"><use href="#i-trend-up"/></svg>Upgrade plan</button>
           <button class="btn btn-outline btn-sm" onclick="goPricing()" data-bill="downgrade">Change plan</button>
           <button class="btn btn-outline btn-sm" onclick="reactivateSub()" data-bill="reactivate">Reactivate subscription</button>
           <button class="btn btn-ghost btn-sm" onclick="cancelSub()" data-bill="cancel" style="color:#ef6a62;">Cancel subscription</button>
@@ -2681,20 +2700,20 @@ body.billing #billing-view{display:block;}
 
       <div class="card">
         <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-lock"/></svg>Payment method</div></div>
-        <div id="billingNoCard" class="text-3" style="font-size:13px;padding:4px 0 2px;">No payment method on file.</div>
+        <div id="billingNoCard" class="text-3 fs-13" style="padding:4px 0 2px">No payment method on file.</div>
         <div class="pay-card" id="billingCard" hidden>
           <span class="pay-brand" data-acct="cardBrand">CARD</span>
           <div style="flex:1;min-width:0;">
-            <div style="font-size:13px;font-weight:600;">•••• •••• •••• <span class="mono" data-acct="cardLast4">••••</span></div>
-            <div class="text-3" style="font-size:12px;margin-top:2px;">Expires <span class="mono" data-acct="cardExp">Not set</span> · <span data-acct="cardName">Not set</span></div>
+            <div class="fs-13 fw-600">•••• •••• •••• <span class="mono" data-acct="cardLast4">••••</span></div>
+            <div class="text-3 fs-12" style="margin-top:2px">Expires <span class="mono" data-acct="cardExp">Not set</span> · <span data-acct="cardName">Not set</span></div>
           </div>
           <button class="btn btn-outline btn-sm" onclick="updatePaymentMethod()">Update</button>
         </div>
-        <p class="text-3" style="font-size:11px;margin-top:11px;">Card details are held by the payment processor. Rustex only ever stores the last four digits and the expiry.</p>
+        <p class="text-3 fs-11" style="margin-top:11px">Card details are held by the payment processor. Rustex only ever stores the last four digits and the expiry.</p>
       </div>
 
       <div class="card">
-        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-layers"/></svg>Billing history</div><span class="text-3" style="font-size:12px;" id="invoiceCount"></span></div>
+        <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-layers"/></svg>Billing history</div><span class="text-3 fs-12" id="invoiceCount"></span></div>
         <div style="overflow-x:auto;">
           <table class="table" id="invoiceTable">
             <thead><tr><th>Invoice</th><th>Date</th><th>Plan</th><th>Amount</th><th>Status</th><th style="text-align:right">Receipt</th></tr></thead>
@@ -2703,8 +2722,8 @@ body.billing #billing-view{display:block;}
         </div>
         <div id="invoiceEmpty" style="text-align:center;padding:26px 10px;">
           <svg class="icon" style="width:22px;height:22px;color:var(--text-3);margin:0 auto 10px;"><use href="#i-layers"/></svg>
-          <div class="text-2" style="font-size:13px;font-weight:600;margin-bottom:3px;">No invoices yet</div>
-          <div class="text-3" style="font-size:12px;">Your first receipt appears here once a plan is active.</div>
+          <div class="text-2 fs-13 fw-600" style="margin-bottom:3px">No invoices yet</div>
+          <div class="text-3 fs-12">Your first receipt appears here once a plan is active.</div>
         </div>
       </div>
 
@@ -2718,8 +2737,8 @@ body.billing #billing-view{display:block;}
   <div class="container nav-inner">
     <a class="brand" href="#" onclick="goLanding();return false;" aria-label="Rustex — Return to Home"><span class="brand-mark"><svg aria-hidden="true"><use href="#i-mark"/></svg></span>Rustex</a>
     <div class="nav-actions" style="margin-left:auto;">
-      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon" style="width:15px;height:15px"><use href="#i-home"/></svg>Home</button>
-      <button class="btn btn-outline" onclick="goDashboard()">Dashboard<svg class="icon" style="width:15px;height:15px"><use href="#i-arrow-right"/></svg></button>
+      <button class="btn btn-ghost" onclick="goLanding()"><svg class="icon icon-15"><use href="#i-home"/></svg>Home</button>
+      <button class="btn btn-outline" onclick="goDashboard()">Dashboard<svg class="icon icon-15"><use href="#i-arrow-right"/></svg></button>
     </div>
   </div>
 </nav>
@@ -2730,22 +2749,22 @@ body.billing #billing-view{display:block;}
     <div style="text-align:center;margin-bottom:34px;">
       <span class="eyebrow" style="justify-content:center;">Rust+ pairing</span>
       <h1 style="font-size:clamp(27px,3.4vw,38px);margin:14px 0 12px;">Pair straight from the game.</h1>
-      <p class="text-2" style="font-size:14px;max-width:560px;margin:0 auto;">Rustex receives the same in-game request the official Rust+ app uses, after a one-time setup on your PC.</p>
+      <p class="text-2 fs-14" style="max-width:560px; margin:0 auto">Rustex receives the same in-game request the official Rust+ app uses, after a one-time setup on your PC.</p>
     </div>
 
 
     <div style="text-align:center;margin-bottom:18px;">
-      <button class="btn btn-primary" style="font-size:14px;padding:12px 22px;" onclick="openConnect()">
-        <svg class="icon" style="width:16px;height:16px"><use href="#i-wifi"/></svg>Connect Rust+ account
+      <button class="btn btn-primary fs-14" style="padding:12px 22px" onclick="openConnect()">
+        <svg class="icon icon-16"><use href="#i-wifi"/></svg>Connect Rust+ account
       </button>
     </div>
 
     <div class="card" style="margin-bottom:16px;border-color:var(--border-accent);background:var(--orange-soft);">
       <div style="display:flex;gap:13px;align-items:flex-start;">
-        <svg class="icon" style="width:17px;height:17px;color:var(--orange);flex-shrink:0;margin-top:1px;"><use href="#i-wifi"/></svg>
+        <svg class="icon icon-17" style="color:var(--orange); flex-shrink:0; margin-top:1px"><use href="#i-wifi"/></svg>
         <div style="min-width:0;">
-          <div style="font-weight:700;font-size:14px;margin-bottom:5px;">Automatic pairing isn&rsquo;t available here</div>
-          <div class="text-2" style="font-size:13px;line-height:1.6;">
+          <div class="fs-14 fw-700" style="margin-bottom:5px">Automatic pairing isn&rsquo;t available here</div>
+          <div class="text-2 fs-13" style="line-height:1.6">
             Catching the in-game <b>Pair With Server</b> push needs a service that stays connected to
             Google&rsquo;s push network, which static hosting cannot do. Live raid alarms need the same thing.
             <b style="color:var(--text)">Everything else works today</b>: connect a server by hand below and
@@ -2792,22 +2811,22 @@ body.billing #billing-view{display:block;}
     </div>
 
     <div class="card" style="margin-top:16px;">
-      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-grid"/></svg>Paired servers</div><span class="text-3" style="font-size:12px;" id="pairedCount"></span></div>
+      <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-grid"/></svg>Paired servers</div><span class="text-3 fs-12" id="pairedCount"></span></div>
       <div id="pairedList" style="display:flex;flex-direction:column;gap:10px;"></div>
       <div id="pairedEmpty" style="text-align:center;padding:24px 10px;">
         <svg class="icon" style="width:20px;height:20px;color:var(--text-3);margin:0 auto 9px;"><use href="#i-wifi"/></svg>
-        <div class="text-2" style="font-size:13px;font-weight:600;margin-bottom:3px;">Nothing paired yet</div>
-        <div class="text-3" style="font-size:12px;">Servers land here once pairing is connected.</div>
+        <div class="text-2 fs-13 fw-600" style="margin-bottom:3px">Nothing paired yet</div>
+        <div class="text-3 fs-12">Servers land here once pairing is connected.</div>
       </div>
     </div>
 
     <section class="pair-manual" id="connectPanel" hidden>
       <div class="card-title" style="margin-bottom:4px;">Connect a server</div>
       <div style="margin-top:14px;">
-        <textarea class="inp" id="mPaste" rows="3" placeholder="Paste the pairing output here and the fields below fill themselves"
-          style="max-width:none;width:100%;resize:vertical;font-family:var(--font-mono);font-size:12px;line-height:1.5;"
+        <textarea class="inp fs-12" id="mPaste" rows="3" placeholder="Paste the pairing output here and the fields below fill themselves"
+          style="max-width:none; width:100%; resize:vertical; font-family:var(--font-mono); line-height:1.5"
           oninput="parsePairing(this.value)"></textarea>
-        <div id="pasteNote" class="text-3" style="font-size:11px;margin-top:6px;" hidden></div>
+        <div id="pasteNote" class="text-3 fs-11" style="margin-top:6px" hidden></div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 120px;gap:10px;margin-top:12px;">
@@ -2840,7 +2859,7 @@ body.billing #billing-view{display:block;}
         <div class="pairapp-status" id="pairStatus">Not listening.</div>
       </div>
 
-      <p class="text-3" style="font-size:11px;margin-top:10px;line-height:1.6;">
+      <p class="text-3 fs-11" style="margin-top:10px; line-height:1.6">
         <b style="color:var(--text)">Step 1.</b> Link your Steam account. Runs once, opens the Rust+
         login, saves the result on your PC. Nothing is sent to Rustex.
         <span class="cmd-row"><code class="cmd">npx @liamcottle/rustplus.js fcm-register</code><button class="cmd-copy" type="button" onclick="copyCmd(this)">Copy</button></span>
@@ -2968,6 +2987,9 @@ function avatarFor(name, seed){
 
 // ---- view switching ----
 function showView(name){
+  // The dashboard ships in the desktop app. Guarding here rather than at each caller closes
+  // the #dash hash, the command palette, and anything added later, all at once.
+  if(name === 'dash' && !IS_DESKTOP){ goDashboard(); return; }
   document.body.classList.remove('dash','pairing','pricing','settings','billing');
   if(name) document.body.classList.add(name);
   window.scrollTo({ top:0, left:0, behavior:'auto' });
@@ -3171,10 +3193,10 @@ function renderSettings(){
   wrap.innerHTML = Session.servers.length ? Session.servers.map(s =>
     '<div class="panel-2" style="padding:10px 12px;display:flex;align-items:center;gap:10px;">'
     + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
-    + '<div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:600;">' + s.name + '</div>'
-    + '<div class="text-3 mono" style="font-size:11px;">' + s.addr + '</div></div>'
+    + '<div style="flex:1;min-width:0;"><div class="fs-13 fw-600">' + s.name + '</div>'
+    + '<div class="text-3 mono fs-11">' + s.addr + '</div></div>'
     + '<button class="btn btn-ghost btn-sm" onclick="unpairServer(\'' + s.id + '\')">Unpair</button></div>'
-  ).join('') : '<div class="text-3" style="font-size:12px;">No servers paired yet — pair one from the pairing page.</div>';
+  ).join('') : '<div class="text-3 fs-12">No servers paired yet — pair one from the pairing page.</div>';
 }
 function saveSettings(){
   const val = id => (document.getElementById(id) || {}).value;
@@ -3331,7 +3353,10 @@ async function logOut(){
   // and the dashboard. Setting a view here as well left both showing at once.
   const want = IS_DESKTOP ? '' : h.replace('#','');
   if(want === 'dash' || want === 'dashboard'){
-    if(Session.entitled) document.body.classList.add('dash');
+    // Arriving at #dash on the website — including coming back from Steam — must not open
+    // a dashboard that no longer exists there.
+    if(IS_DESKTOP && Session.entitled) document.body.classList.add('dash');
+    else if(!IS_DESKTOP) history.replaceState(null, '', location.pathname);
     else if(Session.signedIn) document.body.classList.add('pricing');
   }
   else if(want === 'pairing') document.body.classList.add('pairing');
@@ -3555,8 +3580,9 @@ function appLoginStatus(text){
 function appSignIn(btn){
   const done = btn ? busyButton(btn, 'Opening…') : () => {};
   try {
-    window.rustexNative?.openExternal('https://rustex-site.vercel.app/api/auth/steam');
-    appLoginStatus('Steam opened in your browser. Finish there, then come back.');
+    window.rustexNative?.openExternal('https://rustex-site.vercel.app/api/auth/steam?next=settings');
+    appLoginStatus('Steam opened in your browser. Sign in there, then come back to this window '
+      + 'and choose Continue. The dashboard is here in the app, not on the website.');
   } finally { done(); }
 }
 
@@ -3828,7 +3854,7 @@ document.querySelectorAll('#rcZoneTabs .tab').forEach(tab=>{
   });
 });
 function renderRc(){
-  if(rcItems.length===0){ rcDrop.innerHTML = '<span class="text-3" style="font-size:12px;">Drop components here…</span>'; document.getElementById('rcOutput').innerHTML = '<span>Not set</span>'; return; }
+  if(rcItems.length===0){ rcDrop.innerHTML = '<span class="text-3 fs-12">Drop components here…</span>'; document.getElementById('rcOutput').innerHTML = '<span>Not set</span>'; return; }
   rcDrop.innerHTML = rcItems.map(i=>{
     const {ic, label} = RC_YIELDS[i];
     return `<div class="rc-chip"><span class="item-ic sm photo ${ic}" title="${label}"></span>${label}</div>`;
@@ -4342,10 +4368,10 @@ function renderPairedServers(){
   list.innerHTML = Session.servers.map(s =>
     '<div class="panel-2" style="padding:12px 14px;display:flex;align-items:center;gap:12px;">'
     + '<span class="pill pill-online" style="flex-shrink:0"><span class="dot"></span>Live</span>'
-    + '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:13px;">' + s.name + '</div>'
-    + '<div class="text-3 mono" style="font-size:11px;">' + s.addr + '</div></div>'
+    + '<div style="flex:1;min-width:0;"><div class="fs-13 fw-700">' + s.name + '</div>'
+    + '<div class="text-3 mono fs-11">' + s.addr + '</div></div>'
     + '<button class="icon-btn" style="width:30px;height:30px;" title="Unpair" onclick="unpairServer(\'' + s.id + '\')">'
-    + '<svg class="icon" style="width:13px;height:13px"><use href="#i-x"/></svg></button></div>'
+    + '<svg class="icon icon-13"><use href="#i-x"/></svg></button></div>'
   ).join('');
   empty.style.display = Session.servers.length ? 'none' : '';
   count.textContent = Session.servers.length ? Session.servers.length + ' paired' : '';
@@ -4538,7 +4564,7 @@ function clearLiveFigures(){
   });
   const body = document.getElementById('teamRows');
   if(body) body.innerHTML =
-    '<div class="text-3" style="font-size:12px;padding:4px 0;">Connect a server to see your team.</div>';
+    '<div class="text-3 fs-12" style="padding:4px 0">Connect a server to see your team.</div>';
 }
 
 /** Replaces the sample roster with the real one. */
@@ -4832,7 +4858,7 @@ async function loadTeamChat(btn){
   const log = document.getElementById('chatLog');
   const server = Session.servers[0];
   if(!log) return;
-  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to load team chat.</div>'; return; }
+  if(!server){ log.innerHTML = '<div class="text-3 fs-12">Connect a server to load team chat.</div>'; return; }
 
   const done = busyButton(btn, 'Loading…');
   try {
@@ -4878,7 +4904,7 @@ function renderChatLog(log, msgs, note){
     chatLine('You', p.message, p.failed ? 'chat-failed' : 'chat-sending')).join('');
   const body = (sent || waiting)
     ? sent + waiting
-    : '<div class="text-3" style="font-size:12px;">No messages in the recent buffer.</div>';
+    : '<div class="text-3 fs-12">No messages in the recent buffer.</div>';
   const warn = note ? '<div class="chat-note">' + escapeHtml(note) + '</div>' : '';
   log.innerHTML = body + warn;
   log.scrollTop = log.scrollHeight;
@@ -4937,7 +4963,7 @@ async function loadActivity(){
   const log = document.getElementById('activityLog');
   const server = Session.servers[0];
   if(!log) return;
-  if(!server){ log.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to load live events.</div>'; return; }
+  if(!server){ log.innerHTML = '<div class="text-3 fs-12">Connect a server to load live events.</div>'; return; }
 
   try {
     const [markers, info] = await Promise.all([
@@ -4959,9 +4985,9 @@ async function loadActivity(){
           return '<div class="act-line"><span class="act-grid mono">' + escapeHtml(where) + '</span>'
             + '<span class="act-what">' + escapeHtml(what) + '</span></div>';
         }).join('')
-      : '<div class="text-3" style="font-size:12px;">Nothing on the map right now.</div>';
+      : '<div class="text-3 fs-12">Nothing on the map right now.</div>';
   } catch(err){
-    log.innerHTML = '<div class="text-3" style="font-size:12px;">' + escapeHtml(err.message) + '</div>';
+    log.innerHTML = '<div class="text-3 fs-12">' + escapeHtml(err.message) + '</div>';
   }
 }
 
@@ -5004,9 +5030,9 @@ async function refreshVending(btn){
   const server = Session.servers[0];
   if(!list) return;
   if(!server){
-    list.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to search vending machines.</div>';
+    list.innerHTML = '<div class="text-3 fs-12">Connect a server to search vending machines.</div>';
     const al = document.getElementById('shopAlerts');
-    if(al) al.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to watch for shop changes.</div>';
+    if(al) al.innerHTML = '<div class="text-3 fs-12">Connect a server to watch for shop changes.</div>';
     return;
   }
   const done = btn ? busyButton(btn, 'Reading…') : () => {};
@@ -5027,7 +5053,7 @@ async function refreshVending(btn){
     diffShops();
     runVendSearch();
   } catch(err){
-    list.innerHTML = '<div class="text-3" style="font-size:12px;">' + escapeHtml(err.message) + '</div>';
+    list.innerHTML = '<div class="text-3 fs-12">' + escapeHtml(err.message) + '</div>';
   } finally { done(); }
 }
 
@@ -5042,7 +5068,7 @@ function runVendSearch(){
   if(!list) return;
   const q = (document.getElementById('vendQuery')?.value || '').trim().toLowerCase();
   if(!vendShops.length){
-    list.innerHTML = '<div class="text-3" style="font-size:12px;">No vending machines on the map yet. Refresh to read them.</div>';
+    list.innerHTML = '<div class="text-3 fs-12">No vending machines on the map yet. Refresh to read them.</div>';
     return;
   }
   const hits = vendOrders()
@@ -5051,7 +5077,7 @@ function runVendSearch(){
     .slice(0, 40);
 
   if(!hits.length){
-    list.innerHTML = '<div class="text-3" style="font-size:12px;">Nothing matching "'
+    list.innerHTML = '<div class="text-3 fs-12">Nothing matching "'
       + escapeHtml(q) + '" is for sale right now.</div>';
     return;
   }
@@ -5084,7 +5110,7 @@ function diffShops(){
   const now = new Map(vendShops.map(s => [s.id, s]));
   if(!vendPrev){
     vendPrev = now;
-    box.innerHTML = '<div class="text-3" style="font-size:12px;">Watching ' + now.size
+    box.innerHTML = '<div class="text-3 fs-12">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. Changes since you opened the page appear here.</div>';
     return;
   }
@@ -5111,7 +5137,7 @@ function diffShops(){
       + '"><span class="dot"></span>' + (kind === 'new' ? 'New' : 'Gone') + '</span>'
       + '<span class="vend-item">' + escapeHtml(text) + '</span></div>').join('');
   else
-    box.innerHTML = '<div class="text-3" style="font-size:12px;">Watching ' + now.size
+    box.innerHTML = '<div class="text-3 fs-12">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. No changes since the last read.</div>';
 }
 
@@ -5155,7 +5181,7 @@ function renderGenes(){
   const box = document.getElementById('geneList');
   if(!box) return;
   if(!geneList.length){
-    box.innerHTML = '<div class="text-3" style="font-size:12px;">No clones added yet.</div>';
+    box.innerHTML = '<div class="text-3 fs-12">No clones added yet.</div>';
     return;
   }
   // Best first, so the one to plant is at the top.
@@ -5242,11 +5268,11 @@ function renderDevices(){
   const box = document.getElementById('devList');
   if(!box) return;
   if(!Session.servers[0]){
-    box.innerHTML = '<div class="text-3" style="font-size:12px;">Connect a server to control your devices.</div>';
+    box.innerHTML = '<div class="text-3 fs-12">Connect a server to control your devices.</div>';
     return;
   }
   if(!devices.length){
-    box.innerHTML = '<div class="text-3" style="font-size:12px;">No devices added yet.</div>';
+    box.innerHTML = '<div class="text-3 fs-12">No devices added yet.</div>';
     return;
   }
   box.innerHTML = devices.map(d => {
@@ -5443,7 +5469,7 @@ function renderRecycler(){
         return '<div class="rc-total"><span class="rc-amt mono">' + amount + '</span>'
              + '<span class="rc-name">' + escapeHtml(YIELD_LABEL[k] || k) + '</span></div>';
       }).join('')
-    : '<div class="text-3" style="font-size:12px;">Enter how many of each component you have.</div>';
+    : '<div class="text-3 fs-12">Enter how many of each component you have.</div>';
 
   const secs = items * (recycleMode === 'mon' ? 5 : 8);
   const note = document.getElementById('rcNote');
@@ -5675,6 +5701,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 00:25 UTC</div>
+<div class="build-stamp">build 2026-07-30 00:40 UTC</div>
 </body>
 </html>
