@@ -1658,6 +1658,7 @@ body.billing #billing-view{display:block;}
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-siren"/></svg>Trigger test raid alarm<span class="k">G R</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-tag"/></svg>Search vending: "AK47"<span class="k">↵</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-flask"/></svg>Open Genetics Lab<span class="k">G G</span></div>
+      <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-bomb"/></svg>Open Raid Calculator<span class="k">G R</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-map"/></svg>Open Resource Heatmap<span class="k">G H</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Pair a new server<span class="k">G P</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goLanding();"><svg class="icon"><use href="#i-home"/></svg>Back to landing page<span class="k">G L</span></div>
@@ -2133,6 +2134,47 @@ body.billing #billing-view{display:block;}
           <button type="button" data-heat-zoom="out" aria-label="Zoom out" title="Zoom out"><svg class="icon"><use href="#i-minus"/></svg></button>
           <button type="button" data-heat-zoom="reset" aria-label="Reset view" title="Reset view"><svg class="icon"><use href="#i-crosshair"/></svg></button>
         </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SECTION 10 — RAID CALCULATOR ============ -->
+<section class="feature" id="f10">
+  <span class="feature-num">10</span>
+  <div class="container feature-grid">
+    <div class="feature-copy reveal">
+      <span class="num-tag">10</span>
+      <span class="eyebrow">Raid planning</span>
+      <h2>Know the cost<br/>before you build it.</h2>
+      <p class="desc">Mix explosives, see the sulfur, and find the cheapest way through.</p>
+      <ul class="feature-list">
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Every door and wall, from twig to armoured</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Combine rockets, C4, satchels, beancans and ammo</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Cheapest, fewest items, or use what you already have</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Enter your stock and see what you can already raid</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Full sulfur and resource breakdown, copy to team chat</li>
+      </ul>
+      <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Raid Calculator<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
+    </div>
+    <div class="feature-mock hud-frame glass" style="padding:16px;">
+      <span class="hb-tr"></span><span class="hb-bl"></span>
+      <div class="card-head">
+        <div class="card-title"><svg class="icon"><use href="#i-bomb"/></svg>Raid Calculator</div>
+        <span class="pill pill-orange"><span class="dot"></span>Garage Door</span>
+      </div>
+      <div class="raid-rows" style="margin-bottom:12px">
+        <div class="raid-row"><span class="raid-name">Rocket<span class="raid-unit"> &middot; 1,400 sul</span></span><span class="raid-unit">&times; 2</span><span class="raid-unit">2,800</span></div>
+        <div class="raid-row"><span class="raid-name">Satchel Charge<span class="raid-unit"> &middot; 480 sul</span></span><span class="raid-unit">&times; 3</span><span class="raid-unit">1,440</span></div>
+      </div>
+      <div class="raid-cost"><b>4,240</b><span>sulfur &middot; 5 items</span></div>
+      <div class="raid-bar" style="margin:11px 0"><span style="width:100%"></span></div>
+      <div class="raid-verdict ok">Enough to breach Garage Door</div>
+      <div class="raid-label" style="margin-top:14px">Cheaper options</div>
+      <div class="raid-list">
+        <div class="raid-opt top"><span class="rank">1</span><span>150 Explo ammo</span><span class="mono">3,750 sul</span></div>
+        <div class="raid-opt"><span class="rank">2</span><span>3 Rockets</span><span class="mono">4,200 sul</span></div>
+        <div class="raid-opt"><span class="rank">3</span><span>9 Satchels</span><span class="mono">4,320 sul</span></div>
       </div>
     </div>
   </div>
@@ -5139,6 +5181,31 @@ function renderRecycler(){
 // Full-health decay durations with no Tool Cupboard upkeep, and the max HP of one
 // wall of each tier. Decay is linear across the duration, so a wall at half health
 // has half the time left.
+/**
+ * Smart Alarm pushes, shown only when one actually arrives.
+ *
+ * This is the banner that used to be hardcoded on the dashboard, reporting a raid on a base
+ * that did not exist. It is real now because the app holds the FCM listener open, which is
+ * the thing a browser tab could never do — so it appears when the game says so and not before.
+ */
+function showRaidAlarm(alarm){
+  const box = document.getElementById('raidAlarm');
+  if(!box || !alarm) return;
+  const when = new Date(alarm.at || Date.now()).toLocaleTimeString();
+  document.getElementById('raidAlarmTitle').textContent = alarm.title || 'Smart Alarm';
+  document.getElementById('raidAlarmBody').textContent =
+    (alarm.body ? alarm.body + ' · ' : '') + when;
+  box.hidden = false;
+  fireCustomToast(alarm.title || 'Smart Alarm', alarm.body || 'Alarm triggered.', 'i-siren');
+}
+
+function dismissRaidAlarm(){
+  const box = document.getElementById('raidAlarm');
+  if(box) box.hidden = true;
+}
+
+if(IS_DESKTOP) window.rustexNative?.pairing?.onAlarm?.(showRaidAlarm);
+
 // ---- raid calculator: view --------------------------------------------------------
 /**
  * Presentation only. Every number here comes back from the engine above; nothing on this
@@ -5243,6 +5310,28 @@ function raidBreakdown(evald){
     + (res ? '<div class="raid-label" style="margin-top:12px">Also needs</div><div class="raid-break">' + res + '</div>' : '');
 }
 
+/**
+ * Soft side, shown alongside the explosive answer rather than mixed into it: it costs no
+ * sulfur at all, so putting it in the same comparison would make every explosive look
+ * pointless while hiding that you are stood there swinging for a minute and a half.
+ */
+function raidToolBlock(target){
+  const opts = raidToolOptions(target);
+  if(!opts.length){
+    return '<div class="raid-label" style="margin-top:14px">Soft side</div>'
+      + '<div class="raid-empty">No soft side on ' + escapeHtml(target.name.toLowerCase())
+      + '. Explosives only.</div>';
+  }
+  return '<div class="raid-label raid-label-row" style="margin-top:14px">Soft side with tools'
+    + '<span class="raid-hint">no sulfur, but slow and loud</span></div>'
+    + '<div class="raid-list">' + opts.map((o, i) =>
+        '<div class="raid-opt' + (i === 0 ? ' top' : '') + '">'
+        + '<span class="rank">' + (i + 1) + '</span>'
+        + '<span>' + escapeHtml(o.name) + '</span>'
+        + '<span class="mono">' + o.hits + ' hits</span></div>').join('')
+    + '</div>';
+}
+
 function raidRenderOutput(){
   const out = document.getElementById('raidOut');
   const sel = document.getElementById('raidTarget');
@@ -5253,8 +5342,10 @@ function raidRenderOutput(){
   if(raidMode === 'calc'){
     const e = raidEvaluate(target, raidLoadout);
     if(!e.count){
-      out.innerHTML = '<div class="raid-empty">Add explosives on the left to see what it costs '
-        + 'and whether it gets through ' + escapeHtml(target.name.toLowerCase()) + '.</div>';
+      out.innerHTML = '<div class="raid-out"><div class="raid-empty">Add explosives on the left '
+        + 'to see what it costs and whether it gets through '
+        + escapeHtml(target.name.toLowerCase()) + '.</div>'
+        + raidToolBlock(target) + '</div>';
       return;
     }
     const short = e.enough ? '' :
@@ -5273,6 +5364,7 @@ function raidRenderOutput(){
       + short
       + '<div class="raid-label" style="margin-top:4px">Breakdown</div>'
       + raidBreakdown(e)
+      + raidToolBlock(target)
       + '<div class="raid-actions"><button class="btn btn-ghost btn-sm" onclick="raidCopy()">Copy loadout</button></div>'
       + '</div>';
     return;
@@ -5323,6 +5415,7 @@ function raidRenderOutput(){
             + '<span>' + escapeHtml(raidLoadoutText(o.loadout)) + '</span>'
             + '<span class="mono">' + raidNum(o.sulfur) + ' sul</span></div>').join('') + '</div>'
       : '')
+    + raidToolBlock(target)
     + '</div>';
 }
 
@@ -5366,6 +5459,22 @@ const EXPLOSIVES = {
 const EXPLOSIVE_ORDER = ['rocket', 'c4', 'satchel', 'beancan', 'ammo'];
 
 /**
+ * Soft-side tool raiding. A different currency to explosives: nothing is consumed, so the
+ * sulfur cost is zero and the real price is hits, noise and time stood next to the wall.
+ * Kept in its own table for that reason rather than bent into the explosive maths.
+ */
+const TOOLS = {
+  jackhammer: { name:'Jackhammer',       short:'Jackhammer' },
+  pickaxe:    { name:'Pickaxe',          short:'Pickaxe' },
+  icepick:    { name:'Salvaged Icepick', short:'Icepick' },
+  stonespear: { name:'Stone Spear',       short:'Stone Spear' },
+  woodspear:  { name:'Wooden Spear',      short:'Wood Spear' },
+  axe:        { name:'Salvaged Axe',     short:'Salv. Axe' },
+  hatchet:    { name:'Hatchet',          short:'Hatchet' },
+};
+const TOOL_ORDER = ['jackhammer', 'pickaxe', 'icepick', 'axe', 'hatchet', 'stonespear', 'woodspear'];
+
+/**
  * How many of one explosive it takes alone. A target is modelled as 100 raid points and each
  * explosive contributes 100/quantity, so any mix that reaches 100 gets through.
  *
@@ -5377,17 +5486,21 @@ const EXPLOSIVE_ORDER = ['rocket', 'c4', 'satchel', 'beancan', 'ammo'];
  */
 const RAID_TARGETS = [
   { id:'door-wood',   name:'Wooden Door',      category:'Doors',
-    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  } },
+    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  },
+    tools:{ axe:9, hatchet:14, jackhammer:11, pickaxe:22, stonespear:25, woodspear:32 } },
   { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors',
     solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  } },
   { id:'door-garage', name:'Garage Door',      category:'Doors',
-    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 } },
+    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 },
+    tools:{ jackhammer:44, pickaxe:88, icepick:52, stonespear:133, woodspear:170 } },
   { id:'door-armor',  name:'Armored Door',     category:'Doors',
     solo:{ rocket:5,  c4:3, satchel:15, beancan:31, ammo:245 } },
   { id:'wall-wood',   name:'Wooden Wall',      category:'Walls',
-    solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  } },
+    solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  },
+    tools:{ axe:10, hatchet:15, jackhammer:12, pickaxe:26, stonespear:28, woodspear:36 } },
   { id:'wall-stone',  name:'Stone Wall',       category:'Walls',
-    solo:{ rocket:4,  c4:2, satchel:10, beancan:20, ammo:0   } },
+    solo:{ rocket:4,  c4:2, satchel:10, beancan:20, ammo:0   },
+    tools:{ jackhammer:44, pickaxe:88, icepick:52, stonespear:133, woodspear:170 } },
   { id:'wall-sheet',  name:'Sheet Metal Wall', category:'Walls',
     solo:{ rocket:8,  c4:4, satchel:23, beancan:46, ammo:0   } },
   { id:'wall-armor',  name:'Armored Wall',     category:'Walls',
@@ -5523,6 +5636,18 @@ function raidSolve(target, { limits = null, metric = 'cheapest', maxNodes = 2000
     .filter(r => { const k = JSON.stringify(r.loadout); if(seen.has(k)) return false; seen.add(k); return true; })
     .slice(0, 6);
   return { best, options };
+}
+
+/**
+ * Soft-side options for a target, fewest hits first. Empty when the soft side does not give
+ * to tools at all, which is the case for sheet metal and armour.
+ */
+function raidToolOptions(target){
+  if(!target?.tools) return [];
+  return TOOL_ORDER
+    .filter(k => target.tools[k] > 0)
+    .map(k => ({ key:k, short:TOOLS[k].short, name:TOOLS[k].name, hits:target.tools[k] }))
+    .sort((a, b) => a.hits - b.hits);
 }
 
 /** The single cheapest way through using one explosive type only. */
@@ -5768,6 +5893,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 07:24 UTC</div>
+<div class="build-stamp">build 2026-07-30 08:09 UTC</div>
 </body>
 </html>
