@@ -1599,7 +1599,7 @@ body.billing #billing-view{display:block;}
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-siren"/></svg>Trigger test raid alarm<span class="k">G R</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-tag"/></svg>Search vending: "AK47"<span class="k">↵</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-flask"/></svg>Open Genetics Lab<span class="k">G G</span></div>
-      <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-map"/></svg>Open Activity Heatmap<span class="k">G H</span></div>
+      <div class="cmdk-item" onclick="closeCmdk();goDashboard();"><svg class="icon"><use href="#i-map"/></svg>Open Resource Heatmap<span class="k">G H</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goPairing();"><svg class="icon"><use href="#i-wifi"/></svg>Pair a new server<span class="k">G P</span></div>
       <div class="cmdk-item" onclick="closeCmdk();goLanding();"><svg class="icon"><use href="#i-home"/></svg>Back to landing page<span class="k">G L</span></div>
     </div>
@@ -2047,27 +2047,27 @@ body.billing #billing-view{display:block;}
   <div class="container feature-grid">
     <div class="feature-copy reveal">
       <span class="num-tag">09</span>
-      <span class="eyebrow">Map intelligence</span>
-      <h2>See where the<br/>fighting happens.</h2>
-      <p class="desc">Explosions and crates, stacked up over the wipe on your server's map.</p>
+      <span class="eyebrow">Resource intel</span>
+      <h2>Every node<br/>on the map.</h2>
+      <p class="desc">Sulfur, metal and stone density across the whole map.</p>
       <ul class="feature-list">
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Explosions, crates and cargo runs</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Sulfur, metal and stone density</li>
+        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Filter by node type</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Monuments at real coordinates</li>
         <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>The server's own map image</li>
-        <li><span class="tick"><svg class="icon"><use href="#i-check"/></svg></span>Toggleable layers</li>
       </ul>
       <a href="#" class="btn btn-outline" onclick="goDashboard();return false;">Open Heatmap<svg class="icon icon-15"><use href="#i-chevron-right"/></svg></a>
     </div>
     <div class="feature-mock hud-frame glass" style="padding:16px;">
       <span class="hb-tr"></span><span class="hb-bl"></span>
       <div class="card-head">
-        <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Activity Heatmap</div>
+        <div class="card-title"><svg class="icon"><use href="#i-map"/></svg>Resource Heatmap</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;" data-heat-keys>
               
         </div>
       </div>
       <div class="heat-wrap" data-heat>
-        <canvas id="heatCanvas" style="height:400px;" role="img" aria-label="Activity heatmap of observed explosions, crates, cargo, helicopters and shops"></canvas>
+        <canvas id="heatCanvas" style="height:400px;" role="img" aria-label="Resource heatmap of sulfur, metal and stone node density"></canvas>
         <div class="heat-tip" data-heat-tip></div>
         <div class="heat-hint" data-heat-hint>Hover a node · Ctrl + scroll to zoom</div>
         <div class="heat-zoom">
@@ -5259,6 +5259,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 06:01 UTC</div>
+<div class="build-stamp">build 2026-07-30 06:05 UTC</div>
 </body>
 </html>
