@@ -2533,6 +2533,9 @@ function showView(name){
   syncAuthUI();
 }
 function goLanding(){
+  // There is no landing page in the app build, so "home" here means the dashboard.
+  // Without this the logo stripped the view class and left an empty window.
+  if(IS_DESKTOP){ showAppDashboard(); return; }
   const alreadyHome = !document.body.className.match(/\b(dash|pairing|pricing|settings|billing)\b/);
   document.body.classList.remove('dash','pairing','pricing','settings','billing');
   // Already home: glide up. Coming from another view the page under us just swapped, so
@@ -3165,6 +3168,10 @@ if(IS_DESKTOP){
   hideAppSignIn();
 }
 function hideAppSignIn(){
+  // Nothing to go home to in a two screen app.
+  document.querySelectorAll('.topbar .btn[onclick*="goLanding"]').forEach(el => {
+    el.hidden = true; el.style.display = 'none';
+  });
   document.querySelectorAll('[data-auth-only], .steam-btn, #navSignIn').forEach(el => {
     el.hidden = true;
     el.style.display = 'none';
@@ -5243,6 +5250,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-30 03:45 UTC</div>
+<div class="build-stamp">build 2026-07-30 04:03 UTC</div>
 </body>
 </html>
