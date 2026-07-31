@@ -951,6 +951,9 @@ body.is-app .topbar .btn[onclick*="goLanding"]{display:none;}
   line-height:1.35;}
 @media (max-width:760px){
   .live-state{font-size:11px; padding:8px 11px;}
+.live-state{display:flex; align-items:center; gap:10px;}
+.live-state-text{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.live-refresh{flex-shrink:0; gap:5px;}
   .decay-row{grid-template-columns:1fr; gap:5px;}
   .decay-lbl{margin-top:2px;}
   .decay-time{font-size:26px;}
@@ -1572,6 +1575,7 @@ body.billing #billing-view{display:block;}
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
 <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.6 2.5-6 5.5-6s5.5 2.4 5.5 6"/><circle cx="17.5" cy="8.5" r="2.6"/><path d="M15.7 14.3c2.6.3 4.3 2.5 4.3 5.7"/></symbol>
 <symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7.5"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 4v5h-5"/></symbol>
 <symbol id="i-siren" viewBox="0 0 24 24"><path d="M5 20v-6a7 7 0 0114 0v6z"/><path d="M3 20h18M12 3v2M5.5 6.5l1.4 1.4M18.5 6.5l-1.4 1.4"/></symbol>
 <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a12 12 0 006 6L16 14l5 2v4a2 2 0 01-2.2 2A17 17 0 013 6.2 2 2 0 015 4z"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20 12l-8 8-9-9V4h7z"/><circle cx="7.5" cy="7.5" r="1.4"/></symbol>
@@ -1773,7 +1777,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.9 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -4398,10 +4402,38 @@ function setLiveState(el, state, text){
   el.classList.remove('loading', 'ok', 'err');
   el.classList.add('live-state', 'w-12', state);
   if(text !== undefined){
-    el.textContent = text;
+    // Rebuilt rather than assigned to textContent, which would wipe the refresh button.
+    el.innerHTML = '';
+    const label = document.createElement('span');
+    label.className = 'live-state-text';
+    label.textContent = text;
     // A long server name still ellipses on a phone, so keep the whole string reachable.
-    el.title = text;
+    label.title = text;
+    el.appendChild(label);
+    el.appendChild(liveRefreshButton());
   }
+}
+
+/**
+ * Population and queue move faster than the refresh loop, so a manual check is worth having:
+ * the figures are only as fresh as the last poll, and "how many are on right now" is exactly
+ * the question you ask before deciding to log in.
+ */
+function liveRefreshButton(){
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'btn btn-ghost btn-sm live-refresh';
+  b.title = 'Refresh now';
+  b.innerHTML = '<svg class="icon icon-13"><use href="#i-refresh"/></svg>Refresh';
+  b.addEventListener('click', () => refreshLiveNow(b));
+  return b;
+}
+
+/** Manual refresh. Disabled while it runs so an impatient double press is not two requests. */
+async function refreshLiveNow(btn){
+  const done = busyButton(btn, 'Refreshing…');
+  try { await refreshLiveData(); }
+  finally { done(); }
 }
 
 async function refreshLiveData(){
@@ -4493,23 +4525,35 @@ function numberToLetters(num){
   else { pow--; result = 'Z'; }
   return pow > 0 ? numberToLetters(pow) + result : result;
 }
-function toGrid(x, y, mapSize){
+/**
+ * Grid reference for a world position, plus whether that position is off the map.
+ *
+ * The grid is a whole number of 146.25m cells, so it covers slightly less than the map — for
+ * a 4000 map, 3948.75m. Rejecting anything beyond that meant the last ~51m resolved to no
+ * grid at all, and that strip is the map edge the cargo ship spawns on and follows, so those
+ * events were announced with no location.
+ *
+ * Anything outside is clamped to the nearest edge cell rather than discarded: a helicopter
+ * still inbound has a real grid it is heading for, which is more use than silence.
+ */
+function toGridInfo(x, y, mapSize){
+  if(!Number.isFinite(x) || !Number.isFinite(y)) return null;
   const size = correctedMapSize(mapSize);
-  if(x < 0 || x > size || y < 0 || y > size) return null;
-
-  let letters = null, counter = 1;
-  for(let start = 0; start < size; start += GRID_DIAMETER){
-    if(x >= start && x <= start + GRID_DIAMETER){ letters = numberToLetters(counter); break; }
-    counter++;
-  }
-  let number = null;
   const total = Math.floor(size / GRID_DIAMETER);
-  counter = 1;
-  for(let start = 0; start < size; start += GRID_DIAMETER){
-    if(y >= start && y <= start + GRID_DIAMETER){ number = total - counter; break; }
-    counter++;
-  }
-  return (letters === null || number === null) ? null : letters + number;
+  if(total < 1) return null;
+
+  // Measured against the real map, not the grid. The grid stops ~51m short of the map edge,
+  // and something standing in that strip is on the map — it is only genuinely inbound once
+  // it is outside the map itself.
+  const offMap = x < 0 || y < 0 || x > mapSize || y > mapSize;
+  const cell = v => Math.min(total - 1, Math.max(0, Math.floor(v / GRID_DIAMETER)));
+  const ref = numberToLetters(cell(x) + 1) + (total - cell(y) - 1);
+  return { ref, offMap };
+}
+
+/** The reference alone, for callers that do not care whether it was clamped. */
+function toGrid(x, y, mapSize){
+  return toGridInfo(x, y, mapSize)?.ref ?? null;
 }
 
 /**
@@ -4765,7 +4809,9 @@ const OIL_RADIUS = 160;
 function oilRigAt(m){
   const x = Number(m.x) || 0, y = Number(m.y) || 0;
   for(const s of monumentSites){
-    if(!/oil rig/i.test(s.label)) continue;
+    // Tolerant of the token spelling: "large_oil_rig" and "oilrig_2" both title-case into
+    // labels that a strict "oil rig" match would miss one of.
+    if(!/oil\s*rig/i.test(s.label)) continue;
     if(Math.hypot(x - s.x, y - s.y) <= OIL_RADIUS) return s.label;
   }
   return null;
@@ -4792,9 +4838,11 @@ async function runAnnouncements(markers, members, mapSize){
 
   // Grid reference makes an announcement actionable: "Cargo Ship at J12" tells the squad
   // where to go, "Cargo Ship inbound" does not.
+  // Something still off the map is inbound, so say where it is heading rather than where it
+  // is — "Patrol Helicopter heading to A12" is actionable, a bare name is not.
   const at = m => {
-    const g = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-    return g ? ' at ' + g : '';
+    const g = toGridInfo(Number(m.x), Number(m.y), mapSize || 4000);
+    return g ? (g.offMap ? ' heading to ' : ' at ') + g.ref : '';
   };
 
   for(const m of (markers || [])){
@@ -4826,7 +4874,8 @@ async function runAnnouncements(markers, members, mapSize){
     const online = !!m.isOnline;
     const alive = !!m.isAlive;
     const prev = teamState.get(id);
-    teamState.set(id, { online, alive });
+    const deathTime = Number(m.deathTime) || 0;
+    teamState.set(id, { online, alive, deathTime });
     // First time we see someone there is nothing to compare against, and announcing here
     // would fire for the whole team at once on connect.
     if(!prev) continue;
@@ -4836,9 +4885,17 @@ async function runAnnouncements(markers, members, mapSize){
     // The notification is recorded whether or not the event is announced to team chat: one is
     // a local log of what happened, the other posts into the squad's chat, and wanting the
     // first is not the same as wanting the second.
-    if(prev.alive && !alive){
-      const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-      const key = 'dead:' + id + ':' + (m.deathTime || Date.now());
+    // deathTime is the reliable signal, not isAlive.
+    //
+    // Team info is polled, and a Rust respawn is usually quicker than the gap between polls,
+    // so someone who dies and comes back reads as alive at both observations and the death
+    // was silently missed. deathTime moves whether or not we caught them lying there.
+    const died = (deathTime > 0 && deathTime !== prev.deathTime) || (prev.alive && !alive);
+    if(died){
+      // Only quote a grid if they are still dead. Once respawned, x/y is where they are now,
+      // not where they were killed, and naming that as the death site would be a guess.
+      const where = alive ? null : toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+      const key = 'dead:' + id + ':' + (deathTime || Date.now());
       notify('team', name + ' died' + (where ? ' at ' + where : ''), key);
       if(opts.death) once(key, who + ' died' + (where ? ' at ' + where : ''));
     }
@@ -4983,13 +5040,17 @@ function startAnnouncePolling(){
       try {
         if(!announceMapSize){
           const info = await rustPlus(server, 'getInfo').catch(() => null);
-          announceMapSize = info?.info?.mapSize || 4000;
+          // Only cache a real answer. Caching the 4000 fallback after one failed call left
+          // every grid on a larger map wrong for the rest of the session.
+          const size = Number(info?.info?.mapSize) || 0;
+          if(size) announceMapSize = size;
         }
         const [mk, team] = await Promise.all([
           rustPlus(server, 'getMapMarkers'),
           rustPlus(server, 'getTeamInfo').catch(() => null),
         ]);
-        await runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members, announceMapSize);
+        await runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members,
+                               announceMapSize || 4000);
       } catch {}
     }
     announceTimer = setTimeout(tick, document.hidden ? ANNOUNCE_IDLE_MS : ANNOUNCE_POLL_MS);
@@ -6543,6 +6604,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 07:04 UTC</div>
+<div class="build-stamp">build 2026-07-31 07:28 UTC</div>
 </body>
 </html>
