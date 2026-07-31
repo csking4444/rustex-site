@@ -1787,7 +1787,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.5 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.6 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3843,9 +3843,10 @@ function rebuildHeatNodes(){
       density: Math.max(1, Math.round((n / peak) * 100)),
     });
   }
-  for(const mon of heatMonuments)
-    HEAT_NODES.push({ type:'monument', x:mon.x, y:mon.y, r:8, label:mon.label,
-                      wx:mon.wx, wy:mon.wy, count:0, density:0 });
+  // Monuments are not drawn. They are already on the server's own map image underneath, so
+  // pinning them again added a second, less accurate copy on top of the real one. They are
+  // still read from getMap — the announcements name the monument an event landed on, and that
+  // needs their coordinates whether or not anything is painted here.
 }
 
 /** What the panel says when there is nothing real to draw yet. */
@@ -4565,11 +4566,13 @@ async function refreshLiveData(){
     if(banner) banner.hidden = true;
     stopChatPolling();
     stopAnnouncePolling();
+    stopVendPolling();
     clearLiveFigures();
     return;
   }
   startChatPolling();
   startAnnouncePolling();
+  startVendPolling();
 
   const setText = (sel, value) => {
     const el = document.querySelector(sel);
@@ -5220,6 +5223,30 @@ function startAnnouncePolling(){
 }
 function stopAnnouncePolling(){ if(announceTimer){ clearTimeout(announceTimer); announceTimer = null; } }
 
+/**
+ * Shop prices, re-read on a slow loop.
+ *
+ * Safe zone vendors move their prices over a wipe, and the market panel only read once when
+ * you opened it — so a price could double and the page would carry on showing the old one
+ * until you switched tabs. Slower than the chat poll because a shop is not a conversation,
+ * and paused while the panel is off screen so it costs nothing when nobody is looking.
+ */
+const VEND_POLL_MS = 120000;
+let vendPollTimer = null;
+
+function startVendPolling(){
+  stopVendPolling();
+  const tick = async () => {
+    const panel = document.getElementById('vendResults');
+    if(activeServer() && !document.hidden && panel && panel.offsetParent){
+      try { await refreshVending(); } catch {}
+    }
+    vendPollTimer = setTimeout(tick, VEND_POLL_MS);
+  };
+  vendPollTimer = setTimeout(tick, VEND_POLL_MS);
+}
+function stopVendPolling(){ if(vendPollTimer){ clearTimeout(vendPollTimer); vendPollTimer = null; } }
+
 /** Drops the current wait and checks now — used right after sending. */
 function pokeChat(){
   if(!chatTimer) return;
@@ -5407,21 +5434,40 @@ function diffShops(){
         + (shop.orders.length ? ' selling ' + itemName(shop.orders[0].itemId) : '')]);
       continue;
     }
-    const before = new Set(vendPrev.get(id).orders.map(o => String(o.itemId)));
-    for(const o of shop.orders)
-      if(!before.has(String(o.itemId)))
+    // Keyed by item and currency, since the same item listed against a different currency is
+    // a different offer rather than the same one at a new price.
+    const before = new Map(vendPrev.get(id).orders.map(o =>
+      [String(o.itemId) + '/' + String(o.currencyId), o]));
+    for(const o of shop.orders){
+      const was = before.get(String(o.itemId) + '/' + String(o.currencyId));
+      if(!was){
         lines.push(['new', itemName(o.itemId) + ' listed at ' + shop.grid
           + ' for ' + o.costPerItem + ' ' + itemName(o.currencyId)]);
+        continue;
+      }
+      // Safe zone prices move over a wipe, so a listing that is already there can still be
+      // news. Without this the panel only ever reported shops appearing and vanishing, and a
+      // price doubling went unmentioned.
+      const from = Number(was.costPerItem), to = Number(o.costPerItem);
+      if(Number.isFinite(from) && Number.isFinite(to) && from !== to)
+        lines.push([to > from ? 'up' : 'down',
+          itemName(o.itemId) + ' at ' + shop.grid + ' ' + from + ' → ' + to
+          + ' ' + itemName(o.currencyId)]);
+    }
   }
   for(const [id, shop] of vendPrev)
     if(!now.has(id)) lines.push(['gone', 'Shop at ' + shop.grid + ' is gone']);
 
   vendPrev = now;
+  const PILL = { new:['pill-orange','New'], gone:['pill-offline','Gone'],
+                 up:['pill-warn','Up'],     down:['pill-online','Down'] };
   if(lines.length)
-    box.innerHTML = lines.slice(0, 12).map(([kind, text]) =>
-      '<div class="vend-row alert"><span class="pill ' + (kind === 'new' ? 'pill-orange' : 'pill-offline')
-      + '"><span class="dot"></span>' + (kind === 'new' ? 'New' : 'Gone') + '</span>'
-      + '<span class="vend-item">' + escapeHtml(text) + '</span></div>').join('');
+    box.innerHTML = lines.slice(0, 12).map(([kind, text]) => {
+      const [cls, label] = PILL[kind] || PILL.new;
+      return '<div class="vend-row alert"><span class="pill ' + cls + '">'
+        + '<span class="dot"></span>' + label + '</span>'
+        + '<span class="vend-item">' + escapeHtml(text) + '</span></div>';
+    }).join('');
   else
     box.innerHTML = '<div class="text-3 fs-12">Watching ' + now.size
       + ' shop' + (now.size === 1 ? '' : 's') + '. No changes since the last read.</div>';
@@ -6783,6 +6829,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 20:01 UTC</div>
+<div class="build-stamp">build 2026-07-31 21:56 UTC</div>
 </body>
 </html>
