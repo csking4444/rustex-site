@@ -1777,7 +1777,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3703,6 +3703,9 @@ let heatOreState = 'idle';         // idle | loading | ready | unsupported | err
 let heatOreReason = '';
 /** World size in metres, from getInfo. Not the map image's pixel size — see loadServerMap. */
 let heatWorldSize = 4000;
+/** What loadServerMap worked out about the map's geometry, so a wrong placement is diagnosable
+ *  from the page rather than by guessing at it again. */
+let heatMapGeom = null;
 
 /**
  * Real ore nodes for the connected server, read out of the world file the game client caches
@@ -3850,23 +3853,42 @@ async function loadServerMap(info){
     // dimensions, which are unrelated — dividing metres by pixels then clamping to 0..1 piled
     // everything onto the edges of the image.
     heatWorldSize = world;
-    // The rendered image also covers a margin of ocean on every side, so world 0 is not image
-    // 0: the world occupies the middle `mapSize` of a `mapSize + 2*margin` square.
-    const margin = Number(map.oceanMargin) || 0;
-    const span = heatWorldSize + margin * 2;
-    const norm = v => (Number(v) + margin) / span;
+    const raw = (map.monuments || []).filter(mn =>
+      Number.isFinite(Number(mn.x)) && Number.isFinite(Number(mn.y)));
 
-    heatMonuments = (map.monuments || []).map(mn => ({
+    // Rust has two coordinate conventions and this call has been seen using either: 0..mapSize,
+    // and a world centred on zero running -mapSize/2..+mapSize/2. Assuming the wrong one puts
+    // every monument in the wrong half of the map, so detect it — a negative coordinate can
+    // only be the centred form.
+    const centred = raw.some(mn => Number(mn.x) < 0 || Number(mn.y) < 0);
+    const toWorld = v => (Number(v) || 0) + (centred ? heatWorldSize / 2 : 0);
+
+    // The rendered image also covers a margin of ocean on every side, so world 0 is not image
+    // 0: the world occupies the middle `mapSize` of a `mapSize + 2*margin` square. oceanMargin
+    // is optional and decoded with defaults:false, so an absent one is unknown rather than
+    // zero. Zero is the safe assumption — it maps the world onto the whole image, which is
+    // only slightly wide if there is a margin, whereas inventing a margin is wrong outright.
+    const marginKnown = Number.isFinite(Number(map.oceanMargin)) && Number(map.oceanMargin) >= 0;
+    const margin = marginKnown ? Number(map.oceanMargin) : 0;
+    const span = heatWorldSize + margin * 2;
+    const norm = v => (toWorld(v) + margin) / span;
+
+    heatMapGeom = { world: heatWorldSize, margin, marginKnown, centred,
+                    monuments: raw.length,
+                    xRange: raw.length ? [Math.min(...raw.map(m => Number(m.x))),
+                                          Math.max(...raw.map(m => Number(m.x)))] : null };
+
+    heatMonuments = raw.map(mn => ({
       x: Math.max(0, Math.min(1, norm(mn.x))),
       // Rust's Y axis runs the other way to a canvas, the same inversion the grid refs use.
       y: Math.max(0, Math.min(1, 1 - norm(mn.y))),
       // Kept in world units too, so the tooltip can quote the same grid the game does rather
       // than one derived from the margin-padded image space.
-      wx: Number(mn.x) || 0, wy: Number(mn.y) || 0,
+      wx: toWorld(mn.x), wy: toWorld(mn.y),
       label: monumentLabel(mn.token),
     }));
-    monumentSites = (map.monuments || []).map(mn => ({
-      x: Number(mn.x) || 0, y: Number(mn.y) || 0, label: monumentLabel(mn.token),
+    monumentSites = raw.map(mn => ({
+      x: toWorld(mn.x), y: toWorld(mn.y), label: monumentLabel(mn.token),
     }));
     rebuildHeatNodes();
     if(map.jpgImage){
@@ -4892,12 +4914,14 @@ async function runAnnouncements(markers, members, mapSize){
     // was silently missed. deathTime moves whether or not we caught them lying there.
     const died = (deathTime > 0 && deathTime !== prev.deathTime) || (prev.alive && !alive);
     if(died){
-      // Only quote a grid if they are still dead. Once respawned, x/y is where they are now,
-      // not where they were killed, and naming that as the death site would be a guess.
-      const where = alive ? null : toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+      // Always give a grid, but do not claim the wrong one. While they are still down, their
+      // position is where they were killed. Once respawned it is where they came back, which
+      // is worth knowing and is said as such rather than passed off as the death site.
+      const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+      const tail = where ? (alive ? ', respawned at ' + where : ' at ' + where) : '';
       const key = 'dead:' + id + ':' + (deathTime || Date.now());
-      notify('team', name + ' died' + (where ? ' at ' + where : ''), key);
-      if(opts.death) once(key, who + ' died' + (where ? ' at ' + where : ''));
+      notify('team', name + ' died' + tail, key);
+      if(opts.death) once(key, who + ' died' + tail);
     }
     if(!prev.online && online){
       const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
@@ -6604,6 +6628,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 07:28 UTC</div>
+<div class="build-stamp">build 2026-07-31 08:10 UTC</div>
 </body>
 </html>
