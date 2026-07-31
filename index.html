@@ -1757,7 +1757,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.4 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3663,6 +3663,8 @@ let heatMonuments = [];
 let monumentSites = [];
 let heatOreState = 'idle';         // idle | loading | ready | unsupported | error
 let heatOreReason = '';
+/** World size in metres, from getInfo. Not the map image's pixel size — see loadServerMap. */
+let heatWorldSize = 4000;
 
 /**
  * Real ore nodes for the connected server, read out of the world file the game client caches
@@ -3726,7 +3728,7 @@ function rebuildHeatNodes(){
   }
   for(const mon of heatMonuments)
     HEAT_NODES.push({ type:'monument', x:mon.x, y:mon.y, r:8, label:mon.label,
-                      count:0, density:0 });
+                      wx:mon.wx, wy:mon.wy, count:0, density:0 });
 }
 
 /** What the panel says when there is nothing real to draw yet. */
@@ -3789,7 +3791,7 @@ let heatMapLoadedFor = null;
  * plus every monument with real coordinates, so both the background and the labels stop
  * being decorative. Fetched once per server, since the image only changes on a wipe.
  */
-async function loadServerMap(){
+async function loadServerMap(info){
   const server = activeServer();
   if(!server || heatMapLoadedFor === server.id) return;
   heatMapLoadedFor = server.id;
@@ -3797,11 +3799,32 @@ async function loadServerMap(){
     const res = await rustPlus(server, 'getMap');
     const map = res?.map;
     if(!map) return;
-    const size = Math.max(Number(map.width) || 0, Number(map.height) || 0) || 4000;
+    // Callers that already hold getInfo pass it in; every request goes through one queue with
+    // a gap between calls, so refetching it here would slow every other panel down for nothing.
+    let world = Number(info?.info?.mapSize) || 0;
+    if(!world){
+      const fetched = await rustPlus(server, 'getInfo').catch(() => null);
+      world = Number(fetched?.info?.mapSize) || 4000;
+    }
+
+    // Two separate scales, and conflating them is what put every monument in the wrong place.
+    // Monument x/y are world metres (0..mapSize). map.width/height are the JPEG's pixel
+    // dimensions, which are unrelated — dividing metres by pixels then clamping to 0..1 piled
+    // everything onto the edges of the image.
+    heatWorldSize = world;
+    // The rendered image also covers a margin of ocean on every side, so world 0 is not image
+    // 0: the world occupies the middle `mapSize` of a `mapSize + 2*margin` square.
+    const margin = Number(map.oceanMargin) || 0;
+    const span = heatWorldSize + margin * 2;
+    const norm = v => (Number(v) + margin) / span;
+
     heatMonuments = (map.monuments || []).map(mn => ({
-      // Monument coordinates are in world units on the same inverted Y axis as the markers.
-      x: Math.max(0, Math.min(1, Number(mn.x) / size)),
-      y: Math.max(0, Math.min(1, 1 - Number(mn.y) / size)),
+      x: Math.max(0, Math.min(1, norm(mn.x))),
+      // Rust's Y axis runs the other way to a canvas, the same inversion the grid refs use.
+      y: Math.max(0, Math.min(1, 1 - norm(mn.y))),
+      // Kept in world units too, so the tooltip can quote the same grid the game does rather
+      // than one derived from the margin-padded image space.
+      wx: Number(mn.x) || 0, wy: Number(mn.y) || 0,
       label: monumentLabel(mn.token),
     }));
     monumentSites = (map.monuments || []).map(mn => ({
@@ -3874,9 +3897,15 @@ function initHeatmap(wrap){
     if(!tip || hover < 0) return;
     const n = HEAT_NODES[hover];
     const col = HEAT_NODE_COLOR[n.type];
+    // Quote the grid the game shows. Where world coordinates are known that is the same
+    // maths the rest of the dashboard uses; the canvas-space fallback is only for nodes
+    // that never had world coordinates to begin with.
+    const grid = Number.isFinite(n.wx) && Number.isFinite(n.wy)
+      ? (toGrid(n.wx, n.wy, heatWorldSize) || heatGridRef(n.x, n.y))
+      : heatGridRef(n.x, n.y);
     const rows = n.type === 'monument'
-      ? `<div class="t-r"><span>Grid</span><b>${heatGridRef(n.x,n.y)}</b></div>`
-      : `<div class="t-r"><span>Grid</span><b>${heatGridRef(n.x,n.y)}</b></div>`
+      ? `<div class="t-r"><span>Grid</span><b>${grid}</b></div>`
+      : `<div class="t-r"><span>Grid</span><b>${grid}</b></div>`
         + `<div class="t-r"><span>Nodes</span><b>${n.count}</b></div>`
         + `<div class="t-r"><span>Density</span><b>${n.density}%</b></div>`;
     const head = n.type === 'monument'
@@ -4214,7 +4243,7 @@ function resetServerScopedState(){
   devices = [];
   announced.clear(); announceQueue.length = 0; teamState.clear(); announceMapSize = 0;
   heatOre = []; heatMonuments = []; monumentSites = [];
-  heatOreState = 'idle'; heatOreReason = '';
+  heatOreState = 'idle'; heatOreReason = ''; heatWorldSize = 4000;
   heatMapLoadedFor = null;
   rebuildHeatNodes();
   heatInstances.forEach(fn => fn());
@@ -4930,8 +4959,9 @@ async function loadActivity(){
     // request. It resolves once per server and then short-circuits.
     loadOreNodes(server, info);
     // Monuments come from getMap, and the oil rig announcement needs their real coordinates
-    // to tell a rig crate from any other crate. Also cached per server, so it is one call.
-    loadServerMap();
+    // to tell a rig crate from any other crate. Cached per server, and handed the getInfo this
+    // call already made so it costs exactly one extra request.
+    loadServerMap(info);
     // Players are the bulk of the list and are already on the team panel; the interesting
     // events are everything else.
     const list = (markers?.mapMarkers?.markers || []).filter(activityLabel);
@@ -6219,6 +6249,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 02:49 UTC</div>
+<div class="build-stamp">build 2026-07-31 03:05 UTC</div>
 </body>
 </html>
