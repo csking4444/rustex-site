@@ -186,6 +186,10 @@ function mapError(code) {
     case 'player_not_found':   return 'That player is not on this server.';
     case 'wrong_type':         return 'That device cannot be switched. Only smart switches accept on and off.';
     case 'rate_limit':         return 'Too many requests to that server. Wait a moment and retry.';
-    default:                   return `The server rejected the request (${code}).`;
+    // Team chat only exists if you are in a team. A solo player has nowhere to post, which is
+    // the usual reason a send is refused by a server that is otherwise answering normally.
+    case 'no_team':            return 'You are not in a team on that server, so there is no team chat to post into. Join or start a team in game and try again.';
+    default:                   return `The server rejected the request (${code}). `
+                                    + 'If it keeps happening, pair the server again to refresh the token.';
   }
 }

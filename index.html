@@ -199,6 +199,15 @@ img,svg{display:block;}
 .item-ic svg{width:17px; height:17px; stroke-width:1.6; fill:none; stroke:currentColor;}
 .item-ic.sm{width:24px; height:24px; border-radius:var(--r-sm);}
 .item-ic.xs{width:18px; height:18px; border-radius:4px;}
+/* Devices arrive by pairing, so the panel says whether pairing can reach it. */
+.dev-pair-state{font-size:11.5px; line-height:1.5; margin:0 0 10px; display:flex; gap:7px; align-items:baseline;}
+.dev-pair-state::before{content:''; width:7px; height:7px; border-radius:50%; flex-shrink:0;
+  background:var(--text-3); transform:translateY(-1px);}
+.dev-pair-state.on{color:var(--text-3);} .dev-pair-state.on::before{background:var(--success);}
+.dev-pair-state.off{color:var(--warning);} .dev-pair-state.off::before{background:var(--warning);}
+.dev-manual{margin-bottom:10px;}
+.dev-manual summary{cursor:pointer; font-size:11.5px; color:var(--text-3); user-select:none;}
+.dev-manual summary:hover{color:var(--text-2);}
 /* The target dropdown cannot hold an image, so its art sits alongside it. */
 .raid-target-row{display:flex; align-items:center; gap:8px;}
 .raid-target-row .raid-select{flex:1; min-width:0;}
@@ -1748,7 +1757,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3151,7 +3160,11 @@ function initAppPairing(){
       pairStatus(st?.message ? 'Listener stopped: ' + st.message : 'Not listening.',
                  st?.message ? 'err' : '');
     }
+    setDevPairState(!!st?.running);
   });
+  // Say on the devices panel itself whether pairing can even arrive, so a device that never
+  // shows up points at the reason rather than looking like the panel is broken.
+  window.rustexNative.pairing.state?.().then(st => setDevPairState(!!st?.running)).catch(()=>{});
 
   // A pairing arriving is the whole point: add the server and go, rather than filling a form
   // and asking the user to press one more button.
@@ -5180,6 +5193,16 @@ function saveDevices(){
   try { localStorage.setItem(key, JSON.stringify(devices)); } catch {}
 }
 
+/** Whether a device paired in game can actually reach this window. */
+function setDevPairState(running){
+  const el = document.getElementById('devPairState');
+  if(!el) return;
+  el.textContent = running
+    ? 'Listening — pair a device in game and it will appear here.'
+    : 'Not listening, so a device paired in game cannot arrive. Start it on the Pairing screen.';
+  el.className = 'dev-pair-state' + (running ? ' on' : ' off');
+}
+
 function devError(msg){
   const el = document.getElementById('devErr');
   if(el){ el.textContent = msg; el.hidden = !msg; }
@@ -6196,6 +6219,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 02:07 UTC</div>
+<div class="build-stamp">build 2026-07-31 02:49 UTC</div>
 </body>
 </html>
