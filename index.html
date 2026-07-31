@@ -199,6 +199,14 @@ img,svg{display:block;}
 .item-ic svg{width:17px; height:17px; stroke-width:1.6; fill:none; stroke:currentColor;}
 .item-ic.sm{width:24px; height:24px; border-radius:var(--r-sm);}
 .item-ic.xs{width:18px; height:18px; border-radius:4px;}
+/* Update control, in the title bar so it is visible without going looking for it. */
+.tb-update{-webkit-app-region:no-drag; margin-left:10px; padding:2px 9px; border-radius:999px;
+  font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text-2); transition:.15s;}
+.tb-update:hover{color:var(--text); border-color:var(--border-accent);}
+.tb-update.ready, .tb-update.available{background:var(--orange); border-color:var(--orange); color:#160d06;}
+.tb-update.busy{opacity:.7; cursor:default;}
+.tb-update.err{border-color:#ef6a62; color:#ef6a62;}
 /* Devices arrive by pairing, so the panel says whether pairing can reach it. */
 .dev-pair-state{font-size:11.5px; line-height:1.5; margin:0 0 10px; display:flex; gap:8px;
   align-items:center; flex-wrap:wrap;}
@@ -1657,6 +1665,8 @@ body.billing #billing-view{display:block;}
     <span class="tb-mark" aria-hidden="true"></span>
     <span class="tb-name">Rustex</span>
     <span class="tb-ver mono" id="tbVer"></span>
+    <button type="button" class="tb-update" id="tbUpdate" hidden
+            onclick="updateAction(this)"></button>
   </div>
   <div class="tb-controls">
     <button type="button" class="tb-btn" onclick="winMin()" aria-label="Minimise"><span class="tb-i-min"></span></button>
@@ -1777,7 +1787,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.4 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.5 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3334,6 +3344,71 @@ queueMicrotask(checkDownload);
  */
 const APP_SIGNED_IN = 'rustex.app.signedin';
 
+/**
+ * Updates, driven from the title bar.
+ *
+ * One button that always says what pressing it will do — Check, Download, Restart — because
+ * an update control that reports state without offering the next step is how people end up
+ * running a build from hours ago. Nothing downloads or restarts on its own: a raid does not
+ * pause for a version bump.
+ */
+const UPDATE_LABEL = {
+  idle:        'Check for updates',
+  checking:    'Checking…',
+  current:     'Up to date',
+  available:   v => 'Update to ' + v,
+  downloading: p => 'Downloading ' + p + '%',
+  ready:       'Restart to update',
+  error:       'Update failed',
+  unsupported: '',
+};
+
+let updateState = { status:'idle' };
+
+function renderUpdate(st){
+  updateState = st || updateState;
+  const btn = document.getElementById('tbUpdate');
+  if(!btn) return;
+  const s = updateState.status;
+  // Nothing to offer when running from source: there is no installer to replace.
+  if(s === 'unsupported'){ btn.hidden = true; return; }
+  const label = UPDATE_LABEL[s];
+  btn.textContent = typeof label === 'function'
+    ? label(s === 'downloading' ? (updateState.percent || 0) : updateState.version)
+    : label;
+  btn.hidden = false;
+  btn.disabled = s === 'checking' || s === 'downloading';
+  btn.className = 'tb-update'
+    + (s === 'ready' || s === 'available' ? ' ' + s : '')
+    + (s === 'checking' || s === 'downloading' ? ' busy' : '')
+    + (s === 'error' ? ' err' : '');
+  btn.title = updateState.message
+    || (s === 'ready' ? 'Downloaded. Restart to finish installing.' : '');
+}
+
+async function updateAction(btn){
+  const api = window.rustexNative?.update;
+  if(!api) return;
+  const s = updateState.status;
+  try {
+    if(s === 'available')      renderUpdate(await api.download());
+    else if(s === 'ready')     await api.install();
+    else                       renderUpdate(await api.check());
+  } catch(err){
+    renderUpdate({ status:'error', message: err?.message || 'Update failed.' });
+  }
+}
+
+function initUpdates(){
+  const api = window.rustexNative?.update;
+  if(!api) return;
+  api.onState(renderUpdate);
+  // Check once on start. Finding out there is a new build should not require remembering to
+  // ask, but it still will not install anything without being told to.
+  api.state().then(renderUpdate).catch(()=>{});
+  setTimeout(() => api.check().then(renderUpdate).catch(()=>{}), 4000);
+}
+
 function winMin(){ window.rustexNative?.win?.minimize(); }
 function winMax(){ window.rustexNative?.win?.maximize(); }
 function winClose(){ window.rustexNative?.win?.close(); }
@@ -3402,6 +3477,7 @@ function initAppShell(){
     const icon = document.getElementById('tbMaxIcon');
     if(icon) icon.style.opacity = st?.maximized ? '.55' : '1';
   });
+  initUpdates();
 
   // Ask who is signed in before choosing a screen, so a returning account lands straight on
   // the dashboard with its name and plan already filled in rather than on a login it does
@@ -6707,6 +6783,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 19:44 UTC</div>
+<div class="build-stamp">build 2026-07-31 20:01 UTC</div>
 </body>
 </html>
