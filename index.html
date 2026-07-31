@@ -1787,7 +1787,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.6 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.7 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -6214,10 +6214,14 @@ function raidToolBlock(target){
   const opts = raidToolOptions(target);
   if(!opts.length){
     return '<div class="raid-label" style="margin-top:14px">Soft side</div>'
-      + '<div class="raid-empty">A ' + escapeHtml(target.name.toLowerCase())
-      + ' has no soft side &mdash; only walls do. Explosives only.</div>';
+      + '<div class="raid-empty">No melee route into a ' + escapeHtml(target.name.toLowerCase())
+      + '. Explosives only.</div>';
   }
-  return '<div class="raid-label raid-label-row" style="margin-top:14px">Soft side with tools'
+  // A wall gives to melee on its weak face; a door has no such face but still comes down to
+  // enough swings. Both are eco raids, and calling a door's cost a "soft side" was the part
+  // that was wrong, not the numbers.
+  const heading = target.category === 'Walls' ? 'Soft side with tools' : 'Eco raid with tools';
+  return '<div class="raid-label raid-label-row" style="margin-top:14px">' + heading
     + '<span class="raid-hint">no sulfur, but slow and loud</span></div>'
     + '<div class="raid-list">' + opts.map((o, i) =>
         '<div class="raid-opt' + (i === 0 ? ' top' : '') + '">'
@@ -6398,20 +6402,25 @@ const TOOL_ORDER = ['jackhammer', 'hammer', 'sword', 'pickaxe', 'icepick', 'mace
  * it reads as the tier at a glance.
  */
 const RAID_TARGETS = [
-  // No `tools` on doors: a door has no soft side in Rust, only walls do. These carried melee
-  // costs for a while, taken from an eco chart that lists hard-side melee — filed under a
-  // heading reading "Soft side with tools", which claimed something the game does not do.
+  // Doors carry `tools` too. A door has no soft side — that is a wall mechanic — but it can
+  // still be taken down with melee, which is what an eco raid is. The two were conflated
+  // once in each direction: first these numbers were shown under a "soft side" heading, then
+  // they were deleted outright. The costs are real; only the heading was ever wrong.
   { id:'door-wood',   name:'Wooden Door',      category:'Doors', ic:'ic-doorwood', hp:200,
-    solo:{ rocket:1,  c4:1, satchel:2,  beancan:6,  ammo:19  } },
+    solo:{ rocket:1,  c4:1, satchel:2,  beancan:6,  ammo:19  },
+    tools:{ sword:9, molotov:2 } },
   { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors', ic:'ic-doorsheet', hp:250,
     solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  },
     // A rocket takes all but 14 HP of this door, which is why one rocket plus four explosive
     // rounds gets through where the ceiling-derived half-a-door said it could not.
-    dmg:{ rocket:236 } },
+    dmg:{ rocket:236 },
+    tools:{ hammer:24, mace:53 } },
   { id:'door-garage', name:'Garage Door',      category:'Doors', ic:'ic-garagedoor', hp:600,
-    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 } },
+    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 },
+    tools:{ hammer:56, mace:125 } },
   { id:'door-armor',  name:'Armored Door',     category:'Doors', ic:'ic-doorarmor', hp:800,
-    solo:{ rocket:5,  c4:2, satchel:12, beancan:31, ammo:250 } },
+    solo:{ rocket:5,  c4:2, satchel:12, beancan:31, ammo:250 },
+    tools:{ hammer:93, mace:209 } },
   { id:'wall-wood',   name:'Wooden Wall',      category:'Walls', ic:'ic-wood', hp:250,
     solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  },
     tools:{ sword:8, molotov:4 } },
@@ -6829,6 +6838,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 21:56 UTC</div>
+<div class="build-stamp">build 2026-07-31 22:31 UTC</div>
 </body>
 </html>
