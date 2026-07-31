@@ -1765,7 +1765,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.5 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.6 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3451,7 +3451,7 @@ function toggleDropdown(id, evt){
   closeDropdowns();
   if(!wasOpen) panel.classList.add('open');
 }
-function openNotifs(evt){ toggleDropdown('ddNotifs', evt); document.getElementById('notifDot').style.display='none'; }
+function openNotifs(evt){ toggleDropdown('ddNotifs', evt); markNotificationsRead(); }
 document.addEventListener('click', e=>{ if(!e.target.closest('.dropdown')) closeDropdowns(); });
 // selectServer used to live here. It only relabelled the selector — every panel still read
 // the first paired server — so switching appeared to work and changed nothing. The menu is
@@ -4187,6 +4187,7 @@ function showDashSection(id, focusWidget){
   if(id === 'overview' && document.getElementById('alarmList')){
     loadDevices(); loadAlarmLog(); renderAlarms();
   }
+  if(!notifications.length) loadNotifications();
   // Chat was the one tools panel with no hook, so it sat on "Connect a server" text written
   // before a server existed. The poller only refreshes a panel that is already visible, which
   // is never true until something loads it once.
@@ -4255,6 +4256,7 @@ function resetServerScopedState(){
   chatCache = []; chatPending.length = 0; chatDelay = 0;
   devices = [];
   alarmLog = [];
+  notifications = [];
   announced.clear(); announceQueue.length = 0; teamState.clear(); announceMapSize = 0;
   heatOre = []; heatMonuments = []; monumentSites = [];
   heatOreState = 'idle'; heatOreReason = ''; heatWorldSize = 4000;
@@ -4276,6 +4278,7 @@ function setActiveServer(id){
   renderDevices();
   loadAlarmLog();
   renderAlarms();
+  loadNotifications();
   refreshLiveData();
   if(document.getElementById('chatLog')) loadTeamChat();
   loadActivity();
@@ -4354,7 +4357,10 @@ let chatTimer = null;
 let chatPending = []; // messages shown before the send round trip finishes
 let chatDelay = 0;    // current poll gap; shrinks while the chat is busy, grows when quiet
 let chatSeq = 0;      // ids for optimistic lines
-const CHAT_FAST_MS = 2000;    // poll gap while messages are actually moving
+// Every request opens its own socket, so the poll rate is also the connection rate. At 2s the
+// chat alone was 30 connections a minute before anything else asked for data, which is what
+// pushed servers into resetting them. 5s still reads as live.
+const CHAT_FAST_MS = 5000;    // poll gap while messages are actually moving
 const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
 /**
@@ -4529,7 +4535,7 @@ function escapeHtml(value){
  * succeed on one refresh and fail on the next. So calls are queued and spaced instead of
  * racing, and a transient failure is retried once before it is reported.
  */
-const RP_GAP_MS = 240;
+const RP_GAP_MS = 350;        // minimum spacing between connections, for the same reason
 let rpChain = Promise.resolve();
 let rpLast = 0;
 
@@ -4538,8 +4544,13 @@ let rpLast = 0;
  * Matched against the wording the API actually returns, not the Rust+ error codes — the
  * server maps those to sentences before the client ever sees them.
  */
+/**
+ * Worth retrying rather than surfacing. ECONNRESET and its siblings are named explicitly:
+ * every request opens its own socket, so a server that is rate limiting connections resets
+ * them, and the raw errno was reaching the panels as "ECONNRESET" with no explanation.
+ */
 function rpTransient(message){
-  return /too many requests|rate.?limit|did not answer|closed the connection|could not reach|failed to fetch|network|timed? ?out/i
+  return /too many requests|rate.?limit|did not answer|closed the connection|could not reach|failed to fetch|network|timed? ?out|econnreset|econnrefused|epipe|etimedout|socket hang ?up|handshake/i
     .test(message || '');
 }
 
@@ -4551,8 +4562,15 @@ function rpQueue(run){
       return await run();
     } catch(err){
       if(!rpTransient(err.message)) throw err;
-      await new Promise(r => setTimeout(r, 600));
-      return await run();
+      // Two retries with a widening gap. One short retry was not enough against a server that
+      // had started resetting connections: the second attempt landed inside the same window
+      // that caused the first to fail.
+      for(const wait of [700, 2200]){
+        await new Promise(r => setTimeout(r, wait));
+        try { return await run(); }
+        catch(again){ if(!rpTransient(again.message)) throw again; }
+      }
+      throw new Error('That server is refusing connections right now. Retrying on its own.');
     } finally { rpLast = Date.now(); }
   });
   // Keep the chain alive: one rejection must not stop every later call from running.
@@ -4753,6 +4771,10 @@ async function runAnnouncements(markers, members, mapSize){
   for(const m of (markers || [])){
     const type = m.type;
     const key = type + ':' + m.id;
+    // Recorded locally regardless of the chat toggles, for the same reason as the team
+    // transitions above.
+    if(type === 'CargoShip')        notify('event', 'Cargo Ship' + at(m), key);
+    if(type === 'PatrolHelicopter') notify('event', 'Patrol Helicopter' + at(m), key);
     if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship' + at(m));
     if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter' + at(m));
     if(type === 'Crate'){
@@ -4761,6 +4783,7 @@ async function runAnnouncements(markers, members, mapSize){
       // Naming the rig beats a bare "Locked Crate", so it gets its own line and its own toggle
       // — falling back to the crate toggle so turning oil off loses nothing.
       const rig = oilRigAt(m);
+      notify('event', (rig ? rig + ' crate is up' : 'Locked Crate') + at(m), key);
       if(rig){ if(opts.oil || opts.crate) once(key, '[Rustex] ' + rig + ' crate is up' + at(m)); }
       else if(opts.crate)                 once(key, '[Rustex] Locked Crate' + at(m));
     }
@@ -4779,16 +4802,25 @@ async function runAnnouncements(markers, members, mapSize){
     // would fire for the whole team at once on connect.
     if(!prev) continue;
 
-    const who = '[Rustex] ' + (m.name || 'A teammate');
-    if(opts.death && prev.alive && !alive){
+    const name = m.name || 'A teammate';
+    const who = '[Rustex] ' + name;
+    // The notification is recorded whether or not the event is announced to team chat: one is
+    // a local log of what happened, the other posts into the squad's chat, and wanting the
+    // first is not the same as wanting the second.
+    if(prev.alive && !alive){
       const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-      once('dead:' + id + ':' + (m.deathTime || Date.now()),
-           who + ' died' + (where ? ' at ' + where : ''));
+      const key = 'dead:' + id + ':' + (m.deathTime || Date.now());
+      notify('team', name + ' died' + (where ? ' at ' + where : ''), key);
+      if(opts.death) once(key, who + ' died' + (where ? ' at ' + where : ''));
     }
-    if(opts.online && !prev.online && online){
+    if(!prev.online && online){
       const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-      once('on:' + id + ':' + (m.spawnTime || Date.now()),
-           who + ' is online' + (where ? ' at ' + where : ''));
+      const key = 'on:' + id + ':' + (m.spawnTime || Date.now());
+      notify('team', name + ' came online' + (where ? ' at ' + where : ''), key);
+      if(opts.online) once(key, who + ' is online' + (where ? ' at ' + where : ''));
+    }
+    if(prev.online && !online){
+      notify('team', name + ' went offline', 'off:' + id + ':' + Math.floor(Date.now() / 60000));
     }
   }
 
@@ -5531,6 +5563,84 @@ function renderRecycler(){
 const ALARM_LOG_MAX = 40;
 let alarmLog = [];
 
+/**
+ * Notifications.
+ *
+ * This panel used to hold three hand-written examples — a Smart Alarm on a wall that does not
+ * exist, a shop in a grid nobody listed, a teammate going offline — with invented timestamps
+ * that never moved. Everything here is now recorded from something that actually happened on
+ * the connected server, or the list stays empty and says so.
+ */
+const NOTIF_MAX = 50;
+let notifications = [];
+
+const notifKey = () => {
+  const server = activeServer();
+  return server ? 'rustex.notifs.' + server.id : null;
+};
+
+function loadNotifications(){
+  const key = notifKey();
+  if(!key){ notifications = []; renderNotifications(); return; }
+  try { notifications = JSON.parse(localStorage.getItem(key) || '[]') || []; }
+  catch(err){ if(!(err instanceof SyntaxError)) throw err; notifications = []; }
+  renderNotifications();
+}
+
+function saveNotifications(){
+  const key = notifKey();
+  if(!key) return;
+  try { localStorage.setItem(key, JSON.stringify(notifications.slice(0, NOTIF_MAX))); } catch {}
+}
+
+/**
+ * Records one real event. `key` dedupes, so the same cargo ship seen on ten polls is one
+ * notification rather than ten.
+ */
+function notify(kind, text, key){
+  const id = key || (kind + ':' + text);
+  if(notifications.some(n => n.key === id)) return;
+  notifications.unshift({ kind, text, key: id, at: Date.now(), read: false });
+  if(notifications.length > NOTIF_MAX) notifications.length = NOTIF_MAX;
+  saveNotifications();
+  renderNotifications();
+}
+
+const NOTIF_ICON = { alarm:'i-siren', device:'i-cpu', team:'i-users', event:'i-map', server:'i-wifi' };
+const NOTIF_COLOR = { alarm:'var(--crimson)', device:'var(--orange)', event:'var(--orange)' };
+
+/** "6m ago" from a real timestamp, rather than a number typed into the markup. */
+function notifAgo(at){
+  const s = Math.max(0, Math.round((Date.now() - at) / 1000));
+  if(s < 60) return s + 's ago';
+  if(s < 3600) return Math.round(s / 60) + 'm ago';
+  if(s < 86400) return Math.round(s / 3600) + 'h ago';
+  return new Date(at).toLocaleDateString();
+}
+
+function renderNotifications(){
+  const list = document.getElementById('notifList');
+  const dot = document.getElementById('notifDot');
+  if(dot) dot.hidden = !notifications.some(n => !n.read);
+  if(!list) return;
+  list.innerHTML = notifications.length
+    ? notifications.slice(0, 12).map(n =>
+        '<div class="dropdown-item" style="align-items:flex-start;">'
+        + '<svg class="icon" style="margin-top:2px;'
+        +   (NOTIF_COLOR[n.kind] ? 'color:' + NOTIF_COLOR[n.kind] : '') + '">'
+        + '<use href="#' + (NOTIF_ICON[n.kind] || 'i-bell') + '"/></svg>'
+        + '<span>' + escapeHtml(n.text)
+        + '<br/><span class="text-3 fs-11">' + notifAgo(n.at) + '</span></span></div>').join('')
+    : '<div class="dropdown-item text-3" style="cursor:default;">Nothing yet.</div>';
+}
+
+function markNotificationsRead(){
+  let touched = false;
+  for(const n of notifications) if(!n.read){ n.read = true; touched = true; }
+  if(touched) saveNotifications();
+  renderNotifications();
+}
+
 const alarmKey = () => {
   const server = activeServer();
   return server ? 'rustex.alarms.' + server.id : null;
@@ -5551,6 +5661,8 @@ function saveAlarmLog(){
 
 /** Newest first, bounded, and kept across restarts so a trip overnight is still there. */
 function recordAlarm(alarm){
+  notify('alarm', (alarm.title || 'Smart Alarm') + (alarm.body ? ' — ' + alarm.body : ''),
+         'alarm:' + (alarm.at || Date.now()));
   alarmLog.unshift({ title: alarm.title || 'Smart Alarm', body: alarm.body || '',
                      at: alarm.at || Date.now() });
   if(alarmLog.length > ALARM_LOG_MAX) alarmLog.length = ALARM_LOG_MAX;
@@ -5629,6 +5741,7 @@ function addPairedDevice(d){
   }
   saveDevices();
   devError('');
+  notify('device', (d.entityName || ('Device ' + id)) + ' paired', 'device:' + id);
   renderDevices();
   renderAlarms();          // a paired Smart Alarm belongs on the raid panel too
   refreshDevice(id);
@@ -6346,6 +6459,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 03:31 UTC</div>
+<div class="build-stamp">build 2026-07-31 04:24 UTC</div>
 </body>
 </html>
