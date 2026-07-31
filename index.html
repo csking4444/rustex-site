@@ -1770,7 +1770,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.7 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.8 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -4585,15 +4585,18 @@ function rpQueue(run){
       return await run();
     } catch(err){
       if(!rpTransient(err.message)) throw err;
-      // Two retries with a widening gap. One short retry was not enough against a server that
-      // had started resetting connections: the second attempt landed inside the same window
-      // that caused the first to fail.
-      for(const wait of [700, 2200]){
-        await new Promise(r => setTimeout(r, wait));
-        try { return await run(); }
-        catch(again){ if(!rpTransient(again.message)) throw again; }
-      }
-      throw new Error('That server is refusing connections right now. Retrying on its own.');
+      // Exactly one retry, and a short one.
+      //
+      // A previous attempt at this retried twice with a widening gap, which was worse on the
+      // servers it was meant to help: every call shares this queue, so a failing request held
+      // it for nearly three seconds and starved chat, team and map behind it — while adding
+      // more connection attempts to a server that was refusing them. Backing the poll rate off
+      // is what reduces resets; retrying harder just makes the stall longer.
+      await new Promise(r => setTimeout(r, 800));
+      try { return await run(); }
+      // Surface the real reason. Replacing it with a generic line lost the error code that
+      // says whether this is a rate limit, a dead pairing or a wrong token.
+      catch(again){ throw again; }
     } finally { rpLast = Date.now(); }
   });
   // Keep the chain alive: one rejection must not stop every later call from running.
@@ -6494,6 +6497,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 05:43 UTC</div>
+<div class="build-stamp">build 2026-07-31 05:54 UTC</div>
 </body>
 </html>
