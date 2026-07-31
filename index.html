@@ -205,6 +205,14 @@ img,svg{display:block;}
   background:var(--text-3); transform:translateY(-1px);}
 .dev-pair-state.on{color:var(--text-3);} .dev-pair-state.on::before{background:var(--success);}
 .dev-pair-state.off{color:var(--warning);} .dev-pair-state.off::before{background:var(--warning);}
+.alarm-cols{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+@media (max-width:820px){ .alarm-cols{grid-template-columns:1fr;} }
+.alarm-log{display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto;}
+.alarm-row{display:flex; align-items:baseline; gap:9px; padding:7px 9px; border-radius:var(--r-sm);
+  background:var(--surface-2); border:1px solid var(--border); font-size:12px;}
+.alarm-row .t{font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.alarm-row .w{font-family:var(--font-mono); font-size:11px; color:var(--text-3); flex-shrink:0;}
+.alarm-row.fresh{border-color:rgba(179,38,30,.5);}
 .dev-manual{margin-bottom:10px;}
 .dev-manual summary{cursor:pointer; font-size:11.5px; color:var(--text-3); user-select:none;}
 .dev-manual summary:hover{color:var(--text-2);}
@@ -1757,7 +1765,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.4 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.5 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -4174,6 +4182,11 @@ function showDashSection(id, focusWidget){
   if(id === 'tools' && document.getElementById('geneList')) renderGenes();
   if(id === 'tools' && document.getElementById('raidTarget')) raidRender();
   if(id === 'tools' && document.getElementById('devList')){ loadDevices(); renderDevices(); refreshDevices(); }
+  // The raid panel lives on the overview, and its alarm list is drawn from the same paired
+  // devices the tools section owns — so load them here too rather than only when tools opens.
+  if(id === 'overview' && document.getElementById('alarmList')){
+    loadDevices(); loadAlarmLog(); renderAlarms();
+  }
   // Chat was the one tools panel with no hook, so it sat on "Connect a server" text written
   // before a server existed. The poller only refreshes a panel that is already visible, which
   // is never true until something loads it once.
@@ -4241,6 +4254,7 @@ function activeServer(){
 function resetServerScopedState(){
   chatCache = []; chatPending.length = 0; chatDelay = 0;
   devices = [];
+  alarmLog = [];
   announced.clear(); announceQueue.length = 0; teamState.clear(); announceMapSize = 0;
   heatOre = []; heatMonuments = []; monumentSites = [];
   heatOreState = 'idle'; heatOreReason = ''; heatWorldSize = 4000;
@@ -4260,6 +4274,8 @@ function setActiveServer(id){
   renderServerMenu();
   loadDevices();
   renderDevices();
+  loadAlarmLog();
+  renderAlarms();
   refreshLiveData();
   if(document.getElementById('chatLog')) loadTeamChat();
   loadActivity();
@@ -5231,6 +5247,16 @@ function setDevPairState(running){
     ? 'Listening — pair a device in game and it will appear here.'
     : 'Not listening, so a device paired in game cannot arrive. Start it on the Pairing screen.';
   el.className = 'dev-pair-state' + (running ? ' on' : ' off');
+
+  // An alarm that never fires is indistinguishable from a listener that is off, so the raid
+  // panel says which it is rather than sitting there looking quiet.
+  const al = document.getElementById('alarmPairState');
+  if(al){
+    al.textContent = running
+      ? 'Listening for alarm pushes.'
+      : 'Not listening — a Smart Alarm cannot reach this window. Start it on the Pairing screen.';
+    al.className = 'dev-pair-state' + (running ? ' on' : ' off');
+  }
 }
 
 function devError(msg){
@@ -5259,6 +5285,7 @@ function addDevice(){
 function removeDevice(id){
   devices = devices.filter(d => d.id !== id);
   saveDevices();
+  renderAlarms();          // the raid panel lists alarms from this same set
   renderDevices();
 }
 
@@ -5493,9 +5520,78 @@ function renderRecycler(){
  * that did not exist. It is real now because the app holds the FCM listener open, which is
  * the thing a browser tab could never do — so it appears when the game says so and not before.
  */
+/**
+ * Raid alarms.
+ *
+ * A Smart Alarm is paired like any other entity, and its trips arrive as FCM pushes on the
+ * same channel as the pairings — which is the whole reason this works in the app and never
+ * could in a browser tab: it needs a listener held open. Nothing here is polled or inferred;
+ * a row exists only because the game sent one.
+ */
+const ALARM_LOG_MAX = 40;
+let alarmLog = [];
+
+const alarmKey = () => {
+  const server = activeServer();
+  return server ? 'rustex.alarms.' + server.id : null;
+};
+
+function loadAlarmLog(){
+  const key = alarmKey();
+  if(!key){ alarmLog = []; return; }
+  try { alarmLog = JSON.parse(localStorage.getItem(key) || '[]') || []; }
+  catch(err){ if(!(err instanceof SyntaxError)) throw err; alarmLog = []; }
+}
+
+function saveAlarmLog(){
+  const key = alarmKey();
+  if(!key) return;
+  try { localStorage.setItem(key, JSON.stringify(alarmLog.slice(0, ALARM_LOG_MAX))); } catch {}
+}
+
+/** Newest first, bounded, and kept across restarts so a trip overnight is still there. */
+function recordAlarm(alarm){
+  alarmLog.unshift({ title: alarm.title || 'Smart Alarm', body: alarm.body || '',
+                     at: alarm.at || Date.now() });
+  if(alarmLog.length > ALARM_LOG_MAX) alarmLog.length = ALARM_LOG_MAX;
+  saveAlarmLog();
+  renderAlarms();
+}
+
+function clearAlarmLog(){
+  alarmLog = [];
+  saveAlarmLog();
+  renderAlarms();
+}
+
+function renderAlarms(){
+  const list = document.getElementById('alarmList');
+  if(list){
+    // Alarms are just paired entities, so they come from the same list the devices panel uses.
+    const alarms = devices.filter(d => d.type === 'Alarm');
+    list.innerHTML = alarms.length
+      ? alarms.map(a => '<div class="dev-row"><span class="dev-name">' + escapeHtml(a.name)
+          + '<span class="dev-meta mono">#' + a.id + ' · Alarm</span></span>'
+          + '<button type="button" class="gene-x" onclick="removeDevice(' + a.id + ')"'
+          + ' aria-label="Remove alarm">&times;</button></div>').join('')
+      : '<div class="text-3 fs-12">No Smart Alarm paired yet.</div>';
+  }
+  const log = document.getElementById('alarmLogList');
+  if(log){
+    log.innerHTML = alarmLog.length
+      ? alarmLog.map((a, i) => '<div class="alarm-row' + (i === 0 ? ' fresh' : '') + '">'
+          + '<span class="t">' + escapeHtml(a.title)
+          + (a.body ? ' <span class="text-3">' + escapeHtml(a.body) + '</span>' : '') + '</span>'
+          + '<span class="w">' + new Date(a.at).toLocaleString() + '</span></div>').join('')
+      : '<div class="text-3 fs-12">Nothing has tripped yet.</div>';
+  }
+}
+
 function showRaidAlarm(alarm){
   const box = document.getElementById('raidAlarm');
-  if(!box || !alarm) return;
+  if(!alarm) return;
+  recordAlarm(alarm);
+  if(!box) return;
   const when = new Date(alarm.at || Date.now()).toLocaleTimeString();
   document.getElementById('raidAlarmTitle').textContent = alarm.title || 'Smart Alarm';
   document.getElementById('raidAlarmBody').textContent =
@@ -5534,6 +5630,7 @@ function addPairedDevice(d){
   saveDevices();
   devError('');
   renderDevices();
+  renderAlarms();          // a paired Smart Alarm belongs on the raid panel too
   refreshDevice(id);
 }
 if(IS_DESKTOP) window.rustexNative?.pairing?.onDevice?.(addPairedDevice);
@@ -6249,6 +6346,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 03:05 UTC</div>
+<div class="build-stamp">build 2026-07-31 03:31 UTC</div>
 </body>
 </html>
