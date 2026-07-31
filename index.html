@@ -1777,7 +1777,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3819,10 +3819,18 @@ let heatOcean = '#12333c';
 
 /** Monument tokens come through as "airfield_display_name" and similar. */
 function monumentLabel(token){
-  return String(token || '').replace(/_display_name$/, '').split(/[_\s]+/)
+  const name = String(token || '').replace(/_display_name$/, '').split(/[_\s]+/)
     .filter(Boolean)
     .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ') || 'Monument';
+  // The two rigs come through under inconsistent tokens — "large_oil_rig" one way and
+  // "oil_rig_small" the other, which title-cases into "Oil Rig Small". Say them the way
+  // players do, since which rig it is, is the whole location.
+  if(/oil\s*rig/i.test(name)){
+    if(/small/i.test(name)) return 'Small Oil Rig';
+    if(/large/i.test(name)) return 'Large Oil Rig';
+  }
+  return name;
 }
 
 let heatMapLoadedFor = null;
@@ -4896,9 +4904,12 @@ async function runAnnouncements(markers, members, mapSize){
   // marker is standing on a monument, name it: "Locked Crate at Launch Site (G12)" tells you
   // where to go in a way a grid reference alone does not.
   const at = m => {
-    const g = toGridInfo(Number(m.x), Number(m.y), mapSize || 4000);
-    if(!g) return '';
     const mon = monumentAt(m);
+    // The oil rigs sit off the grid entirely, so a reference for one is meaningless — the
+    // rig's name is the location, and which of the two it is, is the useful part.
+    if(mon && /oil\s*rig/i.test(mon)) return ' at ' + mon;
+    const g = toGridInfo(Number(m.x), Number(m.y), mapSize || 4000);
+    if(!g) return mon ? ' at ' + mon : '';
     return (g.offMap ? ' heading to ' : ' at ')
          + (mon ? mon + ' (' + g.ref + ')' : g.ref);
   };
@@ -6677,6 +6688,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 08:43 UTC</div>
+<div class="build-stamp">build 2026-07-31 08:54 UTC</div>
 </body>
 </html>
