@@ -200,9 +200,12 @@ img,svg{display:block;}
 .item-ic.sm{width:24px; height:24px; border-radius:var(--r-sm);}
 .item-ic.xs{width:18px; height:18px; border-radius:4px;}
 /* Devices arrive by pairing, so the panel says whether pairing can reach it. */
-.dev-pair-state{font-size:11.5px; line-height:1.5; margin:0 0 10px; display:flex; gap:7px; align-items:baseline;}
+.dev-pair-state{font-size:11.5px; line-height:1.5; margin:0 0 10px; display:flex; gap:8px;
+  align-items:center; flex-wrap:wrap;}
+.dev-pair-state span{flex:1; min-width:180px;}
+.dev-pair-state .btn{flex-shrink:0;}
 .dev-pair-state::before{content:''; width:7px; height:7px; border-radius:50%; flex-shrink:0;
-  background:var(--text-3); transform:translateY(-1px);}
+  background:var(--text-3);}
 .dev-pair-state.on{color:var(--text-3);} .dev-pair-state.on::before{background:var(--success);}
 .dev-pair-state.off{color:var(--warning);} .dev-pair-state.off::before{background:var(--warning);}
 .alarm-cols{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
@@ -1770,7 +1773,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.1.8 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.1.9 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -5297,24 +5300,67 @@ function saveDevices(){
   try { localStorage.setItem(key, JSON.stringify(devices)); } catch {}
 }
 
-/** Whether a device paired in game can actually reach this window. */
-function setDevPairState(running){
-  const el = document.getElementById('devPairState');
-  if(!el) return;
-  el.textContent = running
-    ? 'Listening — pair a device in game and it will appear here.'
-    : 'Not listening, so a device paired in game cannot arrive. Start it on the Pairing screen.';
-  el.className = 'dev-pair-state' + (running ? ' on' : ' off');
+/**
+ * Whether a device paired in game can reach this window — and the control to fix it.
+ *
+ * These panels used to say "start it on the Pairing screen" — an instruction to go somewhere
+ * else to do the one thing the panel is about. The button does it here instead, including the
+ * Steam link step when that is what is missing.
+ */
+function setDevPairState(running, note){
+  const action = running
+    ? '<button type="button" class="btn btn-ghost btn-sm" onclick="pairFromPanel(this,false)">Stop</button>'
+    : '<button type="button" class="btn btn-primary btn-sm" onclick="pairFromPanel(this,true)">Start listening</button>';
 
-  // An alarm that never fires is indistinguishable from a listener that is off, so the raid
-  // panel says which it is rather than sitting there looking quiet.
-  const al = document.getElementById('alarmPairState');
-  if(al){
-    al.textContent = running
-      ? 'Listening for alarm pushes.'
-      : 'Not listening — a Smart Alarm cannot reach this window. Start it on the Pairing screen.';
-    al.className = 'dev-pair-state' + (running ? ' on' : ' off');
+  const paint = (id, onText, offText) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.className = 'dev-pair-state' + (running ? ' on' : ' off');
+    // Keyed off the bridge rather than IS_DESKTOP: the bridge is what the button actually
+    // needs, and checking for it directly is both more honest and testable.
+    el.innerHTML = '<span>' + escapeHtml(note || (running ? onText : offText)) + '</span>'
+      + (window.rustexNative?.pairing ? action : '');
+  };
+
+  // Short on purpose. The state is a status line, not an explanation: the panel above already
+  // says what pairing does, and an alarm that never fires still needs to be distinguishable
+  // from a listener that was never started.
+  paint('devPairState', 'Listening — press Pair in game', 'Not listening');
+  paint('alarmPairState', 'Listening for alarm trips', 'Not listening');
+}
+
+/**
+ * Starts or stops the pairing listener from whichever panel you are already looking at.
+ * If the Steam account has never been linked it does that first, since being told which
+ * step is missing is not much better than being told nothing.
+ */
+async function pairFromPanel(btn, start){
+  if(!window.rustexNative?.pairing) return;
+  if(!start){
+    try { await window.rustexNative.pairing.stop(); } catch {}
+    setDevPairState(false);
+    return;
   }
+  const done = busyButton(btn, 'Starting…');
+  try {
+    let r = await window.rustexNative.pairing.listen();
+    if(r && r.running === false && r.needsRegister){
+      setDevPairState(false, 'Opening Steam to link your account…');
+      const reg = await window.rustexNative.pairing.register();
+      if(!reg?.ok){
+        setDevPairState(false, reg?.message || 'Linking did not finish.');
+        return;
+      }
+      r = await window.rustexNative.pairing.listen();
+    }
+    if(r && r.running === false){
+      setDevPairState(false, r.message || 'The listener did not start.');
+      return;
+    }
+    setDevPairState(true);
+  } catch(err){
+    setDevPairState(false, err.message);
+  } finally { done(); }
 }
 
 function devError(msg){
@@ -6497,6 +6543,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 05:54 UTC</div>
+<div class="build-stamp">build 2026-07-31 07:04 UTC</div>
 </body>
 </html>
