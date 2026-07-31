@@ -6279,25 +6279,28 @@ const RAID_TARGETS = [
   // No `tools` on doors: a door has no soft side in Rust, only walls do. These carried melee
   // costs for a while, taken from an eco chart that lists hard-side melee — filed under a
   // heading reading "Soft side with tools", which claimed something the game does not do.
-  { id:'door-wood',   name:'Wooden Door',      category:'Doors', ic:'ic-doorwood',
-    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  } },
-  { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors', ic:'ic-doorsheet',
-    solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  } },
-  { id:'door-garage', name:'Garage Door',      category:'Doors', ic:'ic-garagedoor',
+  { id:'door-wood',   name:'Wooden Door',      category:'Doors', ic:'ic-doorwood', hp:200,
+    solo:{ rocket:1,  c4:1, satchel:2,  beancan:6,  ammo:19  } },
+  { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors', ic:'ic-doorsheet', hp:250,
+    solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  },
+    // A rocket takes all but 14 HP of this door, which is why one rocket plus four explosive
+    // rounds gets through where the ceiling-derived half-a-door said it could not.
+    dmg:{ rocket:236 } },
+  { id:'door-garage', name:'Garage Door',      category:'Doors', ic:'ic-garagedoor', hp:600,
     solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 } },
-  { id:'door-armor',  name:'Armored Door',     category:'Doors', ic:'ic-doorarmor',
-    solo:{ rocket:5,  c4:3, satchel:15, beancan:31, ammo:245 } },
-  { id:'wall-wood',   name:'Wooden Wall',      category:'Walls', ic:'ic-wood',
+  { id:'door-armor',  name:'Armored Door',     category:'Doors', ic:'ic-doorarmor', hp:800,
+    solo:{ rocket:5,  c4:2, satchel:12, beancan:31, ammo:250 } },
+  { id:'wall-wood',   name:'Wooden Wall',      category:'Walls', ic:'ic-wood', hp:250,
     solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  },
     tools:{ sword:8, molotov:4 } },
-  { id:'wall-stone',  name:'Stone Wall',       category:'Walls', ic:'ic-stones',
-    solo:{ rocket:4,  c4:2, satchel:10, beancan:20, ammo:0   },
+  { id:'wall-stone',  name:'Stone Wall',       category:'Walls', ic:'ic-stones', hp:500,
+    solo:{ rocket:4,  c4:2, satchel:10, beancan:20, ammo:152 },
     tools:{ jackhammer:1, pickaxe:7 } },
-  { id:'wall-sheet',  name:'Sheet Metal Wall', category:'Walls', ic:'ic-metalfrag',
+  { id:'wall-sheet',  name:'Sheet Metal Wall', category:'Walls', ic:'ic-metalfrag', hp:1000,
     solo:{ rocket:8,  c4:4, satchel:23, beancan:46, ammo:0   },
     tools:{ jackhammer:3, icepick:30 } },
-  { id:'wall-armor',  name:'Armored Wall',     category:'Walls', ic:'ic-hqm',
-    solo:{ rocket:15, c4:8, satchel:40, beancan:80, ammo:0   },
+  { id:'wall-armor',  name:'Armored Wall',     category:'Walls', ic:'ic-hqm', hp:2000,
+    solo:{ rocket:15, c4:8, satchel:46, beancan:80, ammo:0   },
     tools:{ jackhammer:5, icepick:59 } },
 ];
 
@@ -6312,9 +6315,26 @@ const RAID_POINTS = 100;
 const raidTarget = id => RAID_TARGETS.find(t => t.id === id) || null;
 
 /** What one unit of an explosive contributes toward breaching a target. 0 means it cannot. */
+/**
+ * What one of an explosive contributes, as a percentage of the target.
+ *
+ * Derived from the solo count by default, which is conservative: a solo count is rounded up,
+ * so "2 rockets" could mean a rocket does anywhere from half the structure to just under all
+ * of it, and taking half understates every mixed loadout. Where the real damage is known it
+ * is given explicitly on the target and used instead — that is the difference between a
+ * sheet metal door reading as needing 2 rockets and reading as 1 rocket plus 4 explosive
+ * rounds, which is what actually gets through.
+ *
+ * An explicit value must still agree with the solo count; if it does not, the solo count wins,
+ * since that is the number people check against.
+ */
 function raidYield(target, key){
   const need = target?.solo?.[key];
-  return need > 0 ? RAID_POINTS / need : 0;
+  if(!(need > 0)) return 0;
+  const dmg = target?.dmg?.[key], hp = target?.hp;
+  if(dmg > 0 && hp > 0 && Math.ceil(hp / dmg) === need)
+    return (dmg / hp) * RAID_POINTS;
+  return RAID_POINTS / need;
 }
 
 /** Scores a loadout: { rocket:2, satchel:1 } against a target. */
@@ -6687,6 +6707,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 09:05 UTC</div>
+<div class="build-stamp">build 2026-07-31 19:44 UTC</div>
 </body>
 </html>
