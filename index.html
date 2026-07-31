@@ -1777,7 +1777,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3870,13 +3870,29 @@ async function loadServerMap(info){
     // only slightly wide if there is a margin, whereas inventing a margin is wrong outright.
     const marginKnown = Number.isFinite(Number(map.oceanMargin)) && Number(map.oceanMargin) >= 0;
     const margin = marginKnown ? Number(map.oceanMargin) : 0;
-    const span = heatWorldSize + margin * 2;
-    const norm = v => (toWorld(v) + margin) / span;
 
-    heatMapGeom = { world: heatWorldSize, margin, marginKnown, centred,
+    // The window the image covers, in world units.
+    //
+    // When oceanMargin is given, the image is the world plus that margin on every side. When
+    // it is not, the coordinates themselves say: monuments that run past mapSize are in the
+    // image's padded space, not the world's. Normalising those against mapSize alone pushed
+    // every one of them past 1 and the clamp stacked the lot into a corner, which is worse
+    // than being slightly out. Fit the window to what actually arrived instead.
+    let lo = -margin, hi = heatWorldSize + margin;
+    if(!marginKnown && raw.length){
+      const vals = raw.flatMap(mn => [toWorld(mn.x), toWorld(mn.y)]);
+      lo = Math.min(lo, ...vals);
+      hi = Math.max(hi, ...vals);
+    }
+    const span = (hi - lo) || heatWorldSize;
+    const norm = v => (toWorld(v) - lo) / span;
+
+    heatMapGeom = { world: heatWorldSize, margin, marginKnown, centred, span, lo, hi,
                     monuments: raw.length,
-                    xRange: raw.length ? [Math.min(...raw.map(m => Number(m.x))),
-                                          Math.max(...raw.map(m => Number(m.x)))] : null };
+                    range: raw.length
+                      ? { x: [Math.min(...raw.map(m => Number(m.x))), Math.max(...raw.map(m => Number(m.x)))],
+                          y: [Math.min(...raw.map(m => Number(m.y))), Math.max(...raw.map(m => Number(m.y)))] }
+                      : null };
 
     heatMonuments = raw.map(mn => ({
       x: Math.max(0, Math.min(1, norm(mn.x))),
@@ -4819,24 +4835,39 @@ const announced = new Set();
  *  send that fails is retried rather than being marked done and lost. */
 const announceQueue = [];
 
-/** How close a marker has to sit to a monument to count as standing on it, in world units.
- *  The rig deck is comfortably inside this and the nearest other monument is far outside. */
-const OIL_RADIUS = 160;
+/** How close a marker has to sit to a monument to count as standing on it, in world units. */
+const MONUMENT_RADIUS = 220;
+
+/** Marker types decode as the enum name, but the activity feed has seen the raw number too. */
+const MARKER_KIND = { 2:'Explosion', 3:'VendingMachine', 4:'CH47', 5:'CargoShip',
+                      6:'Crate', 8:'PatrolHelicopter' };
+const markerKind = m => MARKER_KIND[Number(m?.type)] || String(m?.type ?? '');
+
+/**
+ * The monument a marker is standing on, or null. Monuments come from getMap with real
+ * coordinates, so this is measured rather than assumed; with no map loaded it returns null
+ * and callers fall back to the bare grid rather than inventing a place.
+ */
+function monumentAt(m){
+  const x = Number(m?.x) || 0, y = Number(m?.y) || 0;
+  let best = null, bestD = MONUMENT_RADIUS;
+  for(const s of monumentSites){
+    const d = Math.hypot(x - s.x, y - s.y);
+    if(d <= bestD){ bestD = d; best = s.label; }
+  }
+  return best;
+}
 
 /**
  * The name of the oil rig a marker is standing on, or null. Monuments come from getMap with
  * real coordinates, so this is measured rather than assumed; if the map has not loaded yet
  * the caller falls back to the generic crate line rather than inventing a rig.
  */
+/** Tolerant of token spelling: "large_oil_rig" and "oilrig_2" both title-case into labels a
+ *  strict "oil rig" match would miss one of. */
 function oilRigAt(m){
-  const x = Number(m.x) || 0, y = Number(m.y) || 0;
-  for(const s of monumentSites){
-    // Tolerant of the token spelling: "large_oil_rig" and "oilrig_2" both title-case into
-    // labels that a strict "oil rig" match would miss one of.
-    if(!/oil\s*rig/i.test(s.label)) continue;
-    if(Math.hypot(x - s.x, y - s.y) <= OIL_RADIUS) return s.label;
-  }
-  return null;
+  const mon = monumentAt(m);
+  return mon && /oil\s*rig/i.test(mon) ? mon : null;
 }
 /** Online and alive state at the previous refresh, per teammate, so an announcement can be
  *  raised on the transition instead of every time the same state is seen again. */
@@ -4861,14 +4892,19 @@ async function runAnnouncements(markers, members, mapSize){
   // Grid reference makes an announcement actionable: "Cargo Ship at J12" tells the squad
   // where to go, "Cargo Ship inbound" does not.
   // Something still off the map is inbound, so say where it is heading rather than where it
-  // is — "Patrol Helicopter heading to A12" is actionable, a bare name is not.
+  // is — "Patrol Helicopter heading to A12" is actionable, a bare name is not. Where the
+  // marker is standing on a monument, name it: "Locked Crate at Launch Site (G12)" tells you
+  // where to go in a way a grid reference alone does not.
   const at = m => {
     const g = toGridInfo(Number(m.x), Number(m.y), mapSize || 4000);
-    return g ? (g.offMap ? ' heading to ' : ' at ') + g.ref : '';
+    if(!g) return '';
+    const mon = monumentAt(m);
+    return (g.offMap ? ' heading to ' : ' at ')
+         + (mon ? mon + ' (' + g.ref + ')' : g.ref);
   };
 
   for(const m of (markers || [])){
-    const type = m.type;
+    const type = markerKind(m);
     const key = type + ':' + m.id;
     // Recorded locally regardless of the chat toggles, for the same reason as the team
     // transitions above.
@@ -4882,9 +4918,12 @@ async function runAnnouncements(markers, members, mapSize){
       // Naming the rig beats a bare "Locked Crate", so it gets its own line and its own toggle
       // — falling back to the crate toggle so turning oil off loses nothing.
       const rig = oilRigAt(m);
-      notify('event', (rig ? rig + ' crate is up' : 'Locked Crate') + at(m), key);
-      if(rig){ if(opts.oil || opts.crate) once(key, '[Rustex] ' + rig + ' crate is up' + at(m)); }
-      else if(opts.crate)                 once(key, '[Rustex] Locked Crate' + at(m));
+      const line = 'Locked Crate spawned' + at(m);
+      notify('event', line, key);
+      // An oil rig crate is the rig respawning, which has its own toggle. Everything else is
+      // a plain crate, and `at` already names the monument it landed on.
+      if(rig){ if(opts.oil || opts.crate) once(key, '[Rustex] ' + line); }
+      else if(opts.crate)                 once(key, '[Rustex] ' + line);
     }
   }
 
@@ -4897,7 +4936,10 @@ async function runAnnouncements(markers, members, mapSize){
     const alive = !!m.isAlive;
     const prev = teamState.get(id);
     const deathTime = Number(m.deathTime) || 0;
-    teamState.set(id, { online, alive, deathTime });
+    // Their position each refresh is remembered, because once a death is noticed they have
+    // usually respawned and their current position is no longer where it happened.
+    const here = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
+    teamState.set(id, { online, alive, deathTime, at: here });
     // First time we see someone there is nothing to compare against, and announcing here
     // would fire for the whole team at once on connect.
     if(!prev) continue;
@@ -4914,11 +4956,18 @@ async function runAnnouncements(markers, members, mapSize){
     // was silently missed. deathTime moves whether or not we caught them lying there.
     const died = (deathTime > 0 && deathTime !== prev.deathTime) || (prev.alive && !alive);
     if(died){
-      // Always give a grid, but do not claim the wrong one. While they are still down, their
-      // position is where they were killed. Once respawned it is where they came back, which
-      // is worth knowing and is said as such rather than passed off as the death site.
-      const where = toGrid(Number(m.x) || 0, Number(m.y) || 0, mapSize || 4000);
-      const tail = where ? (alive ? ', respawned at ' + where : ' at ' + where) : '';
+      // Both grids, and neither overstated.
+      //
+      // Still down: their position is the death site, so it is given plainly. Already back:
+      // the death site is only as good as the last position seen before it — up to one poll
+      // stale — so it is qualified as "near" rather than stated as fact, and the respawn is
+      // named separately.
+      const fell = alive ? (prev.at || null) : here;
+      const back = alive ? here : null;
+      const bits = [];
+      if(fell) bits.push((alive ? 'near ' : 'at ') + fell);
+      if(back) bits.push('respawned at ' + back);
+      const tail = bits.length ? ' ' + bits.join(', ') : '';
       const key = 'dead:' + id + ':' + (deathTime || Date.now());
       notify('team', name + ' died' + tail, key);
       if(opts.death) once(key, who + ' died' + tail);
@@ -6628,6 +6677,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 08:10 UTC</div>
+<div class="build-stamp">build 2026-07-31 08:43 UTC</div>
 </body>
 </html>
