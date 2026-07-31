@@ -1777,7 +1777,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.4 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -6092,8 +6092,8 @@ function raidToolBlock(target){
   const opts = raidToolOptions(target);
   if(!opts.length){
     return '<div class="raid-label" style="margin-top:14px">Soft side</div>'
-      + '<div class="raid-empty">No soft side on ' + escapeHtml(target.name.toLowerCase())
-      + '. Explosives only.</div>';
+      + '<div class="raid-empty">A ' + escapeHtml(target.name.toLowerCase())
+      + ' has no soft side &mdash; only walls do. Explosives only.</div>';
   }
   return '<div class="raid-label raid-label-row" style="margin-top:14px">Soft side with tools'
     + '<span class="raid-hint">no sulfur, but slow and loud</span></div>'
@@ -6276,18 +6276,17 @@ const TOOL_ORDER = ['jackhammer', 'hammer', 'sword', 'pickaxe', 'icepick', 'mace
  * it reads as the tier at a glance.
  */
 const RAID_TARGETS = [
+  // No `tools` on doors: a door has no soft side in Rust, only walls do. These carried melee
+  // costs for a while, taken from an eco chart that lists hard-side melee — filed under a
+  // heading reading "Soft side with tools", which claimed something the game does not do.
   { id:'door-wood',   name:'Wooden Door',      category:'Doors', ic:'ic-doorwood',
-    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  },
-    tools:{ sword:9, molotov:2 } },
+    solo:{ rocket:1,  c4:1, satchel:1,  beancan:2,  ammo:46  } },
   { id:'door-sheet',  name:'Sheet Metal Door', category:'Doors', ic:'ic-doorsheet',
-    solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  },
-    tools:{ hammer:24, mace:53 } },
+    solo:{ rocket:2,  c4:1, satchel:4,  beancan:9,  ammo:63  } },
   { id:'door-garage', name:'Garage Door',      category:'Doors', ic:'ic-garagedoor',
-    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 },
-    tools:{ hammer:56, mace:125 } },
+    solo:{ rocket:3,  c4:2, satchel:9,  beancan:19, ammo:150 } },
   { id:'door-armor',  name:'Armored Door',     category:'Doors', ic:'ic-doorarmor',
-    solo:{ rocket:5,  c4:3, satchel:15, beancan:31, ammo:245 },
-    tools:{ hammer:93, mace:209 } },
+    solo:{ rocket:5,  c4:3, satchel:15, beancan:31, ammo:245 } },
   { id:'wall-wood',   name:'Wooden Wall',      category:'Walls', ic:'ic-wood',
     solo:{ rocket:2,  c4:1, satchel:3,  beancan:6,  ammo:92  },
     tools:{ sword:8, molotov:4 } },
@@ -6688,6 +6687,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 08:54 UTC</div>
+<div class="build-stamp">build 2026-07-31 09:05 UTC</div>
 </body>
 </html>
