@@ -1816,7 +1816,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.4.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.4.4 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -6765,7 +6765,10 @@ function raidToolBlock(target){
   // that was wrong, not the numbers.
   const heading = target.category === 'Walls' ? 'Soft side with tools' : 'Eco raid with tools';
   return '<div class="raid-label raid-label-row" style="margin-top:14px">' + heading
-    + '<span class="raid-hint">no sulfur, but slow and loud</span></div>'
+    // Stated explicitly: these counts assume you refill at a workbench between runs, which is
+    // where the published figures come from. Without refills you need considerably more, and
+    // reading a refilled number as a carry-in number is how you turn up short.
+    + '<span class="raid-hint">no sulfur · counts assume refilling at a bench</span></div>'
     + '<div class="raid-list">' + opts.map((o, i) =>
         '<div class="raid-opt' + (i === 0 ? ' top' : '') + '">'
         + '<span class="rank">' + (i + 1) + '</span>'
@@ -7381,6 +7384,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 08:12 UTC</div>
+<div class="build-stamp">build 2026-08-01 08:22 UTC</div>
 </body>
 </html>
