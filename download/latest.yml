@@ -1,8 +1,8 @@
-version: 0.3.1
+version: 0.3.2
 files:
   - url: Rustex-Setup.exe
-    sha512: Vywesx6saF0WEU7ppg27y5trhap/vyfRRDm8PM7njJ2VSVWLvo0a4sYQEhtyoeb2UPzcYi2RHr0NwtlAEhJsrQ==
-    size: 84158641
+    sha512: lOtF+yzlUPT+kLQvICEOazO0h3ZMrKZaqDTyIdp2nwzG7ASy5B24oDXFokF8zwrV723/zQRDLjhmxWJwZ3H0jA==
+    size: 84159104
 path: Rustex-Setup.exe
-sha512: Vywesx6saF0WEU7ppg27y5trhap/vyfRRDm8PM7njJ2VSVWLvo0a4sYQEhtyoeb2UPzcYi2RHr0NwtlAEhJsrQ==
-releaseDate: '2026-08-01T04:01:57.708Z'
+sha512: lOtF+yzlUPT+kLQvICEOazO0h3ZMrKZaqDTyIdp2nwzG7ASy5B24oDXFokF8zwrV723/zQRDLjhmxWJwZ3H0jA==
+releaseDate: '2026-08-01T06:24:58.295Z'

@@ -1811,7 +1811,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.3.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.3.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -2666,7 +2666,8 @@ const RX_SERVERS = 'rustex.servers.v1';
 const RX_ACTIVE = 'rustex.activeServer.v1';
 const RX_ANNOUNCE = 'rustex.announce.v1';
 // Announcements write into the squad's chat, so every one of these starts off.
-const ANNOUNCE_DEFAULTS = { cargo:false, heli:false, crate:false, oil:false, death:false, online:false };
+const ANNOUNCE_DEFAULTS = { cargo:false, heli:false, chinook:false, crate:false, oil:false,
+                            death:false, online:false };
 const PLANS = {
   scout:  { id:'scout',  name:'Scout',  monthly:4.99,  yearly:47.90  },
   raider: { id:'raider', name:'Raider', monthly:9.99,  yearly:95.90  },
@@ -5147,8 +5148,13 @@ async function runAnnouncements(markers, members, mapSize){
     // transitions above.
     if(type === 'CargoShip')        notify('event', 'Cargo Ship' + at(m), key);
     if(type === 'PatrolHelicopter') notify('event', 'Patrol Helicopter' + at(m), key);
+    // The Chinook was missing entirely — the activity feed knew the type but the
+    // announcements never had a branch for it, so the one event that tells you a hackable
+    // crate is being dropped went out to nobody.
+    if(type === 'CH47')             notify('event', 'Chinook' + at(m), key);
     if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship' + at(m));
     if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter' + at(m));
+    if(opts.chinook && type === 'CH47')           once(key, '[Rustex] Chinook' + at(m));
     if(type === 'Crate'){
       // Rust+ reports no event for an oil rig itself, but its locked crate is the thing the
       // squad cares about: a fresh Crate marker standing on the rig means oil has respawned.
@@ -5355,6 +5361,10 @@ function startAnnouncePolling(){
           const size = Number(info?.info?.mapSize) || 0;
           if(size) announceMapSize = size;
         }
+        // Monuments are not fetched here on purpose. Every call shares one queue, so a map
+        // fetch in this path sits in front of the markers it exists to read. loadActivity
+        // already loads them once per server.
+
         const [mk, team] = await Promise.all([
           rustPlus(server, 'getMapMarkers'),
           rustPlus(server, 'getTeamInfo').catch(() => null),
@@ -7061,6 +7071,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 04:02 UTC</div>
+<div class="build-stamp">build 2026-08-01 06:25 UTC</div>
 </body>
 </html>
