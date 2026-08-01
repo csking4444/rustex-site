@@ -230,6 +230,8 @@ img,svg{display:block;}
 .pairapp-steps.simple li{font-size:12.5px; line-height:1.55; color:var(--text-2);}
 .pairapp-steps.simple b{color:var(--text);}
 .pairapp-go{width:100%; justify-content:center;}
+.upd-actions{display:flex; gap:9px; margin:18px 0 12px; flex-wrap:wrap;}
+.upd-actions .btn{flex:1; min-width:130px; justify-content:center;}
 .dev-manual{margin-bottom:10px;}
 .dev-manual summary{cursor:pointer; font-size:11.5px; color:var(--text-3); user-select:none;}
 .dev-manual summary:hover{color:var(--text-2);}
@@ -1698,6 +1700,22 @@ body.billing #billing-view{display:block;}
   </div>
 </div>
 
+<!-- Update prompt. Shown once per version, on launch, when there is actually one to take. -->
+<div class="dlm" id="updModal" hidden role="dialog" aria-modal="true" aria-labelledby="updTitle">
+  <div class="dlm-card">
+    <button type="button" class="dlm-x" onclick="closeUpdatePrompt()" aria-label="Close">&times;</button>
+    <span class="dlm-eyebrow">Update available</span>
+    <h2 class="dlm-title" id="updTitle">Rustex <span id="updVersion"></span> is ready</h2>
+    <p class="dlm-lead" id="updLead">You are on <span id="updCurrent"></span>. Updating takes a
+      few seconds and restarts the app.</p>
+    <div class="upd-actions">
+      <button class="btn btn-primary" id="updGo" onclick="updatePromptAction(this)">Update now</button>
+      <button class="btn btn-ghost" onclick="closeUpdatePrompt()">Not now</button>
+    </div>
+    <p class="dlm-note" id="updNote">You can always update later from the button in the title bar.</p>
+  </div>
+</div>
+
 <div class="dlm" id="dlModal" hidden role="dialog" aria-modal="true" aria-labelledby="dlmTitle">
   <div class="dlm-card">
     <button type="button" class="dlm-x" onclick="closeDlWarning()" aria-label="Close">&times;</button>
@@ -1793,7 +1811,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.9 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.3.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3463,14 +3481,71 @@ async function updateAction(btn){
   }
 }
 
+/**
+ * The launch prompt.
+ *
+ * Shown once per version. Nagging on every start is how people learn to dismiss a dialog
+ * without reading it, and the one time it matters is the time they click through it — so a
+ * version that has been declined stays declined until a newer one turns up.
+ */
+const RX_UPD_SEEN = 'rustex.update.seen';
+
+function updatePromptSeen(v){
+  try { return localStorage.getItem(RX_UPD_SEEN) === String(v); } catch { return false; }
+}
+function markUpdatePromptSeen(v){
+  try { localStorage.setItem(RX_UPD_SEEN, String(v)); } catch {}
+}
+
+function openUpdatePrompt(version){
+  const box = document.getElementById('updModal');
+  if(!box || !version || updatePromptSeen(version)) return;
+  const set = (id, text) => { const el = document.getElementById(id); if(el) el.textContent = text; };
+  set('updVersion', 'v' + version);
+  set('updCurrent', 'v' + (document.getElementById('tbVer')?.textContent || '').replace(/^v/, ''));
+  box.hidden = false;
+}
+
+function closeUpdatePrompt(){
+  const box = document.getElementById('updModal');
+  if(box) box.hidden = true;
+  // Declining is remembered, so this version does not ask again on every launch.
+  if(updateState.version) markUpdatePromptSeen(updateState.version);
+}
+
+/** The dialog's button mirrors the title bar one: download, then restart. */
+async function updatePromptAction(btn){
+  const api = window.rustexNative?.update;
+  if(!api) return;
+  const go = document.getElementById('updGo');
+  if(updateState.status === 'ready'){ await api.install(); return; }
+  if(go){ go.disabled = true; go.textContent = 'Downloading…'; }
+  try { renderUpdate(await api.download()); }
+  catch(err){ renderUpdate({ status:'error', message: err?.message || 'Update failed.' }); }
+}
+
 function initUpdates(){
   const api = window.rustexNative?.update;
   if(!api) return;
-  api.onState(renderUpdate);
-  // Check once on start. Finding out there is a new build should not require remembering to
-  // ask, but it still will not install anything without being told to.
+  api.onState(st => {
+    renderUpdate(st);
+    // Progress and completion are reflected in the dialog while it is open, so it does not
+    // sit there saying "Update now" through a download it already started.
+    const go = document.getElementById('updGo');
+    const box = document.getElementById('updModal');
+    if(go && box && !box.hidden){
+      if(st?.status === 'downloading'){ go.disabled = true; go.textContent = 'Downloading ' + (st.percent || 0) + '%'; }
+      else if(st?.status === 'ready'){ go.disabled = false; go.textContent = 'Restart now'; }
+      else if(st?.status === 'error'){ go.disabled = false; go.textContent = 'Try again'; }
+    }
+    if(st?.status === 'available') openUpdatePrompt(st.version);
+  });
+  // Check on launch. Finding out there is a new build should not depend on remembering to
+  // ask — but nothing downloads or restarts without being told to.
   api.state().then(renderUpdate).catch(()=>{});
-  setTimeout(() => api.check().then(renderUpdate).catch(()=>{}), 4000);
+  setTimeout(() => api.check()
+    .then(st => { renderUpdate(st); if(st?.status === 'available') openUpdatePrompt(st.version); })
+    .catch(()=>{}), 4000);
 }
 
 function winMin(){ window.rustexNative?.win?.minimize(); }
@@ -6978,6 +7053,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 02:19 UTC</div>
+<div class="build-stamp">build 2026-08-01 03:46 UTC</div>
 </body>
 </html>
