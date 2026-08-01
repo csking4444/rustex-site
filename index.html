@@ -1787,7 +1787,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.2.7 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.2.8 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -2492,6 +2492,7 @@ body.billing #billing-view{display:block;}
       <div class="card">
         <div class="card-head"><div class="card-title"><svg class="icon"><use href="#i-bell"/></svg>Notifications</div></div>
         <div class="pref-row"><div><div class="pt">Raid alarms</div><div class="pd">Web push the moment a Smart Alarm trips on a base you track.</div></div><label class="switch"><input type="checkbox" id="prefRaid" checked><span class="track"></span></label></div>
+        <div class="pref-row"><div><div class="pt">Alarm sound</div><div class="pd">Sound a siren when a Smart Alarm trips, so it reaches you in game. Silence it from the banner without turning this off.</div></div><label class="switch"><input type="checkbox" id="prefAlarmSound" data-pref="alarmSound" onchange="toggleAlarmSound(this)" checked><span class="track"></span></label></div>
         <div class="pref-row"><div><div class="pt">Phone call escalation</div><div class="pd">If nobody acknowledges a raid alarm within 60 seconds, call every member.</div></div><label class="switch"><input type="checkbox" id="prefCall" checked><span class="track"></span></label></div>
         <div class="pref-row"><div><div class="pt">Shop &amp; vending alerts</div><div class="pd">Tell me when a watched item is listed near me, or a shop disappears.</div></div><label class="switch"><input type="checkbox" id="prefShop" checked><span class="track"></span></label></div>
         <div class="pref-row"><div><div class="pt">Decay warnings</div><div class="pd">Warn me when any tracked base drops under 12 hours of upkeep.</div></div><label class="switch"><input type="checkbox" id="prefDecay" checked><span class="track"></span></label></div>
@@ -2648,6 +2649,7 @@ const PLANS = {
   clan:   { id:'clan',   name:'Clan',   monthly:19.99, yearly:191.90 }
 };
 const DEFAULT_PREFS = { raid:true, call:true, shop:true, decay:true, team:false, email:false,
+                        alarmSound:true,
                         timezone:'UTC', appearance:'dark', displayName:'' };
 
 const Session = {
@@ -2940,6 +2942,8 @@ function loadSettingsForm(){
   v('setAppearance', pr.appearance || 'dark');
   c('prefRaid', pr.raid); c('prefCall', pr.call); c('prefShop', pr.shop);
   c('prefDecay', pr.decay); c('prefTeam', pr.team); c('prefEmail', pr.email);
+  // Defaults on: an alarm you cannot hear is the one thing this panel exists to prevent.
+  c('prefAlarmSound', pr.alarmSound !== false);
   const note = document.getElementById('settingsSaved'); if(note) note.textContent = '';
 }
 function renderSettings(){
@@ -6042,6 +6046,7 @@ function showRaidAlarm(alarm){
   const box = document.getElementById('raidAlarm');
   if(!alarm) return;
   recordAlarm(alarm);
+  startAlarmSound();
   if(!box) return;
   const when = new Date(alarm.at || Date.now()).toLocaleTimeString();
   document.getElementById('raidAlarmTitle').textContent = alarm.title || 'Smart Alarm';
@@ -6052,8 +6057,83 @@ function showRaidAlarm(alarm){
 }
 
 function dismissRaidAlarm(){
+  silenceAlarm();
   const box = document.getElementById('raidAlarm');
   if(box) box.hidden = true;
+}
+
+/**
+ * The alarm sound.
+ *
+ * Synthesised rather than shipped as an audio file. The page is one HTML document that makes
+ * no external requests, and a siren long enough to pull someone out of a game would be a
+ * sizeable base64 blob on every load — where two alternating tones is what a real alarm does
+ * anyway, and cuts through game audio in a way a single beep does not.
+ */
+const SIREN_SECONDS = 15;
+const SIREN_STEP = 0.45;          // seconds per tone
+let sirenCtx = null, sirenNodes = null, sirenTimer = null;
+
+function alarmSoundOn(){ return Session.prefs?.alarmSound !== false; }
+
+function startAlarmSound(){
+  if(!alarmSoundOn()) return false;
+  silenceAlarm();
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return false;
+    sirenCtx = sirenCtx || new Ctx();
+    // A context built before any click starts suspended, and an alarm is precisely the case
+    // where that must not silently swallow the sound.
+    if(sirenCtx.state === 'suspended') sirenCtx.resume().catch(()=>{});
+
+    const ctx = sirenCtx;
+    const gain = ctx.createGain();
+    const osc  = ctx.createOscillator();
+    osc.type = 'sawtooth';                       // harsh on purpose; a sine is easy to sleep through
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    const t0 = ctx.currentTime;
+    // Ramped rather than switched, so it does not click on every tone change.
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.exponentialRampToValueAtTime(0.35, t0 + 0.05);
+    for(let i = 0, t = t0; t < t0 + SIREN_SECONDS; i++, t += SIREN_STEP)
+      osc.frequency.setValueAtTime(i % 2 ? 660 : 990, t);
+    gain.gain.setValueAtTime(0.35, t0 + SIREN_SECONDS - 0.08);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + SIREN_SECONDS);
+
+    osc.start(t0);
+    osc.stop(t0 + SIREN_SECONDS);
+    sirenNodes = { osc, gain };
+    sirenTimer = setTimeout(silenceAlarm, SIREN_SECONDS * 1000 + 200);
+    renderSilenceButton(true);
+    return true;
+  } catch { return false; }
+}
+
+/** Stops a siren that is already going, without touching the on/off preference. */
+function silenceAlarm(){
+  if(sirenTimer){ clearTimeout(sirenTimer); sirenTimer = null; }
+  if(sirenNodes){
+    try { sirenNodes.osc.stop(); } catch {}
+    try { sirenNodes.osc.disconnect(); sirenNodes.gain.disconnect(); } catch {}
+    sirenNodes = null;
+  }
+  renderSilenceButton(false);
+}
+
+function renderSilenceButton(sounding){
+  const b = document.getElementById('raidSilence');
+  if(b) b.hidden = !sounding;
+}
+
+/** The switch. Turning it off silences anything already sounding. */
+function toggleAlarmSound(el){
+  Session.prefs = { ...(Session.prefs || DEFAULT_PREFS), alarmSound: !!el.checked };
+  Session.savePrefs?.();
+  if(!el.checked) silenceAlarm();
+  else if(!sirenNodes) startAlarmSound();      // a quick confirmation that it is audible
 }
 
 if(IS_DESKTOP) window.rustexNative?.pairing?.onAlarm?.(showRaidAlarm);
@@ -6838,6 +6918,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-07-31 22:31 UTC</div>
+<div class="build-stamp">build 2026-08-01 00:24 UTC</div>
 </body>
 </html>
