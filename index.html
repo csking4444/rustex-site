@@ -1816,7 +1816,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.4.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.4.3 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -4671,9 +4671,7 @@ let chatSeq = 0;      // ids for optimistic lines
 // chat alone was 30 connections a minute before anything else asked for data, which is what
 // pushed servers into resetting them. 5s still reads as live.
 // Commands are read on this poll, so it is also how long someone waits after typing one.
-// 1.5s reads as immediate in practice. It is the tightest thing here because a command is a
-// question someone is sitting waiting on, unlike a cargo ship crossing a map.
-const CHAT_FAST_MS = 1500;    // poll gap while messages are actually moving
+const CHAT_FAST_MS = 1000;    // poll gap while messages are actually moving
 const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
 /**
@@ -4890,7 +4888,11 @@ function escapeHtml(value){
  * succeed on one refresh and fail on the next. So calls are queued and spaced instead of
  * racing, and a transient failure is retried once before it is reported.
  */
-const RP_GAP_MS = 350;        // minimum spacing between connections, for the same reason
+// Minimum spacing between connections, and the hard ceiling on how fast anything can poll:
+// every request opens its own socket, so this is requests per second for the whole app.
+// 1s chat plus 1s team plus 5s markers is ~2.2/s, which 350ms could not hold without the
+// queue drifting further behind on every pass.
+const RP_GAP_MS = 150;
 let rpChain = Promise.resolve();
 let rpLast = 0;
 
@@ -5640,9 +5642,9 @@ function stopChatPolling(){ if(chatTimer){ clearTimeout(chatTimer); chatTimer = 
 // about them four seconds later changes nothing. Every request opens its own socket, so the
 // poll rate is also the connection rate — slowing the markers down is what pays for reading
 // the team faster, rather than simply asking for more.
-const ANNOUNCE_TEAM_MS   = 4000;    // deaths, joins and drops
-const ANNOUNCE_MARKER_MS = 20000;   // cargo, heli, chinook, crates, rig call-outs
-const ANNOUNCE_IDLE_MS   = 60000;   // hidden window: keep watching, but cheaply
+const ANNOUNCE_TEAM_MS   = 1000;    // deaths, joins and drops
+const ANNOUNCE_MARKER_MS = 5000;    // cargo, heli, chinook, crates, rig call-outs
+const ANNOUNCE_IDLE_MS   = 30000;   // hidden window: keep watching, but cheaply
 let announceTimer = null;
 let announceMapSize = 0;          // getInfo only changes on a wipe, so it is fetched once
 
@@ -7379,6 +7381,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 07:52 UTC</div>
+<div class="build-stamp">build 2026-08-01 08:12 UTC</div>
 </body>
 </html>
