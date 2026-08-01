@@ -1811,7 +1811,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.3.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.3.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -3277,7 +3277,7 @@ function initAppPairing(){
   const panel = document.getElementById('pairApp');
   if(panel) panel.hidden = false;
   // The manual commands are for people without the app.
-  document.querySelectorAll('.cmd-row').forEach(el => { el.style.display = 'none'; });
+  // The npx walkthrough that these hid is gone entirely; the app pairs from one button.
 
   window.rustexNative.pairing.onStatus(st => {
     if(!st?.running){
@@ -3646,9 +3646,17 @@ if(IS_DESKTOP){
   hideAppSignIn();
 }
 function hideAppSignIn(){
-  // Nothing to go home to in a two screen app.
-  document.querySelectorAll('.topbar .btn[onclick*="goLanding"]').forEach(el => {
-    el.hidden = true; el.style.display = 'none';
+  // Nothing to go home to in a two screen app: the landing page is stripped from this build,
+  // so anything calling goLanding() lands on an empty document. This used to match only
+  // `.topbar .btn`, which left the brand and the command palette's Home entry pointing at it
+  // — the app's Home button did nothing but blank the window.
+  document.querySelectorAll('[onclick*="goLanding"]').forEach(el => {
+    el.removeAttribute('onclick');
+    if(el.tagName === 'A'){ el.removeAttribute('href'); el.style.cursor = 'default'; }
+    // The brand stays as a label; anything that was only ever a way there goes.
+    if(el.classList.contains('btn') || el.classList.contains('cmdk-item')){
+      el.hidden = true; el.style.display = 'none';
+    }
   });
   document.querySelectorAll('[data-auth-only], .steam-btn, #navSignIn').forEach(el => {
     el.hidden = true;
@@ -7053,6 +7061,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 03:46 UTC</div>
+<div class="build-stamp">build 2026-08-01 04:02 UTC</div>
 </body>
 </html>
