@@ -1816,7 +1816,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.4.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.4.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -4670,7 +4670,10 @@ let chatSeq = 0;      // ids for optimistic lines
 // Every request opens its own socket, so the poll rate is also the connection rate. At 2s the
 // chat alone was 30 connections a minute before anything else asked for data, which is what
 // pushed servers into resetting them. 5s still reads as live.
-const CHAT_FAST_MS = 3000;    // poll gap while messages are actually moving
+// Commands are read on this poll, so it is also how long someone waits after typing one.
+// 1.5s reads as immediate in practice. It is the tightest thing here because a command is a
+// question someone is sitting waiting on, unlike a cargo ship crossing a map.
+const CHAT_FAST_MS = 1500;    // poll gap while messages are actually moving
 const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
 /**
@@ -5342,9 +5345,6 @@ const CHAT_COMMANDS = {
   pop:     { args:'',         help:'players, queue and max' },
   time:    { args:'',         help:'in-game time' },
   wipe:    { args:'',         help:'how long since the wipe' },
-  team:    { args:'',         help:'everyone in the team' },
-  online:  { args:'',         help:'who is online, and where' },
-  offline: { args:'',         help:'who is offline' },
   alive:   { args:'',         help:'longest time alive' },
   prox:    { args:'',         help:'distance to your teammates' },
   steamid: { args:'<name>',   help:'a teammate’s Steam ID' },
@@ -5358,9 +5358,9 @@ const CHAT_COMMANDS = {
   connections: { args:'',     help:'recent joins and disconnects' },
   devices: { args:'',         help:'paired smart devices and their state' },
   alarms:  { args:'',         help:'recent Smart Alarm trips' },
-  recycle: { args:'<item>',   help:'what an item recycles into' },
-  decay:   { args:'<item>',   help:'how long something takes to decay' },
-  raid:    { args:'<target>', help:'cheapest way in, e.g. !raid sheet metal door' },
+  // No !recycle, !decay, !raid, !team, !online or !offline: each of those is a panel in the
+  // dashboard already, and a chat command is a worse way to read a table than the table.
+  // What is left is what you cannot see while you are in the game.
   mute:    { args:'',         help:'stop answering in team chat' },
   unmute:  { args:'',         help:'start answering again' },
 };
@@ -5427,7 +5427,7 @@ async function runChatCommand(name, arg){
   if(name === 'mute'){ chatMuted = true;  return 'Muted. !unmute to bring me back.'; }
   if(name === 'unmute'){ chatMuted = false; return 'Listening again.'; }
 
-  if(['team','online','offline','alive','prox','steamid'].includes(name)){
+  if(['alive','prox','steamid'].includes(name)){
     const [team, info] = await Promise.all([
       rustPlus(server, 'getTeamInfo'),
       rustPlus(server, 'getInfo').catch(() => null),
@@ -5437,17 +5437,6 @@ async function runChatCommand(name, arg){
     if(!members.length) return 'No team.';
     const find = q => members.find(m => (m.name || '').toLowerCase().includes(q.toLowerCase()));
 
-    if(name === 'team')    return members.map(m => (m.name || '?')
-      + (m.isOnline ? '' : ' (offline)')).join(', ');
-    if(name === 'online'){
-      const on = members.filter(m => m.isOnline);
-      return on.length ? on.map(m => (m.name || '?') + ' ' + grid(m.x, m.y, size)
-        + (m.isAlive ? '' : ' dead')).join(', ') : 'Nobody online.';
-    }
-    if(name === 'offline'){
-      const off = members.filter(m => !m.isOnline);
-      return off.length ? off.map(m => m.name || '?').join(', ') : 'Everyone is online.';
-    }
     if(name === 'alive'){
       // spawnTime is when they last came back, so the oldest one has survived longest.
       const alive = members.filter(m => m.isAlive && m.spawnTime);
@@ -5529,65 +5518,6 @@ async function runChatCommand(name, arg){
       : 'Nothing since Rustex started watching.';
   }
 
-  if(name === 'recycle'){
-    const q = (arg || '').trim().toLowerCase();
-    if(!q) return 'Name an item, e.g. !recycle tech trash';
-    const row = RECYCLE.find(r => r.name.toLowerCase() === q)
-             || RECYCLE.find(r => r.name.toLowerCase().includes(q));
-    if(!row) return 'Nothing called "' + q + '" in the recycler chart.';
-    const y = row.mon;
-    const part = k => y[k] === undefined ? null
-      : (Array.isArray(y[k]) ? y[k].join('-') : y[k]) + ' ' + (YIELD_LABEL[k] || k);
-    return row.name + ': ' + Object.keys(y).map(part).filter(Boolean).join(', ') + ' (monument)';
-  }
-
-  if(name === 'decay'){
-    const q = (arg || '').trim().toLowerCase();
-    if(!q) return 'Name something, e.g. !decay sheet metal door';
-    const t = RAID_TARGETS.find(x => x.name.toLowerCase() === q)
-           || RAID_TARGETS.find(x => x.name.toLowerCase().includes(q));
-    if(!t) return 'Nothing called "' + q + '".';
-    return t.name + ': ' + t.hp + ' HP. Decay only runs once it is outside upkeep.';
-  }
-
-  if(name === 'events'){
-    const [mk, info] = await Promise.all([
-      rustPlus(server, 'getMapMarkers'),
-      rustPlus(server, 'getInfo').catch(() => null),
-    ]);
-    const size = info?.info?.mapSize;
-    const seen = [];
-    for(const m of (mk?.mapMarkers?.markers || [])){
-      const kind = markerKind(m);
-      const label = { CargoShip:'Cargo', PatrolHelicopter:'Heli', CH47:'Chinook',
-                      Crate:'Crate' }[kind];
-      if(label) seen.push(label + ' ' + (monumentAt(m) || grid(m.x, m.y, size)));
-    }
-    return seen.length ? seen.slice(0, 8).join(', ') : 'Nothing on the map right now.';
-  }
-
-  if(name === 'devices'){
-    if(!devices.length) return 'No devices paired.';
-    return devices.map(d => d.name + ': '
-      + (d.on === true ? 'on' : d.on === false ? 'off' : 'unknown')).join(', ');
-  }
-
-  if(name === 'alarms'){
-    if(!alarmLog.length) return 'No alarms have tripped.';
-    return alarmLog.slice(0, 3).map(a =>
-      a.title + ' ' + new Date(a.at).toLocaleTimeString()).join(', ');
-  }
-
-  if(name === 'raid'){
-    const q = (arg || '').trim().toLowerCase();
-    if(!q) return 'Name a target, e.g. !raid sheet metal door';
-    const t = RAID_TARGETS.find(x => x.name.toLowerCase() === q)
-           || RAID_TARGETS.find(x => x.name.toLowerCase().includes(q));
-    if(!t) return 'No target called "' + q + '".';
-    const best = raidSolve(t, { metric:'cheapest' })?.best;
-    if(!best) return t.name + ': no solution.';
-    return t.name + ': ' + raidLoadoutText(best.loadout) + ' — ' + raidNum(best.sulfur) + ' sulfur';
-  }
   return null;
 }
 
@@ -5702,15 +5632,21 @@ function stopChatPolling(){ if(chatTimer){ clearTimeout(chatTimer); chatTimer = 
  * point is to fire while you are elsewhere. It does skip the request when every toggle is
  * off, so a squad that wants none of this pays nothing for it.
  */
-// A death is the one thing here worth knowing about immediately, and it is found by comparing
-// two polls — so the gap between them is the delay. 25s was chosen to keep connections down
-// and made a teammate dying old news by the time it was said. Every request opens its own
-// socket, so this is also the connection rate: 10s is about as tight as that gets before
-// servers start resetting them, and a held-open socket is what would remove the trade-off.
-const ANNOUNCE_POLL_MS = 10000;
-const ANNOUNCE_IDLE_MS = 60000;   // hidden window: keep watching, but cheaply
+// Split, because the two halves are not equally urgent and asking for both at the same rate
+// wastes the budget on the wrong one.
+//
+// A death is found by comparing two team reads, so that gap is the delay on the one event
+// worth knowing about immediately. Cargo and heli move across a map over minutes; hearing
+// about them four seconds later changes nothing. Every request opens its own socket, so the
+// poll rate is also the connection rate — slowing the markers down is what pays for reading
+// the team faster, rather than simply asking for more.
+const ANNOUNCE_TEAM_MS   = 4000;    // deaths, joins and drops
+const ANNOUNCE_MARKER_MS = 20000;   // cargo, heli, chinook, crates, rig call-outs
+const ANNOUNCE_IDLE_MS   = 60000;   // hidden window: keep watching, but cheaply
 let announceTimer = null;
 let announceMapSize = 0;          // getInfo only changes on a wipe, so it is fetched once
+
+let announceMarkerAt = 0;         // when the markers were last read
 
 function startAnnouncePolling(){
   stopAnnouncePolling();
@@ -5730,20 +5666,27 @@ function startAnnouncePolling(){
         // fetch in this path sits in front of the markers it exists to read. loadActivity
         // already loads them once per server.
 
+        // The team is read every pass; the markers only every few. That is what buys the
+        // faster death detection without asking the server for more overall.
+        const wantMarkers = Date.now() - announceMarkerAt >= ANNOUNCE_MARKER_MS;
         const [mk, team] = await Promise.all([
-          rustPlus(server, 'getMapMarkers'),
+          wantMarkers ? rustPlus(server, 'getMapMarkers').catch(() => null) : null,
           rustPlus(server, 'getTeamInfo').catch(() => null),
         ]);
-        await runAnnouncements(mk?.mapMarkers?.markers, team?.teamInfo?.members,
+        if(wantMarkers) announceMarkerAt = Date.now();
+        await runAnnouncements(mk?.mapMarkers?.markers || [], team?.teamInfo?.members || [],
                                announceMapSize || 4000);
       } catch {}
     }
-    announceTimer = setTimeout(tick, document.hidden ? ANNOUNCE_IDLE_MS : ANNOUNCE_POLL_MS);
+    announceTimer = setTimeout(tick, document.hidden ? ANNOUNCE_IDLE_MS : ANNOUNCE_TEAM_MS);
   };
   // A short first pass so turning a toggle on is visibly followed by something happening.
-  announceTimer = setTimeout(tick, 3000);
+  announceTimer = setTimeout(tick, 2000);
 }
-function stopAnnouncePolling(){ if(announceTimer){ clearTimeout(announceTimer); announceTimer = null; } }
+function stopAnnouncePolling(){
+  if(announceTimer){ clearTimeout(announceTimer); announceTimer = null; }
+  announceMarkerAt = 0;
+}
 
 /**
  * Shop prices, re-read on a slow loop.
@@ -7436,6 +7379,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 07:32 UTC</div>
+<div class="build-stamp">build 2026-08-01 07:52 UTC</div>
 </body>
 </html>
