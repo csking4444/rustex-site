@@ -1816,7 +1816,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.4.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.4.1 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -2672,7 +2672,7 @@ const RX_ACTIVE = 'rustex.activeServer.v1';
 const RX_ANNOUNCE = 'rustex.announce.v1';
 // Announcements write into the squad's chat, so every one of these starts off.
 const ANNOUNCE_DEFAULTS = { cargo:false, heli:false, chinook:false, crate:false, oil:false,
-                            death:false, online:false };
+                            death:false, online:false, offline:false };
 const PLANS = {
   scout:  { id:'scout',  name:'Scout',  monthly:4.99,  yearly:47.90  },
   raider: { id:'raider', name:'Raider', monthly:9.99,  yearly:95.90  },
@@ -4670,7 +4670,7 @@ let chatSeq = 0;      // ids for optimistic lines
 // Every request opens its own socket, so the poll rate is also the connection rate. At 2s the
 // chat alone was 30 connections a minute before anything else asked for data, which is what
 // pushed servers into resetting them. 5s still reads as live.
-const CHAT_FAST_MS = 5000;    // poll gap while messages are actually moving
+const CHAT_FAST_MS = 3000;    // poll gap while messages are actually moving
 const CHAT_SLOW_MS = 15000;   // poll gap once the chat has gone quiet
 
 /**
@@ -5082,6 +5082,24 @@ const announceQueue = [];
 /** How close a marker has to sit to a monument to count as standing on it, in world units. */
 const MONUMENT_RADIUS = 220;
 
+/**
+ * Oil rig crates.
+ *
+ * Rust+ reports no timer for these, but it does show the Chinook, and a Chinook arriving at a
+ * rig is the rig being called — the crate unlocks about fifteen minutes later. The countdown
+ * is therefore measured from something real that was actually seen, not invented; if Rustex
+ * was not watching when the Chinook arrived there is no timer and the commands say so.
+ */
+const RIG_UNLOCK_MS = 15 * 60 * 1000;
+const rigCalled = new Map();       // rig label -> when its Chinook was first seen
+
+/** "12m 04s" for a countdown. */
+function fmtLeft(ms){
+  const s = Math.max(0, Math.round(ms / 1000));
+  const m = Math.floor(s / 60);
+  return m + 'm ' + String(s % 60).padStart(2, '0') + 's';
+}
+
 /** Marker types decode as the enum name, but the activity feed has seen the raw number too. */
 const MARKER_KIND = { 2:'Explosion', 3:'VendingMachine', 4:'CH47', 5:'CargoShip',
                       6:'Crate', 8:'PatrolHelicopter' };
@@ -5160,7 +5178,21 @@ async function runAnnouncements(markers, members, mapSize){
     // The Chinook was missing entirely — the activity feed knew the type but the
     // announcements never had a branch for it, so the one event that tells you a hackable
     // crate is being dropped went out to nobody.
-    if(type === 'CH47')             notify('event', 'Chinook' + at(m), key);
+    if(type === 'CH47'){
+      // A Chinook over a rig is the crate being called; anywhere else it is just a Chinook.
+      const rig = oilRigAt(m);
+      if(rig){
+        // Only start a countdown if one is not already running, so the Chinook sitting there
+        // across several polls does not keep resetting it.
+        const prevCall = rigCalled.get(rig);
+        if(!prevCall || Date.now() - prevCall > RIG_UNLOCK_MS) rigCalled.set(rig, Date.now());
+        const line = 'Heavy Scientists got called to the ' + rig;
+        notify('event', line, 'rig:' + rig + ':' + rigCalled.get(rig));
+        if(opts.oil || opts.chinook) once('rig:' + rig + ':' + rigCalled.get(rig), '[Rustex] ' + line);
+      } else {
+        notify('event', 'Chinook' + at(m), key);
+      }
+    }
     if(opts.cargo && type === 'CargoShip')        once(key, '[Rustex] Cargo Ship' + at(m));
     if(opts.heli  && type === 'PatrolHelicopter') once(key, '[Rustex] Patrol Helicopter' + at(m));
     if(opts.chinook && type === 'CH47')           once(key, '[Rustex] Chinook' + at(m));
@@ -5231,7 +5263,12 @@ async function runAnnouncements(markers, members, mapSize){
       if(opts.online) once(key, who + ' is online' + (where ? ' at ' + where : ''));
     }
     if(prev.online && !online){
-      notify('team', name + ' went offline', 'off:' + id + ':' + Math.floor(Date.now() / 60000));
+      // Rust+ has no disconnect event, so this is inferred from isOnline flipping between two
+      // polls. The key is bucketed by minute because a brief blip in the team info would
+      // otherwise announce a disconnect every time it flickered.
+      const key = 'off:' + id + ':' + Math.floor(Date.now() / 60000);
+      notify('team', name + ' went offline', key);
+      if(opts.offline) once(key, who + ' went offline');
     }
   }
 
@@ -5318,6 +5355,7 @@ const CHAT_COMMANDS = {
   small:   { args:'',         help:'small oil rig crate' },
   events:  { args:'',         help:'what is on the map now' },
   deaths:  { args:'',         help:'recent team deaths' },
+  connections: { args:'',     help:'recent joins and disconnects' },
   devices: { args:'',         help:'paired smart devices and their state' },
   alarms:  { args:'',         help:'recent Smart Alarm trips' },
   recycle: { args:'<item>',   help:'what an item recycles into' },
@@ -5350,7 +5388,33 @@ async function runChatCommand(name, arg){
     const info = (await rustPlus(server, name === 'time' ? 'getTime' : 'getInfo'))?.[
       name === 'time' ? 'time' : 'info'];
     if(!info) return 'That server did not answer.';
-    if(name === 'time') return 'In-game time ' + String(info.time ?? '?').slice(0, 5);
+    if(name === 'time'){
+      // AppTime.time is a float count of in-game hours, not a clock string — slicing it gave
+      // "9.383" where the game shows 09:23. dayLengthMinutes is how many real minutes a full
+      // 24h cycle takes, which is what turns the remaining in-game hours into a countdown.
+      const now = Number(info.time);
+      if(!Number.isFinite(now)) return 'That server did not report a time.';
+      // Rounded to the nearest minute, via total minutes so 59.6 cannot become ":60". The
+      // game rounds too — flooring showed 09:22 where it read 09:23.
+      const clock = h => {
+        const t = Math.round(h * 60);
+        return String(Math.floor(t / 60) % 24).padStart(2, '0') + ':'
+             + String(t % 60).padStart(2, '0');
+      };
+      const sunrise = Number(info.sunrise), sunset = Number(info.sunset);
+      const dayMins = Number(info.dayLengthMinutes) || 60;
+      let line = 'In-Game time: ' + clock(now) + '.';
+      if(Number.isFinite(sunrise) && Number.isFinite(sunset)){
+        const night = now >= sunset || now < sunrise;
+        const target = night ? sunrise : sunset;
+        const hoursLeft = ((target - now) + 24) % 24;
+        const secs = Math.max(0, Math.round((hoursLeft / 24) * dayMins * 60));
+        const h = Math.floor(secs / 3600), m = Math.floor((secs % 3600) / 60), s = secs % 60;
+        const span = (h ? h + 'h ' : '') + (h || m ? m + 'm ' : '') + s + 's';
+        line += ' ' + span + (night ? ' before daybreak.' : ' before nightfall.');
+      }
+      return line;
+    }
     if(name === 'pop')
       return info.players + '/' + info.maxPlayers + ' online'
         + (info.queuedPlayers ? ', ' + info.queuedPlayers + ' queued' : ', no queue');
@@ -5419,10 +5483,28 @@ async function runChatCommand(name, arg){
     const markers = mk?.mapMarkers?.markers || [];
     if(name === 'large' || name === 'small'){
       const want = name === 'large' ? /large/i : /small/i;
-      const hit = markers.find(m => markerKind(m) === 'Crate'
-        && want.test(monumentAt(m) || '') && /oil\s*rig/i.test(monumentAt(m) || ''));
-      return hit ? (monumentAt(hit) + ' crate is up')
-                 : ('No crate on the ' + name + ' oil rig right now.');
+      const rig = monumentSites.find(s => /oil\s*rig/i.test(s.label) && want.test(s.label));
+      // Without the rig's position there is no way to tell a crate on it from any other
+      // crate. Saying "no crate" then would be a false negative, which is worse than saying
+      // the question cannot be answered.
+      if(!rig) return 'I do not know where the ' + name + ' oil rig is on this server yet — '
+                    + 'open the dashboard once so the map loads.';
+      const crates = markers.filter(m => markerKind(m) === 'Crate');
+      // Measured against the rig itself rather than through monumentAt, so a crate sitting on
+      // a large deck still counts.
+      const near = crates.filter(m =>
+        Math.hypot((Number(m.x) || 0) - rig.x, (Number(m.y) || 0) - rig.y) <= 300);
+
+      // A countdown only exists if the Chinook that started it was actually seen.
+      const called = rigCalled.get(rig.label);
+      const left = called ? RIG_UNLOCK_MS - (Date.now() - called) : null;
+      if(left !== null && left > 0)
+        return rig.label + ': crate unlocks in ' + fmtLeft(left);
+      if(near.length)
+        return rig.label + ' crate is up'
+             + (called ? ', unlocked ' + fmtLeft(Date.now() - called - RIG_UNLOCK_MS) + ' ago' : '')
+             + (near.length > 1 ? ' (' + near.length + ' crates)' : '');
+      return 'No crate on ' + rig.label + ' right now.';
     }
     const kind = { cargo:'CargoShip', heli:'PatrolHelicopter', chinook:'CH47' }[name];
     const hits = markers.filter(m => markerKind(m) === kind);
@@ -5435,6 +5517,16 @@ async function runChatCommand(name, arg){
   if(name === 'deaths'){
     const recent = notifications.filter(n => n.kind === 'team' && /died/.test(n.text)).slice(0, 4);
     return recent.length ? recent.map(n => n.text).join(', ') : 'No deaths recorded yet.';
+  }
+
+  if(name === 'connections'){
+    // Only what has been seen while Rustex was running — there is no history from before it
+    // was watching, and claiming otherwise would be inventing it.
+    const recent = notifications
+      .filter(n => n.kind === 'team' && /(came online|went offline)/.test(n.text)).slice(0, 5);
+    return recent.length
+      ? recent.map(n => n.text + ' ' + notifAgo(n.at)).join(', ')
+      : 'Nothing since Rustex started watching.';
   }
 
   if(name === 'recycle'){
@@ -5610,8 +5702,13 @@ function stopChatPolling(){ if(chatTimer){ clearTimeout(chatTimer); chatTimer = 
  * point is to fire while you are elsewhere. It does skip the request when every toggle is
  * off, so a squad that wants none of this pays nothing for it.
  */
-const ANNOUNCE_POLL_MS = 25000;   // markers move slowly; well inside the request budget
-const ANNOUNCE_IDLE_MS = 90000;   // hidden window: keep watching, but cheaply
+// A death is the one thing here worth knowing about immediately, and it is found by comparing
+// two polls — so the gap between them is the delay. 25s was chosen to keep connections down
+// and made a teammate dying old news by the time it was said. Every request opens its own
+// socket, so this is also the connection rate: 10s is about as tight as that gets before
+// servers start resetting them, and a held-open socket is what would remove the trade-off.
+const ANNOUNCE_POLL_MS = 10000;
+const ANNOUNCE_IDLE_MS = 60000;   // hidden window: keep watching, but cheaply
 let announceTimer = null;
 let announceMapSize = 0;          // getInfo only changes on a wipe, so it is fetched once
 
@@ -7339,6 +7436,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 06:37 UTC</div>
+<div class="build-stamp">build 2026-08-01 07:32 UTC</div>
 </body>
 </html>
