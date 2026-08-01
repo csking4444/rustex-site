@@ -232,6 +232,11 @@ img,svg{display:block;}
 .pairapp-go{width:100%; justify-content:center;}
 .upd-actions{display:flex; gap:9px; margin:18px 0 12px; flex-wrap:wrap;}
 .upd-actions .btn{flex:1; min-width:130px; justify-content:center;}
+.cmd-list{display:grid; grid-template-columns:1fr; gap:3px; max-height:230px; overflow-y:auto;}
+.cmd-item{display:flex; gap:10px; align-items:baseline; font-size:11.5px; line-height:1.5;}
+.cmd-name{color:var(--orange); flex-shrink:0; min-width:112px;}
+.cmd-arg{color:var(--text-3);}
+.cmd-help{color:var(--text-3); min-width:0;}
 .dev-manual{margin-bottom:10px;}
 .dev-manual summary{cursor:pointer; font-size:11.5px; color:var(--text-3); user-select:none;}
 .dev-manual summary:hover{color:var(--text-2);}
@@ -1811,7 +1816,7 @@ body.billing #billing-view{display:block;}
           <a class="btn btn-outline dl-btn" id="dlBtn" href="/download/Rustex-Setup.exe" download
              onclick="return openDlWarning(event)">
             <svg class="icon"><use href="#i-download"/></svg><span id="dlLabel">Download for Windows</span></a>
-          <span class="dl-note" id="dlNote">v0.3.2 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
+          <span class="dl-note" id="dlNote">v0.4.0 &middot; 80 MB &middot; Runs on your own machine. Unsigned, so Windows will ask you to confirm.</span>
         </div>
         <div class="trust-row">
           <div class="stat"><span class="num mono">9</span><span class="lbl">Live features</span></div>
@@ -2674,7 +2679,7 @@ const PLANS = {
   clan:   { id:'clan',   name:'Clan',   monthly:19.99, yearly:191.90 }
 };
 const DEFAULT_PREFS = { raid:true, call:true, shop:true, decay:true, team:false, email:false,
-                        alarmSound:true,
+                        alarmSound:true, assistant:false,
                         timezone:'UTC', appearance:'dark', displayName:'' };
 
 const Session = {
@@ -4492,7 +4497,11 @@ function showDashSection(id, focusWidget){
   // Chat was the one tools panel with no hook, so it sat on "Connect a server" text written
   // before a server existed. The poller only refreshes a panel that is already visible, which
   // is never true until something loads it once.
-  if(id === 'tools' && document.getElementById('chatLog')){ loadTeamChat(); pokeChat(); }
+  if(id === 'tools' && document.getElementById('chatLog')){
+    loadTeamChat(); pokeChat(); renderCommandList();
+    const a = document.getElementById('prefAssistant');
+    if(a) a.checked = !!Session.prefs?.assistant;
+  }
   if(focusWidget){
     const el = document.getElementById(focusWidget);
     if(el) requestAnimationFrame(()=> el.scrollIntoView({ block:'nearest', behavior:'smooth' }));
@@ -5268,6 +5277,9 @@ async function loadTeamChat(btn){
       chatPending = chatPending.filter(p => p.failed || !landed.has(p.message));
     }
     renderChatLog(log, chatCache, '');
+    // Answer any commands in what just arrived. Fired rather than awaited so a slow reply
+    // never holds up the panel that has already been drawn.
+    handleChatCommands(msgs).catch(()=>{});
     // Keep checking quickly while people are talking; ease off once it goes quiet.
     chatDelay = changed ? CHAT_FAST_MS : Math.min(CHAT_SLOW_MS, (chatDelay || CHAT_FAST_MS) * 1.6);
   } catch(err){
@@ -5275,6 +5287,262 @@ async function loadTeamChat(btn){
     // like it worked sometimes and showed nothing others.
     renderChatLog(log, chatCache, err.message);
   } finally { done(); }
+}
+
+/**
+ * Chat commands.
+ *
+ * Your squad types these into team chat in game; Rustex reads them on the same poll that
+ * draws the chat panel and answers into the same chat. Every answer comes from a live Rust+
+ * call — there is nothing here that reports a number it did not just fetch.
+ *
+ * Replies carry the [Rustex] prefix the announcements use, and anything already carrying it
+ * is ignored, so the assistant cannot answer itself into a loop.
+ */
+const CHAT_PREFIX = '!';
+const CHAT_COMMANDS = {
+  help:    { args:'',         help:'list these commands' },
+  pop:     { args:'',         help:'players, queue and max' },
+  time:    { args:'',         help:'in-game time' },
+  wipe:    { args:'',         help:'how long since the wipe' },
+  team:    { args:'',         help:'everyone in the team' },
+  online:  { args:'',         help:'who is online, and where' },
+  offline: { args:'',         help:'who is offline' },
+  alive:   { args:'',         help:'longest time alive' },
+  prox:    { args:'',         help:'distance to your teammates' },
+  steamid: { args:'<name>',   help:'a teammate’s Steam ID' },
+  cargo:   { args:'',         help:'cargo ship, if it is up' },
+  heli:    { args:'',         help:'patrol helicopter, if it is up' },
+  chinook: { args:'',         help:'chinook, if it is up' },
+  large:   { args:'',         help:'large oil rig crate' },
+  small:   { args:'',         help:'small oil rig crate' },
+  events:  { args:'',         help:'what is on the map now' },
+  deaths:  { args:'',         help:'recent team deaths' },
+  devices: { args:'',         help:'paired smart devices and their state' },
+  alarms:  { args:'',         help:'recent Smart Alarm trips' },
+  recycle: { args:'<item>',   help:'what an item recycles into' },
+  decay:   { args:'<item>',   help:'how long something takes to decay' },
+  raid:    { args:'<target>', help:'cheapest way in, e.g. !raid sheet metal door' },
+  mute:    { args:'',         help:'stop answering in team chat' },
+  unmute:  { args:'',         help:'start answering again' },
+};
+
+/** Answered commands, so a message sitting in the buffer is not replied to on every poll. */
+const chatAnswered = new Set();
+/** !mute, for when the squad wants the chat back to themselves. Not persisted: a mute is for
+ *  the session you are in, not a setting you have to remember you changed. */
+let chatMuted = false;
+
+function chatCommandList(){
+  return Object.entries(CHAT_COMMANDS)
+    .map(([name, c]) => CHAT_PREFIX + name + (c.args ? ' ' + c.args : ''));
+}
+
+async function runChatCommand(name, arg){
+  const server = activeServer();
+  if(!server) return 'No server connected.';
+  const grid = (x, y, size) => toGrid(Number(x) || 0, Number(y) || 0, size || 4000) || '?';
+
+  if(name === 'help')
+    return 'Commands: ' + chatCommandList().join('  ');
+
+  if(name === 'pop' || name === 'wipe' || name === 'time'){
+    const info = (await rustPlus(server, name === 'time' ? 'getTime' : 'getInfo'))?.[
+      name === 'time' ? 'time' : 'info'];
+    if(!info) return 'That server did not answer.';
+    if(name === 'time') return 'In-game time ' + String(info.time ?? '?').slice(0, 5);
+    if(name === 'pop')
+      return info.players + '/' + info.maxPlayers + ' online'
+        + (info.queuedPlayers ? ', ' + info.queuedPlayers + ' queued' : ', no queue');
+    const days = info.wipeTime
+      ? Math.max(0, Math.floor((Date.now() / 1000 - Number(info.wipeTime)) / 86400)) : null;
+    return days === null ? 'No wipe time reported.'
+      : 'Wiped ' + days + ' day' + (days === 1 ? '' : 's') + ' ago';
+  }
+
+  if(name === 'mute'){ chatMuted = true;  return 'Muted. !unmute to bring me back.'; }
+  if(name === 'unmute'){ chatMuted = false; return 'Listening again.'; }
+
+  if(['team','online','offline','alive','prox','steamid'].includes(name)){
+    const [team, info] = await Promise.all([
+      rustPlus(server, 'getTeamInfo'),
+      rustPlus(server, 'getInfo').catch(() => null),
+    ]);
+    const members = team?.teamInfo?.members || [];
+    const size = info?.info?.mapSize;
+    if(!members.length) return 'No team.';
+    const find = q => members.find(m => (m.name || '').toLowerCase().includes(q.toLowerCase()));
+
+    if(name === 'team')    return members.map(m => (m.name || '?')
+      + (m.isOnline ? '' : ' (offline)')).join(', ');
+    if(name === 'online'){
+      const on = members.filter(m => m.isOnline);
+      return on.length ? on.map(m => (m.name || '?') + ' ' + grid(m.x, m.y, size)
+        + (m.isAlive ? '' : ' dead')).join(', ') : 'Nobody online.';
+    }
+    if(name === 'offline'){
+      const off = members.filter(m => !m.isOnline);
+      return off.length ? off.map(m => m.name || '?').join(', ') : 'Everyone is online.';
+    }
+    if(name === 'alive'){
+      // spawnTime is when they last came back, so the oldest one has survived longest.
+      const alive = members.filter(m => m.isAlive && m.spawnTime);
+      if(!alive.length) return 'Nobody has an alive time yet.';
+      const best = alive.reduce((a, b) => (a.spawnTime < b.spawnTime ? a : b));
+      const mins = Math.max(0, Math.round((Date.now() / 1000 - Number(best.spawnTime)) / 60));
+      return (best.name || '?') + ' alive ' + (mins >= 60
+        ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : mins + 'm');
+    }
+    if(name === 'steamid'){
+      const who = arg ? find(arg) : null;
+      return who ? (who.name || '?') + ' ' + who.steamId : 'Name a teammate, e.g. !steamid Kael';
+    }
+    if(name === 'prox'){
+      const me = arg ? find(arg) : members.find(m => String(m.steamId) === String(server.playerId));
+      if(!me) return 'Could not find you in the team.';
+      const others = members.filter(m => m.steamId !== me.steamId && m.isOnline)
+        .map(m => ({ n:m.name || '?', d: Math.round(Math.hypot(m.x - me.x, m.y - me.y)) }))
+        .sort((a, b) => a.d - b.d).slice(0, 3);
+      return others.length ? others.map(o => o.n + ' ' + o.d + 'm').join(', ')
+                           : 'Nobody else online.';
+    }
+  }
+
+  // One marker type, asked about by name. "Not up" is a real answer here — the alternative
+  // is inventing a timer for something the API does not report.
+  if(['cargo','heli','chinook','large','small'].includes(name)){
+    const [mk, info] = await Promise.all([
+      rustPlus(server, 'getMapMarkers'),
+      rustPlus(server, 'getInfo').catch(() => null),
+    ]);
+    const size = info?.info?.mapSize;
+    const markers = mk?.mapMarkers?.markers || [];
+    if(name === 'large' || name === 'small'){
+      const want = name === 'large' ? /large/i : /small/i;
+      const hit = markers.find(m => markerKind(m) === 'Crate'
+        && want.test(monumentAt(m) || '') && /oil\s*rig/i.test(monumentAt(m) || ''));
+      return hit ? (monumentAt(hit) + ' crate is up')
+                 : ('No crate on the ' + name + ' oil rig right now.');
+    }
+    const kind = { cargo:'CargoShip', heli:'PatrolHelicopter', chinook:'CH47' }[name];
+    const hits = markers.filter(m => markerKind(m) === kind);
+    const label = { cargo:'Cargo ship', heli:'Patrol helicopter', chinook:'Chinook' }[name];
+    return hits.length
+      ? hits.map(m => label + ' ' + (monumentAt(m) || grid(m.x, m.y, size))).join(', ')
+      : label + ' is not on the map.';
+  }
+
+  if(name === 'deaths'){
+    const recent = notifications.filter(n => n.kind === 'team' && /died/.test(n.text)).slice(0, 4);
+    return recent.length ? recent.map(n => n.text).join(', ') : 'No deaths recorded yet.';
+  }
+
+  if(name === 'recycle'){
+    const q = (arg || '').trim().toLowerCase();
+    if(!q) return 'Name an item, e.g. !recycle tech trash';
+    const row = RECYCLE.find(r => r.name.toLowerCase() === q)
+             || RECYCLE.find(r => r.name.toLowerCase().includes(q));
+    if(!row) return 'Nothing called "' + q + '" in the recycler chart.';
+    const y = row.mon;
+    const part = k => y[k] === undefined ? null
+      : (Array.isArray(y[k]) ? y[k].join('-') : y[k]) + ' ' + (YIELD_LABEL[k] || k);
+    return row.name + ': ' + Object.keys(y).map(part).filter(Boolean).join(', ') + ' (monument)';
+  }
+
+  if(name === 'decay'){
+    const q = (arg || '').trim().toLowerCase();
+    if(!q) return 'Name something, e.g. !decay sheet metal door';
+    const t = RAID_TARGETS.find(x => x.name.toLowerCase() === q)
+           || RAID_TARGETS.find(x => x.name.toLowerCase().includes(q));
+    if(!t) return 'Nothing called "' + q + '".';
+    return t.name + ': ' + t.hp + ' HP. Decay only runs once it is outside upkeep.';
+  }
+
+  if(name === 'events'){
+    const [mk, info] = await Promise.all([
+      rustPlus(server, 'getMapMarkers'),
+      rustPlus(server, 'getInfo').catch(() => null),
+    ]);
+    const size = info?.info?.mapSize;
+    const seen = [];
+    for(const m of (mk?.mapMarkers?.markers || [])){
+      const kind = markerKind(m);
+      const label = { CargoShip:'Cargo', PatrolHelicopter:'Heli', CH47:'Chinook',
+                      Crate:'Crate' }[kind];
+      if(label) seen.push(label + ' ' + (monumentAt(m) || grid(m.x, m.y, size)));
+    }
+    return seen.length ? seen.slice(0, 8).join(', ') : 'Nothing on the map right now.';
+  }
+
+  if(name === 'devices'){
+    if(!devices.length) return 'No devices paired.';
+    return devices.map(d => d.name + ': '
+      + (d.on === true ? 'on' : d.on === false ? 'off' : 'unknown')).join(', ');
+  }
+
+  if(name === 'alarms'){
+    if(!alarmLog.length) return 'No alarms have tripped.';
+    return alarmLog.slice(0, 3).map(a =>
+      a.title + ' ' + new Date(a.at).toLocaleTimeString()).join(', ');
+  }
+
+  if(name === 'raid'){
+    const q = (arg || '').trim().toLowerCase();
+    if(!q) return 'Name a target, e.g. !raid sheet metal door';
+    const t = RAID_TARGETS.find(x => x.name.toLowerCase() === q)
+           || RAID_TARGETS.find(x => x.name.toLowerCase().includes(q));
+    if(!t) return 'No target called "' + q + '".';
+    const best = raidSolve(t, { metric:'cheapest' })?.best;
+    if(!best) return t.name + ': no solution.';
+    return t.name + ': ' + raidLoadoutText(best.loadout) + ' — ' + raidNum(best.sulfur) + ' sulfur';
+  }
+  return null;
+}
+
+/**
+ * Looks for commands in the messages just read and answers them.
+ *
+ * Only the tail is considered: on a first connect the whole buffer arrives at once, and
+ * replying to everything anyone has ever typed would be its own kind of spam.
+ */
+async function handleChatCommands(msgs){
+  if(!Session.prefs?.assistant) return;
+  for(const m of (msgs || []).slice(-6)){
+    const text = String(m?.message || '').trim();
+    if(!text.startsWith(CHAT_PREFIX)) continue;
+    if(text.startsWith('[Rustex]')) continue;            // never answer ourselves
+    const key = (m.steamId || '') + ':' + (m.time || '') + ':' + text;
+    if(chatAnswered.has(key)) continue;
+    chatAnswered.add(key);
+    if(chatAnswered.size > 200) chatAnswered.clear();
+
+    const [word, ...rest] = text.slice(CHAT_PREFIX.length).split(/\s+/);
+    const name = (word || '').toLowerCase();
+    if(!CHAT_COMMANDS[name]) continue;                   // not ours; stay quiet
+    if(chatMuted && name !== 'unmute') continue;         // muted answers nothing but !unmute
+    try {
+      const reply = await runChatCommand(name, rest.join(' '));
+      if(reply) await sendTeamMessage('[Rustex] ' + reply);
+    } catch(err){
+      try { await sendTeamMessage('[Rustex] ' + name + ' failed: ' + err.message); } catch {}
+    }
+  }
+}
+
+/** The list, rendered where the chat is, so nobody has to be told what to type. */
+function renderCommandList(){
+  const box = document.getElementById('cmdList');
+  if(!box) return;
+  box.innerHTML = Object.entries(CHAT_COMMANDS).map(([name, c]) =>
+    '<div class="cmd-item"><span class="mono cmd-name">' + CHAT_PREFIX + escapeHtml(name)
+    + (c.args ? ' <span class="cmd-arg">' + escapeHtml(c.args) + '</span>' : '') + '</span>'
+    + '<span class="cmd-help">' + escapeHtml(c.help) + '</span></div>').join('');
+}
+
+function toggleAssistant(el){
+  Session.prefs = { ...(Session.prefs || DEFAULT_PREFS), assistant: !!el.checked };
+  Session.savePrefs?.();
+  if(el.checked) chatMuted = false;
 }
 
 /** Cheap fingerprint of a buffer, to tell a genuinely new message from a repeat poll. */
@@ -7071,6 +7339,6 @@ async function manualPair(btn){
 }
 </script>
 
-<div class="build-stamp">build 2026-08-01 06:25 UTC</div>
+<div class="build-stamp">build 2026-08-01 06:37 UTC</div>
 </body>
 </html>
